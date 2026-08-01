@@ -7,17 +7,49 @@ document.addEventListener('alpine:init', () => {
         open: false,
         scrolled: false,
         activeMatch: initialMatch,
+        scrollSpyEnabled: false,
+        sectionMatches: [
+            { id: 'features', match: 'home#features' },
+            { id: 'workflow', match: 'home#workflow' },
+            { id: 'pricing', match: 'home#pricing' },
+        ],
+        ticking: false,
 
         init() {
+            this.scrollSpyEnabled = this.isHomePath();
             this.syncFromLocation();
             this.onScroll();
-            window.addEventListener('scroll', () => this.onScroll(), { passive: true });
+
+            window.addEventListener(
+                'scroll',
+                () => {
+                    if (this.ticking) {
+                        return;
+                    }
+
+                    this.ticking = true;
+                    window.requestAnimationFrame(() => {
+                        this.onScroll();
+                        this.ticking = false;
+                    });
+                },
+                { passive: true },
+            );
+
             window.addEventListener('hashchange', () => this.syncFromLocation());
+        },
+
+        isHomePath() {
+            const path = window.location.pathname.replace(/\/$/, '') || '/';
+
+            return path === '/' || path === '';
         },
 
         syncFromLocation() {
             const path = window.location.pathname.replace(/\/$/, '') || '/';
             const hash = window.location.hash.replace('#', '');
+
+            this.scrollSpyEnabled = path === '/' || path === '';
 
             if (path === '/about') {
                 this.activeMatch = 'about';
@@ -34,8 +66,12 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
-            if (path === '/' || path === '') {
-                this.activeMatch = hash ? `home#${hash}` : 'home';
+            if (this.scrollSpyEnabled) {
+                if (hash) {
+                    this.activeMatch = `home#${hash}`;
+                }
+
+                this.updateActiveFromScroll();
                 return;
             }
 
@@ -52,6 +88,39 @@ document.addEventListener('alpine:init', () => {
 
         onScroll() {
             this.scrolled = window.scrollY > 16;
+
+            if (this.scrollSpyEnabled) {
+                this.updateActiveFromScroll();
+            }
+        },
+
+        updateActiveFromScroll() {
+            const marker = 120;
+            let current = '';
+
+            for (const section of this.sectionMatches) {
+                const element = document.getElementById(section.id);
+
+                if (!element) {
+                    continue;
+                }
+
+                const top = element.getBoundingClientRect().top;
+
+                if (top - marker <= 0) {
+                    current = section.match;
+                }
+            }
+
+            if (current) {
+                this.activeMatch = current;
+                return;
+            }
+
+            // Near the top of the homepage — no section link active yet.
+            if (window.scrollY < 80) {
+                this.activeMatch = 'home';
+            }
         },
 
         close() {
