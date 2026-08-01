@@ -1,0 +1,13 @@
+<x-layouts.marketing>
+    @include('marketing.partials.hero')
+    @include('marketing.partials.trusted')
+    @include('marketing.partials.features')
+    @include('marketing.partials.showcase')
+    @include('marketing.partials.workflow')
+    @include('marketing.partials.industries')
+    @include('marketing.partials.why-choose')
+    @include('marketing.partials.pricing')
+    @include('marketing.partials.testimonials')
+    @include('marketing.partials.faq')
+    @include('marketing.partials.cta')
+</x-layouts.marketing>

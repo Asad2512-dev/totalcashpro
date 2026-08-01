@@ -1,0 +1,203 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Manrope', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+    /* Deep Navy */
+    --color-navy-50: #f1f5f9;
+    --color-navy-100: #e2e8f0;
+    --color-navy-200: #cbd5e1;
+    --color-navy-700: #1e293b;
+    --color-navy-800: #152033;
+    --color-navy-900: #0f172a;
+    --color-navy-950: #0a1020;
+
+    /* Royal Blue */
+    --color-royal-50: #eff6ff;
+    --color-royal-100: #dbeafe;
+    --color-royal-500: #3b82f6;
+    --color-royal-600: #2563eb;
+    --color-royal-700: #1d4ed8;
+
+    /* Emerald */
+    --color-emerald-50: #ecfdf5;
+    --color-emerald-100: #d1fae5;
+    --color-emerald-500: #10b981;
+    --color-emerald-600: #059669;
+
+    /* Sky */
+    --color-sky-50: #f0f9ff;
+    --color-sky-100: #e0f2fe;
+    --color-sky-400: #38bdf8;
+    --color-sky-500: #0ea5e9;
+
+    /* Surfaces & text */
+    --color-paper: #f8fafc;
+    --color-snow: #ffffff;
+    --color-line: #e5e7eb;
+    --color-ink: #111827;
+    --color-mute: #6b7280;
+
+    /* Status */
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+
+    --shadow-soft: 0 24px 60px -36px rgb(15 23 42 / 0.32);
+    --shadow-lift: 0 18px 40px -28px rgb(15 23 42 / 0.24);
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-paper font-sans text-ink antialiased;
+    }
+
+    ::selection {
+        @apply bg-royal-100 text-navy-900;
+    }
+}
+
+@layer components {
+    .font-display {
+        font-family: var(--font-display);
+    }
+
+    .mesh-hero {
+        background:
+            radial-gradient(ellipse 50% 40% at 10% 15%, rgb(37 99 235 / 0.08), transparent 55%),
+            radial-gradient(ellipse 40% 35% at 90% 10%, rgb(16 185 129 / 0.08), transparent 50%),
+            radial-gradient(ellipse 45% 40% at 70% 90%, rgb(56 189 248 / 0.08), transparent 55%),
+            linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
+    }
+
+    .dot-field {
+        background-image: radial-gradient(rgb(15 23 42 / 0.07) 1px, transparent 1px);
+        background-size: 22px 22px;
+    }
+
+    .hairline {
+        background: linear-gradient(90deg, transparent, rgb(15 23 42 / 0.12), transparent);
+    }
+
+    .btn-ripple {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .btn-ripple::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgb(255 255 255 / 0.28), transparent 42%);
+        opacity: 0;
+        transform: scale(0.6);
+        transition:
+            opacity 420ms ease,
+            transform 420ms ease;
+        pointer-events: none;
+    }
+
+    .btn-ripple:active::after {
+        opacity: 1;
+        transform: scale(1);
+        transition: none;
+    }
+
+    .reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        transition:
+            opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+            transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .float-a {
+        animation: float-a 7.5s ease-in-out infinite;
+    }
+
+    .float-b {
+        animation: float-b 8.5s ease-in-out infinite;
+    }
+
+    .marquee-track {
+        animation: marquee 32s linear infinite;
+    }
+
+    .nav-solid {
+        @apply border-line bg-snow/90 shadow-[0_8px_30px_-20px_rgb(15_23_42_/_0.28)] backdrop-blur-xl;
+    }
+
+    .device-bezel {
+        @apply rounded-[1.4rem] border border-white/60 bg-gradient-to-b from-white to-navy-50 shadow-soft;
+    }
+
+    .pricing-spotlight {
+        background:
+            radial-gradient(ellipse 60% 50% at 50% 0%, rgb(37 99 235 / 0.1), transparent 60%),
+            #f8fafc;
+    }
+}
+
+@keyframes float-a {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+@keyframes float-b {
+    0%,
+    100% {
+        transform: translateY(0) translateX(0);
+    }
+
+    50% {
+        transform: translateY(-8px) translateX(4px);
+    }
+}
+
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .reveal,
+    .float-a,
+    .float-b,
+    .marquee-track {
+        animation: none !important;
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
