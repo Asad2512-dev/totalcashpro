@@ -1,5 +1,5 @@
 <header
-    x-data="siteNav"
+    x-data="siteNav(@js($currentMatch()))"
     class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition duration-300"
     :class="scrolled ? 'nav-solid' : 'bg-transparent'"
 >
@@ -19,16 +19,36 @@
                 @foreach ($links() as $link)
                     <a
                         href="{{ $link['href'] }}"
-                        class="text-sm font-medium text-mute transition hover:text-navy-900"
+                        @click="setMatch(@js($link['match']))"
+                        :class="isActive(@js($link['match']))
+                            ? 'text-sm font-semibold text-navy-900'
+                            : 'text-sm font-medium text-mute transition hover:text-navy-900'"
+                        :aria-current="isActive(@js($link['match'])) ? 'page' : null"
                     >
-                        {{ $link['label'] }}
+                        <span class="relative inline-flex flex-col items-center">
+                            {{ $link['label'] }}
+                            <span
+                                class="mt-1 h-0.5 w-full rounded-full bg-royal-600 transition"
+                                :class="isActive(@js($link['match'])) ? 'opacity-100' : 'opacity-0'"
+                                aria-hidden="true"
+                            ></span>
+                        </span>
                     </a>
                 @endforeach
             </div>
 
             <div class="hidden items-center gap-2 lg:flex">
-                <x-button href="#pricing" variant="ghost" size="sm">Choose Your Plan</x-button>
-                <x-button :href="route('request-access')" variant="primary" size="sm">Request Access</x-button>
+                <x-button href="{{ route('home') }}#pricing" variant="ghost" size="sm">Choose Your Plan</x-button>
+                <x-button
+                    :href="route('request-access')"
+                    variant="primary"
+                    size="sm"
+                    @class([
+                        'ring-2 ring-royal-600/30 ring-offset-2' => request()->routeIs('request-access*'),
+                    ])
+                >
+                    Request Access
+                </x-button>
             </div>
 
             <button
@@ -60,14 +80,17 @@
             @foreach ($links() as $link)
                 <a
                     href="{{ $link['href'] }}"
-                    class="rounded-2xl px-4 py-3 text-sm font-medium text-navy-800 hover:bg-paper"
-                    x-on:click="close()"
+                    @click="setMatch(@js($link['match'])); close()"
+                    :class="isActive(@js($link['match']))
+                        ? 'rounded-2xl bg-royal-50 px-4 py-3 text-sm font-semibold text-royal-700'
+                        : 'rounded-2xl px-4 py-3 text-sm font-medium text-navy-800 hover:bg-paper'"
+                    :aria-current="isActive(@js($link['match'])) ? 'page' : null"
                 >
                     {{ $link['label'] }}
                 </a>
             @endforeach
             <div class="mt-2 flex flex-col gap-2 border-t border-line pt-4">
-                <x-button href="#pricing" variant="outline" class="w-full" x-on:click="close()">Choose Your Plan</x-button>
+                <x-button href="{{ route('home') }}#pricing" variant="outline" class="w-full" x-on:click="close()">Choose Your Plan</x-button>
                 <x-button :href="route('request-access')" variant="primary" class="w-full" x-on:click="close()">Request Access</x-button>
             </div>
         </x-container>

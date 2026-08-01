@@ -19,16 +19,6 @@ final class PageController extends Controller
         ]);
     }
 
-    public function contact(): View
-    {
-        return view('marketing.contact', [
-            'seo' => [
-                'title' => 'Contact TotalCashPro',
-                'description' => 'Get in touch with the TotalCashPro team to book a demo or ask about restaurant and retail operations software.',
-            ],
-        ]);
-    }
-
     public function privacy(): View
     {
         return view('marketing.privacy', [

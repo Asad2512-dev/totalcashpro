@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Marketing\AccessRequestController;
+use App\Http\Controllers\Marketing\ContactController;
 use App\Http\Controllers\Marketing\HomeController;
 use App\Http\Controllers\Marketing\PageController;
 use Illuminate\Support\Facades\Route;
@@ -11,9 +12,13 @@ Route::get('/', HomeController::class)->name('home');
 
 Route::controller(PageController::class)->group(function (): void {
     Route::get('/about', 'about')->name('about');
-    Route::get('/contact', 'contact')->name('contact');
     Route::get('/privacy', 'privacy')->name('privacy');
     Route::get('/terms', 'terms')->name('terms');
+});
+
+Route::controller(ContactController::class)->group(function (): void {
+    Route::get('/contact', 'create')->name('contact');
+    Route::post('/contact', 'store')->name('contact.store');
 });
 
 Route::controller(AccessRequestController::class)->group(function (): void {

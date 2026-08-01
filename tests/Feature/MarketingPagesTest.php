@@ -71,9 +71,32 @@ final class MarketingPagesTest extends TestCase
     public function test_static_marketing_pages_render_successfully(): void
     {
         $this->get(route('about'))->assertOk()->assertSee('£19.99/month', false);
-        $this->get(route('contact'))->assertOk()->assertSee('Contact', false);
+        $this->get(route('contact'))
+            ->assertOk()
+            ->assertSee('Send a message', false)
+            ->assertSee('What we can help with', false)
+            ->assertSee('Choosing between Basic', false);
         $this->get(route('privacy'))->assertOk()->assertSee('Privacy Policy', false);
         $this->get(route('terms'))->assertOk()->assertSee('£19.99/month', false);
+    }
+
+    public function test_contact_form_submission(): void
+    {
+        Mail::fake();
+
+        $response = $this->post(route('contact.store'), [
+            'name' => 'Amelia Hart',
+            'email' => 'amelia@example.com',
+            'phone' => '+44 7700 900111',
+            'subject' => 'Plan question',
+            'message' => 'Can you explain the difference between Basic and Professional?',
+        ]);
+
+        $response->assertRedirect(route('contact'));
+        $this->assertDatabaseHas('contact_messages', [
+            'email' => 'amelia@example.com',
+            'subject' => 'Plan question',
+        ]);
     }
 
     public function test_purchase_placeholders_redirect_to_request_access(): void
