@@ -14,7 +14,8 @@
 /.zed
 /auth.json
 /node_modules
-/public/build
+# Track compiled Vite assets so Hostinger shared hosting can deploy without Node.
+# /public/build
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
