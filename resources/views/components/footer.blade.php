@@ -11,7 +11,7 @@
                 <p class="mt-5 text-sm leading-relaxed text-white/70">
                     {{ brand_tagline() }}
                 </p>
-                <p class="mt-4 text-sm font-semibold text-[#38BDF8]">£29 one-time · No monthly fees</p>
+                <p class="mt-4 text-sm font-semibold text-[#38BDF8]">From £19.99/month · Cloud SaaS</p>
                 <div class="mt-6 flex items-center gap-2">
                     @foreach (config('totalcashpro.social') as $network => $url)
                         <a
@@ -31,7 +31,7 @@
                     <li><a class="transition hover:text-white" href="{{ route('home') }}#features">Features</a></li>
                     <li><a class="transition hover:text-white" href="{{ route('home') }}#showcase">Product</a></li>
                     <li><a class="transition hover:text-white" href="{{ route('home') }}#pricing">Pricing</a></li>
-                    <li><a class="transition hover:text-white" href="{{ route('home') }}#buy">Buy Now</a></li>
+                    <li><a class="transition hover:text-white" href="{{ route('request-access') }}">Request Access</a></li>
                 </ul>
             </div>
 
@@ -65,7 +65,7 @@
 
         <div class="mt-14 flex flex-col gap-3 border-t border-white/15 pt-6 text-sm text-white/55 sm:flex-row sm:items-center sm:justify-between">
             <p>&copy; {{ date('Y') }} {{ brand_name() }}. All rights reserved.</p>
-            <p>One-time license software for restaurants and retail.</p>
+            <p>Cloud SaaS for restaurants and retail businesses.</p>
         </div>
     </x-container>
 </footer>

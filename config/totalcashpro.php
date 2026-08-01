@@ -6,9 +6,9 @@ return [
 
     'name' => env('APP_NAME', 'TotalCashPro'),
 
-    'tagline' => 'Complete Restaurant & Retail Operations Platform',
+    'tagline' => 'Cloud restaurant & retail operations software.',
 
-    'alt_tagline' => 'One payment. Unlimited business operations.',
+    'alt_tagline' => 'Manage cash, staff, inventory and reports in one secure dashboard.',
 
     'domain' => env('APP_URL', 'https://totalcashpro.com'),
 
@@ -16,22 +16,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Licensing
+    | Subscriptions
     |--------------------------------------------------------------------------
     */
 
     'pricing' => [
-        'amount' => '£29',
-        'label' => 'Lifetime License',
-        'badge' => 'One-Time Payment',
+        'model' => 'monthly_subscription',
         'currency' => 'GBP',
-        'model' => 'one_time',
+        'basic' => [
+            'amount' => '£19.99',
+            'period' => '/month',
+            'label' => 'Basic Plan',
+        ],
+        'professional' => [
+            'amount' => '£29.99',
+            'period' => '/month',
+            'label' => 'Professional Plan',
+            'popular' => 'MOST POPULAR',
+        ],
     ],
 
     'seo' => [
-        'title' => 'TotalCashPro — Restaurant & Retail Software for £29',
-        'description' => 'TotalCashPro is professional restaurant and retail management software for £29 one-time. Cash up, attendance, payroll, inventory, suppliers, reports, and role management — no monthly fees.',
-        'keywords' => 'restaurant software, retail management, cash up, payroll, inventory, attendance, one-time license, TotalCashPro',
+        'title' => 'TotalCashPro — Cloud Restaurant & Retail Software',
+        'description' => 'TotalCashPro is cloud SaaS for restaurants and retail. Basic £19.99/month or Professional £29.99/month. Request access — accounts are reviewed and created by our team.',
+        'keywords' => 'restaurant software, retail management, cash up, payroll, inventory, attendance, SaaS, monthly subscription, TotalCashPro',
         'og_image' => '/images/og-default.svg',
         'twitter_handle' => '@totalcashpro',
     ],

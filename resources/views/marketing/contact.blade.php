@@ -3,10 +3,10 @@
         <x-container class="max-w-3xl">
             <x-badge>Contact</x-badge>
             <h1 class="mt-5 font-display text-4xl font-extrabold tracking-[-0.03em] text-navy-900 sm:text-5xl">
-                Questions before you buy?
+                Questions before you request access?
             </h1>
             <p class="mt-6 text-lg leading-relaxed text-mute">
-                Ask about the Lifetime License, features, or whether TotalCashPro fits your restaurant or retail business.
+                Ask about Basic or Professional, the request process, or whether TotalCashPro fits your restaurant or retail business.
             </p>
         </x-container>
     </section>
@@ -17,7 +17,7 @@
                 <x-card :hover="false">
                     <h2 class="font-display text-2xl font-bold text-navy-900">Get in touch</h2>
                     <p class="mt-3 leading-relaxed text-mute">
-                        Checkout will be connected in a later phase. For now, email us and we will help you with license questions.
+                        Prefer email first? Contact us and we will help you decide which plan to request.
                     </p>
                     <div class="mt-8 space-y-4 text-sm">
                         <div>
@@ -27,13 +27,13 @@
                             </a>
                         </div>
                         <div>
-                            <p class="font-semibold text-navy-900">License price</p>
-                            <p class="text-mute">£29 one-time · No subscriptions</p>
+                            <p class="font-semibold text-navy-900">Subscription prices</p>
+                            <p class="text-mute">Basic £19.99/month · Professional £29.99/month</p>
                         </div>
                     </div>
                     <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                         <x-button href="mailto:{{ config('totalcashpro.support_email') }}" variant="primary">Email TotalCashPro</x-button>
-                        <x-button href="{{ route('home') }}#buy" variant="secondary">View Pricing</x-button>
+                        <x-button href="{{ route('request-access') }}" variant="secondary">Request Access</x-button>
                     </div>
                 </x-card>
 
@@ -42,15 +42,15 @@
                     <ul class="mt-6 space-y-4 text-sm text-white/70">
                         <li class="flex gap-3">
                             <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400"></span>
-                            Confirming what is included in the £29 Lifetime License.
+                            Choosing between Basic (£19.99/month) and Professional (£29.99/month).
                         </li>
                         <li class="flex gap-3">
                             <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400"></span>
-                            Understanding whether TotalCashPro fits your daily operations.
+                            Explaining how the request and account setup process works.
                         </li>
                         <li class="flex gap-3">
                             <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400"></span>
-                            Support questions after you purchase.
+                            Support questions after your account has been created.
                         </li>
                     </ul>
                 </x-card>

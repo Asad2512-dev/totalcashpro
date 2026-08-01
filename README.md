@@ -16,7 +16,7 @@ This repository currently ships:
 - Reusable Blade component library
 - SEO essentials (`robots.txt`, sitemap placeholder, Open Graph, schema-ready layout)
 
-Pricing model: **£29 one-time Lifetime License** (no subscriptions).
+Pricing model: **monthly SaaS subscriptions** — Basic **£19.99/month** and Professional **£29.99/month**. Access is requested via form; accounts are created manually after review.
 
 Authentication, SaaS modules, payment checkout, APIs, and domain database tables are intentionally deferred to later phases.
 

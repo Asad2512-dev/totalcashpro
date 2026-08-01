@@ -9,7 +9,7 @@
                     subtitle="Whether you serve tables, pour coffee, or run a shop — TotalCashPro covers the daily work that keeps the business moving."
                 />
                 <div class="mt-8">
-                    <x-button href="#buy" variant="primary">Buy Now – £29</x-button>
+                    <x-button href="{{ route('request-access') }}" variant="primary">Request Access</x-button>
                 </div>
             </div>
 

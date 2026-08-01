@@ -5,12 +5,12 @@
                 <x-section-title
                     align="left"
                     eyebrow="Features"
-                    title="Everything you need to run the day."
-                    subtitle="Cash up, staff time, inventory, suppliers, payroll, and reports — included in one Lifetime License."
+                    title="Everything you need — clearly labelled by plan."
+                    subtitle="Basic covers cash, staff and daily reports. Professional adds inventory, payroll, unlimited staff and more."
                 />
             </div>
             <p class="max-w-xl text-sm leading-relaxed text-mute lg:justify-self-end lg:text-right" data-reveal>
-                Clear tools for restaurant and retail owners who want practical software without monthly fees.
+                Each feature shows whether it is included in Basic or available on Professional only — so you know exactly what you are requesting.
             </p>
         </div>
 
@@ -20,6 +20,8 @@
                     :title="$feature['title']"
                     :description="$feature['description']"
                     :icon="$feature['icon']"
+                    :plan="$feature['plan']"
+                    :plan-label="$feature['planLabel']"
                 />
             @endforeach
         </div>

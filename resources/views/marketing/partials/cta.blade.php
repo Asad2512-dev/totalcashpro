@@ -12,26 +12,26 @@
 
             <div class="relative mx-auto max-w-3xl text-center">
                 <p class="font-display text-[11px] font-bold uppercase tracking-[0.22em] text-[#38BDF8]">
-                    Ready when you are
+                    Request your account
                 </p>
                 <h2 id="cta-heading" class="mt-4 font-display text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-4xl lg:text-5xl">
-                    Ready to simplify your business?
+                    Ready to request access?
                 </h2>
                 <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-                    Get cash up, attendance, inventory, payroll, and reports in one Lifetime License for £29. No monthly fees. No contracts.
+                    Choose Basic or Professional, submit your business request, and our team will review it before creating your account. No free trial. No instant signup.
                 </p>
                 <div class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
                     <a
-                        href="#buy"
-                        class="btn-ripple inline-flex items-center justify-center rounded-2xl bg-[#2563EB] px-6 py-3.5 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#1D4ED8]"
+                        href="{{ route('request-access') }}"
+                        class="btn-ripple inline-flex items-center justify-center rounded-2xl bg-[#2563EB] px-6 py-3.5 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#1E40AF]"
                     >
-                        Buy Now – £29
+                        Request Access
                     </a>
                     <a
-                        href="#features"
+                        href="#pricing"
                         class="inline-flex items-center justify-center rounded-2xl border border-white/40 bg-transparent px-6 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
                     >
-                        View Features
+                        Choose Your Plan
                     </a>
                 </div>
             </div>

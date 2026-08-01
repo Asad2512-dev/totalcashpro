@@ -3,8 +3,8 @@
         <div data-reveal>
             <x-section-title
                 eyebrow="Why TotalCashPro"
-                title="Simple software. Fair pricing. Real daily use."
-                subtitle="Built for owners and managers who want reliable operations tools without another subscription."
+                title="Simple cloud software for daily operations."
+                subtitle="Built for owners and managers who want clear tools, reviewed onboarding and flexible monthly plans."
             />
         </div>
 

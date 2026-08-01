@@ -27,8 +27,8 @@
             </div>
 
             <div class="hidden items-center gap-2 lg:flex">
-                <x-button :href="route('login')" variant="ghost" size="sm">Login</x-button>
-                <x-button href="#buy" variant="primary" size="sm">Buy Now – £29</x-button>
+                <x-button href="#pricing" variant="ghost" size="sm">Choose Your Plan</x-button>
+                <x-button :href="route('request-access')" variant="primary" size="sm">Request Access</x-button>
             </div>
 
             <button
@@ -67,8 +67,8 @@
                 </a>
             @endforeach
             <div class="mt-2 flex flex-col gap-2 border-t border-line pt-4">
-                <x-button :href="route('login')" variant="outline" class="w-full" x-on:click="close()">Login</x-button>
-                <x-button href="#buy" variant="primary" class="w-full" x-on:click="close()">Buy Now – £29</x-button>
+                <x-button href="#pricing" variant="outline" class="w-full" x-on:click="close()">Choose Your Plan</x-button>
+                <x-button :href="route('request-access')" variant="primary" class="w-full" x-on:click="close()">Request Access</x-button>
             </div>
         </x-container>
     </div>

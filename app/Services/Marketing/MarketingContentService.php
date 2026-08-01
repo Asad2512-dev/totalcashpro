@@ -17,10 +17,10 @@ final class MarketingContentService implements ServiceInterface
     public function heroStats(): array
     {
         return [
-            ['value' => '£29', 'label' => 'One-time price'],
-            ['value' => '12+', 'label' => 'Core tools included'],
-            ['value' => '0', 'label' => 'Monthly fees'],
-            ['value' => '1', 'label' => 'Simple license'],
+            ['value' => '£19.99', 'label' => 'Basic / month'],
+            ['value' => '£29.99', 'label' => 'Pro / month'],
+            ['value' => 'Cloud', 'label' => 'Secure SaaS'],
+            ['value' => '24h', 'label' => 'Request review'],
         ];
     }
 
@@ -31,33 +31,120 @@ final class MarketingContentService implements ServiceInterface
     {
         return [
             'Restaurants',
+            'Cafés',
+            'Takeaways',
+            'Food Trucks',
             'Retail',
-            'Cafe',
-            'Salon',
-            'Bakery',
-            'Pharmacy',
-            'Mini Mart',
+            'Salons',
+            'Bakeries',
+            'Pharmacies',
         ];
     }
 
     /**
-     * @return list<array{title: string, description: string, icon: string}>
+     * @return list<array{title: string, description: string, icon: string, plan: string, planLabel: string}>
      */
     public function features(): array
     {
         return [
-            ['title' => 'Cash Up', 'description' => 'Close each shift with a guided cash reconciliation process and a clear record of what happened.', 'icon' => 'cash'],
-            ['title' => 'Attendance', 'description' => 'Keep accurate staff attendance records that are ready when you need payroll or reports.', 'icon' => 'attendance'],
-            ['title' => 'Clock In', 'description' => 'Let staff start shifts quickly with a simple clock-in flow designed for busy floors.', 'icon' => 'clock-in'],
-            ['title' => 'Clock Out', 'description' => 'End shifts cleanly and keep time records organised for managers and payroll.', 'icon' => 'clock-out'],
-            ['title' => 'Payroll', 'description' => 'Turn attendance into payroll-ready summaries without juggling separate spreadsheets.', 'icon' => 'payroll'],
-            ['title' => 'Inventory', 'description' => 'Track stock levels, movements, and low-stock alerts so shelves stay prepared.', 'icon' => 'inventory'],
-            ['title' => 'Suppliers', 'description' => 'Keep supplier details and purchase history in one place for easier ordering.', 'icon' => 'suppliers'],
-            ['title' => 'Reports', 'description' => 'Review daily operations with clear reports that help you see what needs attention.', 'icon' => 'reports'],
-            ['title' => 'Analytics', 'description' => 'Spot trends across cash, labour, and inventory without rebuilding charts by hand.', 'icon' => 'analytics'],
-            ['title' => 'Branches', 'description' => 'Manage more than one location from the same software when your business grows.', 'icon' => 'branches'],
-            ['title' => 'Security', 'description' => 'Protect business data with role-based access and secure handling of sensitive records.', 'icon' => 'security'],
-            ['title' => 'Role Management', 'description' => 'Give owners, managers, and staff the access they need — and nothing they do not.', 'icon' => 'roles'],
+            [
+                'title' => 'Dashboard',
+                'description' => 'See cash, staff and daily activity in one clear view when you open the app.',
+                'icon' => 'analytics',
+                'plan' => 'basic',
+                'planLabel' => 'Included in Basic',
+            ],
+            [
+                'title' => 'Daily Cash Up',
+                'description' => 'Close each shift with a guided cash reconciliation and a clear record of the day.',
+                'icon' => 'cash',
+                'plan' => 'basic',
+                'planLabel' => 'Included in Basic',
+            ],
+            [
+                'title' => 'Cash History',
+                'description' => 'Look back at previous cash ups whenever you need to check totals or resolve questions.',
+                'icon' => 'reports',
+                'plan' => 'basic',
+                'planLabel' => 'Included in Basic',
+            ],
+            [
+                'title' => 'Staff Clock In & Out',
+                'description' => 'Let staff start and end shifts quickly with a simple clock-in and clock-out flow.',
+                'icon' => 'clock-in',
+                'plan' => 'basic',
+                'planLabel' => 'Included in Basic',
+            ],
+            [
+                'title' => 'Attendance',
+                'description' => 'Keep accurate attendance records ready for managers and end-of-week reviews.',
+                'icon' => 'attendance',
+                'plan' => 'basic',
+                'planLabel' => 'Included in Basic',
+            ],
+            [
+                'title' => 'Up to 5 Staff Members',
+                'description' => 'Manage a small team with staff profiles, roles and attendance on the Basic plan.',
+                'icon' => 'roles',
+                'plan' => 'basic',
+                'planLabel' => 'Basic',
+            ],
+            [
+                'title' => 'Suppliers & Invoices',
+                'description' => 'Store supplier details and invoices in one place instead of scattered paperwork.',
+                'icon' => 'suppliers',
+                'plan' => 'basic',
+                'planLabel' => 'Included in Basic',
+            ],
+            [
+                'title' => 'Daily Reports',
+                'description' => 'Review daily operations with clear reports that help you see what needs attention.',
+                'icon' => 'reports',
+                'plan' => 'basic',
+                'planLabel' => 'Included in Basic',
+            ],
+            [
+                'title' => 'Unlimited Staff',
+                'description' => 'Add as many team members as you need — no staff limit on Professional.',
+                'icon' => 'roles',
+                'plan' => 'professional',
+                'planLabel' => 'Professional Only',
+            ],
+            [
+                'title' => 'Inventory Management',
+                'description' => 'Track stock levels, categories, adjustments and history so shelves stay prepared.',
+                'icon' => 'inventory',
+                'plan' => 'professional',
+                'planLabel' => 'Professional Only',
+            ],
+            [
+                'title' => 'Staff Rota & Shifts',
+                'description' => 'Plan rotas and shifts so managers know who is working before the day starts.',
+                'icon' => 'attendance',
+                'plan' => 'professional',
+                'planLabel' => 'Professional Only',
+            ],
+            [
+                'title' => 'Payroll & Wages',
+                'description' => 'Turn attendance into payroll-ready summaries without juggling separate spreadsheets.',
+                'icon' => 'payroll',
+                'plan' => 'professional',
+                'planLabel' => 'Professional Only',
+            ],
+            [
+                'title' => 'Multiple Branches',
+                'description' => 'Manage more than one location from the same Professional subscription as you grow.',
+                'icon' => 'branches',
+                'plan' => 'professional',
+                'planLabel' => 'Professional Only',
+            ],
+            [
+                'title' => 'Advanced Reports & Analytics',
+                'description' => 'Export reports, review profit & loss, and spot trends across cash, labour and stock.',
+                'icon' => 'analytics',
+                'plan' => 'professional',
+                'planLabel' => 'Professional Only',
+            ],
         ];
     }
 
@@ -67,12 +154,36 @@ final class MarketingContentService implements ServiceInterface
     public function workflow(): array
     {
         return [
-            ['step' => '01', 'title' => 'Create Business', 'description' => 'Set up your business details and start with a clean operating structure.'],
-            ['step' => '02', 'title' => 'Invite Staff', 'description' => 'Add your team and assign roles that match how you run the floor.'],
-            ['step' => '03', 'title' => 'Daily Operations', 'description' => 'Handle clock-ins, stock checks, and supplier tasks as the day unfolds.'],
-            ['step' => '04', 'title' => 'Cash Up', 'description' => 'Close each shift with a guided reconciliation your team can follow.'],
-            ['step' => '05', 'title' => 'Reports', 'description' => 'Review daily reports to understand cash, attendance, and stock clearly.'],
-            ['step' => '06', 'title' => 'Growth', 'description' => 'Keep using the same license as your operations become more organised.'],
+            [
+                'step' => '01',
+                'title' => 'Choose Your Plan',
+                'description' => 'Select Basic or Professional based on the tools your business needs.',
+            ],
+            [
+                'step' => '02',
+                'title' => 'Submit Business Request',
+                'description' => 'Complete the Request Access form with your business details.',
+            ],
+            [
+                'step' => '03',
+                'title' => 'Our Team Reviews Your Request',
+                'description' => 'A TotalCashPro super admin reviews every submission carefully.',
+            ],
+            [
+                'step' => '04',
+                'title' => 'Account Created by TotalCashPro',
+                'description' => 'We manually create your organisation and admin account.',
+            ],
+            [
+                'step' => '05',
+                'title' => 'Login Credentials Sent',
+                'description' => 'You receive secure login details by email when your account is ready.',
+            ],
+            [
+                'step' => '06',
+                'title' => 'Start Managing Your Business',
+                'description' => 'Log in and begin using cash up, staff tools, reports and more.',
+            ],
         ];
     }
 
@@ -82,14 +193,14 @@ final class MarketingContentService implements ServiceInterface
     public function industries(): array
     {
         return [
-            ['title' => 'Restaurants', 'description' => 'Keep cash close, staff time, and inventory organised across service periods.', 'accent' => 'royal'],
-            ['title' => 'Coffee Shops', 'description' => 'Manage busy shifts with clear attendance, stock, and end-of-day totals.', 'accent' => 'emerald'],
-            ['title' => 'Retail Stores', 'description' => 'Bring staffing, suppliers, and reporting into one practical system.', 'accent' => 'sky'],
-            ['title' => 'Pharmacies', 'description' => 'Maintain accountable workflows with clear roles and operational records.', 'accent' => 'royal'],
-            ['title' => 'Salons', 'description' => 'Track teams, attendance, and day-to-day operations without extra tools.', 'accent' => 'emerald'],
-            ['title' => 'Food Trucks', 'description' => 'Run lean operations with software that stays simple on the move.', 'accent' => 'sky'],
-            ['title' => 'Convenience Stores', 'description' => 'Simplify cash and stock visibility for fast-moving retail days.', 'accent' => 'royal'],
-            ['title' => 'Bakeries', 'description' => 'Keep ingredients, staff time, and closing routines under control.', 'accent' => 'emerald'],
+            ['title' => 'Restaurants', 'description' => 'Keep cash close, staff time and daily reports organised across service periods.', 'accent' => 'royal'],
+            ['title' => 'Cafés', 'description' => 'Manage busy shifts with clear attendance, cash ups and end-of-day totals.', 'accent' => 'emerald'],
+            ['title' => 'Takeaways', 'description' => 'Close the till cleanly and keep supplier invoices where you can find them.', 'accent' => 'sky'],
+            ['title' => 'Food Trucks', 'description' => 'Run lean operations with cloud software that stays simple on the move.', 'accent' => 'royal'],
+            ['title' => 'Retail Stores', 'description' => 'Bring staffing, suppliers and reporting into one practical system.', 'accent' => 'emerald'],
+            ['title' => 'Pharmacies', 'description' => 'Maintain accountable workflows with secure login and clear daily records.', 'accent' => 'sky'],
+            ['title' => 'Salons', 'description' => 'Track teams, attendance and day-to-day operations without extra tools.', 'accent' => 'royal'],
+            ['title' => 'Bakeries', 'description' => 'Keep staff time, closing routines and supplier records under control.', 'accent' => 'emerald'],
         ];
     }
 
@@ -99,43 +210,139 @@ final class MarketingContentService implements ServiceInterface
     public function whyChoose(): array
     {
         return [
-            ['title' => 'One-Time Payment', 'description' => 'Pay £29 once. There are no monthly fees, yearly renewals, or hidden charges.', 'icon' => 'affordable'],
-            ['title' => 'Built for Real Businesses', 'description' => 'Designed for restaurant and retail owners who need practical daily tools.', 'icon' => 'easy'],
-            ['title' => 'Complete Operations Toolkit', 'description' => 'Cash up, attendance, inventory, suppliers, payroll prep, and reports in one license.', 'icon' => 'reports'],
-            ['title' => 'Simple to Set Up', 'description' => 'Create your business, invite staff, and begin using core workflows without a long project.', 'icon' => 'fast'],
-            ['title' => 'Role-Based Security', 'description' => 'Control who can see and change sensitive business information.', 'icon' => 'security'],
-            ['title' => 'Clear Daily Reports', 'description' => 'Understand cash, staff, and inventory with reports that are easy to read.', 'icon' => 'analytics'],
-            ['title' => 'Reliable Daily Use', 'description' => 'Built for busy trading hours when your team needs software that stays out of the way.', 'icon' => 'reliable'],
-            ['title' => 'Free Updates in Version Cycle', 'description' => 'Receive updates during the current version cycle after you purchase your license.', 'icon' => 'cloud'],
+            [
+                'title' => 'Cloud SaaS Access',
+                'description' => 'Use TotalCashPro securely online from desktop, tablet or phone — no local install required.',
+                'icon' => 'cloud',
+            ],
+            [
+                'title' => 'Better Than Spreadsheets',
+                'description' => 'Replace scattered notes and sheets with one secure dashboard your team can use.',
+                'icon' => 'easy',
+            ],
+            [
+                'title' => 'Two Clear Plans',
+                'description' => 'Start with Basic for cash and staff, or choose Professional for inventory, payroll and branches.',
+                'icon' => 'reports',
+            ],
+            [
+                'title' => 'Reviewed Onboarding',
+                'description' => 'There is no instant signup. Our team reviews each request and sets up your account.',
+                'icon' => 'security',
+            ],
+            [
+                'title' => 'Built for Real Businesses',
+                'description' => 'Designed for restaurants, cafés, takeaways and retail — not generic office software.',
+                'icon' => 'fast',
+            ],
+            [
+                'title' => 'Clear Daily Reports',
+                'description' => 'Understand cash and staff activity with reports that are easy to read.',
+                'icon' => 'analytics',
+            ],
+            [
+                'title' => 'Cancel Anytime',
+                'description' => 'Monthly subscriptions stay flexible. Keep access while you need it.',
+                'icon' => 'affordable',
+            ],
+            [
+                'title' => 'Priority Paths Available',
+                'description' => 'Professional includes priority support when your team needs faster help.',
+                'icon' => 'reliable',
+            ],
         ];
     }
 
     /**
-     * @return array{name: string, price: string, badge: string, description: string, cta: string, note: string, features: list<string>}
+     * @return list<array{
+     *     name: string,
+     *     price: string,
+     *     period: string,
+     *     badge: string,
+     *     popularBadge: string|null,
+     *     description: string,
+     *     cta: string,
+     *     features: list<string>,
+     *     assurances: list<string>,
+     *     featured: bool,
+     *     ctaHref: string
+     * }>
      */
-    public function pricingPlan(): array
+    public function pricingPlans(): array
     {
         return [
-            'name' => (string) config('totalcashpro.pricing.label', 'Lifetime License'),
-            'price' => (string) config('totalcashpro.pricing.amount', '£29'),
-            'badge' => (string) config('totalcashpro.pricing.badge', 'One-Time Payment'),
-            'description' => 'Own professional restaurant and retail management software with a single payment.',
-            'cta' => 'Buy Now',
-            'note' => 'No subscriptions. No recurring charges.',
-            'features' => [
-                'Complete Cash Up Management',
-                'Employee Clock In & Clock Out',
-                'Attendance Tracking',
-                'Staff Management',
-                'Inventory Management',
-                'Supplier Management',
-                'Payroll Management',
-                'Daily Reports',
-                'Secure Role Management',
-                'Free Updates During Version Cycle',
-                'Responsive Dashboard',
-                'Easy Setup',
-                'Professional Support',
+            [
+                'name' => 'Basic Plan',
+                'price' => '£19.99',
+                'period' => '/month',
+                'badge' => 'Monthly Subscription',
+                'popularBadge' => null,
+                'description' => 'Perfect for small restaurants, cafés, takeaways and retail businesses.',
+                'cta' => 'Request Basic Plan',
+                'featured' => false,
+                'ctaHref' => route('request-access', ['plan' => 'basic']),
+                'assurances' => [
+                    'Monthly Subscription',
+                    'Secure Cloud Access',
+                    'Cancel Anytime',
+                ],
+                'features' => [
+                    'Dashboard',
+                    'Daily Cash Up',
+                    'Cash History',
+                    'Reports',
+                    'Up to 5 Staff Members',
+                    'Staff Clock In',
+                    'Staff Clock Out',
+                    'Attendance',
+                    'Staff Management',
+                    'Suppliers',
+                    'Supplier Invoices',
+                    'Business Profile',
+                    'Secure Login',
+                    'Daily Reports',
+                    'Email Support',
+                    'Responsive Dashboard',
+                ],
+            ],
+            [
+                'name' => 'Professional Plan',
+                'price' => '£29.99',
+                'period' => '/month',
+                'badge' => 'Monthly Subscription',
+                'popularBadge' => 'MOST POPULAR',
+                'description' => 'Everything included in Basic plus complete business management tools.',
+                'cta' => 'Request Professional Plan',
+                'featured' => true,
+                'ctaHref' => route('request-access', ['plan' => 'professional']),
+                'assurances' => [
+                    'Monthly Subscription',
+                    'Secure Cloud Access',
+                    'Cancel Anytime',
+                ],
+                'features' => [
+                    'Everything in Basic',
+                    'Unlimited Staff',
+                    'Unlimited Reports',
+                    'Inventory Management',
+                    'Inventory Categories',
+                    'Inventory History',
+                    'Stock Count',
+                    'Stock Adjustments',
+                    'Low Stock Alerts',
+                    'Stock Notifications',
+                    'Staff Rota',
+                    'Shift Planning',
+                    'Multiple Branches',
+                    'Advanced Dashboard',
+                    'Profit & Loss Reports',
+                    'Payroll',
+                    'Wages Management',
+                    'Attendance Reports',
+                    'Export Reports',
+                    'Advanced Analytics',
+                    'Priority Support',
+                ],
             ],
         ];
     }
@@ -147,19 +354,19 @@ final class MarketingContentService implements ServiceInterface
     {
         return [
             [
-                'quote' => 'We needed something affordable that covered cash up and staff time. Paying once for TotalCashPro made more sense than another monthly bill.',
+                'quote' => 'We requested access, got our account set up properly, and now cash up and attendance sit in one place for the café.',
                 'name' => 'Amelia Hart',
                 'role' => 'Operations Manager',
                 'business' => 'Northbridge Kitchen',
             ],
             [
-                'quote' => 'Attendance, inventory, and daily reports are finally in one place. The price is clear, and the software does the jobs we actually need.',
+                'quote' => 'Professional covers inventory, payroll and branches. The monthly plan is clear, and the onboarding felt careful rather than rushed.',
                 'name' => 'Daniel Okoye',
                 'role' => 'Owner',
                 'business' => 'Harbour Retail Group',
             ],
             [
-                'quote' => 'Our managers can close the day without chasing spreadsheets. For £29, it was an easy decision for our cafe group.',
+                'quote' => 'Our managers close the day without chasing spreadsheets. Requesting an account and receiving login details by email worked well for us.',
                 'name' => 'Sofia Mendes',
                 'role' => 'Regional Director',
                 'business' => 'Lumen Coffee Co.',
@@ -175,27 +382,35 @@ final class MarketingContentService implements ServiceInterface
         return [
             [
                 'question' => 'How much does TotalCashPro cost?',
-                'answer' => 'TotalCashPro is £29 as a one-time payment. There are no monthly fees, yearly fees, or hidden costs.',
+                'answer' => 'Basic is £19.99 per month. Professional is £29.99 per month. Both are cloud SaaS subscriptions.',
             ],
             [
-                'question' => 'Is this a subscription?',
-                'answer' => 'No. Customers pay once and own the software license. There are no recurring charges.',
+                'question' => 'Can I sign up instantly?',
+                'answer' => 'No. There is no instant registration, automatic account creation or free trial. You submit a request, our team reviews it, then we create your organisation and send login credentials by email.',
             ],
             [
-                'question' => 'What is included in the Lifetime License?',
-                'answer' => 'You get cash up, clock in/out, attendance, staff management, inventory, suppliers, payroll management, daily reports, role management, a responsive dashboard, easy setup, professional support, and free updates during the version cycle.',
+                'question' => 'What is included in the Basic plan?',
+                'answer' => 'Basic includes dashboard, daily cash up, cash history, reports, up to 5 staff, clock in/out, attendance, staff management, suppliers, supplier invoices, business profile, secure login, daily reports, email support and a responsive dashboard.',
+            ],
+            [
+                'question' => 'What is included in the Professional plan?',
+                'answer' => 'Professional includes everything in Basic, plus unlimited staff, unlimited reports, inventory tools, staff rota, shift planning, multiple branches, advanced dashboard, profit & loss, payroll, wages, attendance reports, export reports, advanced analytics and priority support.',
+            ],
+            [
+                'question' => 'How long does account setup take?',
+                'answer' => 'Our team aims to review requests and contact you within 24 hours. Once approved, your organisation and admin account are created manually, then credentials are emailed to you.',
             ],
             [
                 'question' => 'Who is TotalCashPro for?',
-                'answer' => 'It is built for restaurants, coffee shops, retail stores, pharmacies, salons, bakeries, convenience stores, food trucks, and similar businesses that need practical daily operations software.',
+                'answer' => 'It is built for restaurants, cafés, takeaways, food trucks, retail stores, pharmacies, salons, bakeries and similar businesses that need practical daily operations software.',
             ],
             [
-                'question' => 'Do I need technical expertise to get started?',
-                'answer' => 'No. The software is designed for business owners and managers. You can set up your business, invite staff, and begin core workflows without a complex technical project.',
+                'question' => 'Can I cancel anytime?',
+                'answer' => 'Yes. Subscriptions are monthly and can be cancelled anytime. You keep access while your subscription is active.',
             ],
             [
-                'question' => 'Can I see the features before buying?',
-                'answer' => 'Yes. Use View Features on the homepage to review the full toolkit, then purchase the Lifetime License when you are ready.',
+                'question' => 'How do I request access?',
+                'answer' => 'Choose a plan, open the Request Access form, submit your business details, and wait for our team to review your request.',
             ],
         ];
     }

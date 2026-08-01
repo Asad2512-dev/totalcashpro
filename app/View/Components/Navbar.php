@@ -16,7 +16,7 @@ final class Navbar extends Component
     {
         return [
             ['label' => 'Features', 'href' => route('home').'#features'],
-            ['label' => 'Solutions', 'href' => route('home').'#industries'],
+            ['label' => 'How Access Works', 'href' => route('home').'#workflow'],
             ['label' => 'Pricing', 'href' => route('home').'#pricing'],
             ['label' => 'About', 'href' => route('about')],
             ['label' => 'Contact', 'href' => route('contact')],

@@ -24,7 +24,7 @@ final class HomeController extends Controller
             'industries' => $this->marketingContent->industries(),
             'whyChoose' => $this->marketingContent->whyChoose(),
             'testimonials' => $this->marketingContent->testimonials(),
-            'pricingPlan' => $this->marketingContent->pricingPlan(),
+            'pricingPlans' => $this->marketingContent->pricingPlans(),
             'faqs' => $this->marketingContent->faqs(),
         ]);
     }

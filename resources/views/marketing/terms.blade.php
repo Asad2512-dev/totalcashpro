@@ -15,7 +15,7 @@
                 <div>
                     <h2 class="font-display text-xl font-bold text-navy-900">License model</h2>
                     <p class="mt-3">
-                        TotalCashPro is offered as a one-time Lifetime License for £29. There are no monthly or yearly subscription fees described on this marketing website. Final purchase terms will apply at checkout when payment processing is enabled.
+                        TotalCashPro is offered as a cloud SaaS product with monthly subscriptions: Basic (£19.99/month) and Professional (£29.99/month). Access is granted after a business request is reviewed and an account is created by TotalCashPro. Final commercial terms apply when billing is enabled.
                     </p>
                 </div>
                 <div>

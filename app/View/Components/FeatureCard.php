@@ -13,6 +13,8 @@ final class FeatureCard extends Component
         public string $title,
         public string $description,
         public string $icon = 'cash',
+        public string $plan = 'basic',
+        public string $planLabel = 'Included in Basic',
     ) {}
 
     public function render(): View

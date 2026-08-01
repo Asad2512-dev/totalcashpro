@@ -14,7 +14,7 @@ final class PageController extends Controller
         return view('marketing.about', [
             'seo' => [
                 'title' => 'About TotalCashPro — Built for Modern Operations',
-                'description' => 'Learn how TotalCashPro helps restaurants and retail businesses unify cash up, attendance, payroll, inventory, and multi-branch operations.',
+                'description' => 'Learn how TotalCashPro helps restaurants and retail businesses manage cash up, attendance, payroll, inventory and multi-branch operations in the cloud.',
             ],
         ]);
     }

@@ -11,6 +11,7 @@ final class PricingCard extends Component
 {
     /**
      * @param  list<string>  $features
+     * @param  list<string>  $assurances
      */
     public function __construct(
         public string $name,
@@ -19,8 +20,11 @@ final class PricingCard extends Component
         public string $description,
         public array $features,
         public string $cta,
-        public string $note = 'No subscriptions. No recurring charges.',
-        public string $ctaHref = '#buy',
+        public array $assurances = [],
+        public string $period = '/month',
+        public ?string $popularBadge = null,
+        public bool $featured = false,
+        public string $ctaHref = '#',
     ) {}
 
     public function render(): View

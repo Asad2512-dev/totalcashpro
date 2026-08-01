@@ -4,23 +4,23 @@
     <x-container class="relative">
         <div class="grid items-center gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10 xl:gap-16">
             <div class="max-w-xl" data-reveal>
-                <x-badge tone="emerald">One Payment. Unlimited Business Operations.</x-badge>
+                <x-badge tone="emerald">Cloud SaaS for restaurants & retail</x-badge>
 
                 <h1 id="hero-heading" class="mt-5 font-display text-[2.45rem] font-extrabold leading-[1.08] tracking-[-0.04em] text-navy-900 sm:text-5xl lg:text-[3.35rem]">
-                    Own Your Business Software for Just £29
+                    Manage cash, staff and reports from one secure dashboard
                 </h1>
 
                 <p class="mt-5 text-lg font-semibold tracking-tight text-navy-800">
-                    Professional Restaurant & Retail Management Software.
+                    Built for restaurants, cafés, takeaways and retail businesses.
                 </p>
 
                 <p class="mt-4 max-w-lg text-base leading-relaxed text-mute sm:text-lg">
-                    No monthly fees. No contracts. Just one simple payment for cash up, attendance, inventory, payroll, reports, and role management.
+                    Save time, reduce paperwork and keep your business organised. Choose Basic (£19.99/month) or Professional (£29.99/month), then request access — our team creates your account.
                 </p>
 
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <x-button href="#buy" variant="primary" size="lg">Buy Now – £29</x-button>
-                    <x-button href="#features" variant="secondary" size="lg">View Features</x-button>
+                    <x-button href="{{ route('request-access') }}" variant="primary" size="lg">Request Access</x-button>
+                    <x-button href="#pricing" variant="secondary" size="lg">Choose Your Plan</x-button>
                 </div>
 
                 <dl class="mt-10 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-8 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
@@ -46,7 +46,7 @@
                         <span class="h-2 w-2 rounded-full bg-sky-400"></span>
                     </div>
                     <p class="mt-1 font-display text-xl font-extrabold">18 on floor</p>
-                    <p class="mt-1 text-xs text-white/55">3 managers · 15 staff</p>
+                    <p class="mt-1 text-xs text-white/55">Professional · Unlimited</p>
                 </div>
 
                 <div class="relative overflow-hidden rounded-[1.75rem] border border-line bg-snow p-3 shadow-soft sm:p-4">
@@ -56,7 +56,7 @@
                                 <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-royal-600">Operations dashboard</p>
                                 <p class="mt-1 font-display text-lg font-bold text-navy-900">Today’s Overview</p>
                             </div>
-                            <span class="rounded-xl bg-sky-50 px-3 py-1 text-xs font-semibold text-navy-800">Live</span>
+                            <span class="rounded-xl bg-sky-50 px-3 py-1 text-xs font-semibold text-navy-800">Cloud</span>
                         </div>
 
                         <div class="mt-4 grid grid-cols-2 gap-3">

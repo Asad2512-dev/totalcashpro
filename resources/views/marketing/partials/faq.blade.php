@@ -5,8 +5,8 @@
                 <x-section-title
                     align="left"
                     eyebrow="FAQ"
-                    title="Clear answers about price and product."
-                    subtitle="The questions business owners usually ask before buying a Lifetime License."
+                    title="Clear answers about plans and access."
+                    subtitle="What business owners usually ask before requesting a TotalCashPro account."
                 />
             </div>
 

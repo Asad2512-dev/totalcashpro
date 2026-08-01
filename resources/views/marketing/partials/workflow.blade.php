@@ -2,9 +2,9 @@
     <x-container>
         <div data-reveal>
             <x-section-title
-                eyebrow="Business Workflow"
-                title="From setup to daily close."
-                subtitle="A simple operating rhythm your team can follow without extra training overhead."
+                eyebrow="How Access Works"
+                title="From plan choice to your first login."
+                subtitle="TotalCashPro accounts are created manually after review — not through instant registration."
             />
         </div>
 
