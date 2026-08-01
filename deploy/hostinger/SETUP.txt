@@ -1,25 +1,24 @@
-TotalCashPro — Hostinger Deploy Checklist
-========================================
+TotalCashPro — Hostinger Deploy (public_html structure)
+=======================================================
 
 Repo: https://github.com/Asad2512-dev/totalcashpro
 Branch: main
 
-Local (already done before push):
-- npm run build
-- public/build committed (no Node needed on Hostinger)
+Recommended structure (easy git pull):
 
-Server steps:
-1. SSH into Hostinger
-2. Backup public_html
-3. git clone into ~/domains/totalcashpro.com/app
-4. Symlink public_html -> app/public  (or use fallback index.php)
-5. composer install --no-dev --optimize-autoloader
-6. cp .env.example .env and set Hostinger DB + APP_URL
-7. php artisan key:generate
-8. php artisan migrate --force
-9. php artisan storage:link
-10. php artisan config:cache && php artisan route:cache && php artisan view:cache
-11. chmod -R 775 storage bootstrap/cache
+~/domains/totalcashpro.com/public_html/   <-- FULL Laravel project
+  .git/
+  .htaccess        (routes all traffic to /public)
+  index.php
+  app/
+  public/
+  artisan
+  composer.json
+  .env
 
-Stack on server: PHP + MySQL + Apache only.
-No Node.js / npm / Redis required for the marketing site.
+Daily update:
+  cd ~/domains/totalcashpro.com/public_html
+  git pull origin main
+  composer install --no-dev --optimize-autoloader
+  php artisan migrate --force
+  php artisan config:cache
