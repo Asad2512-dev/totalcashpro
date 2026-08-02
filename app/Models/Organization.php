@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\BusinessType;
 use App\Enums\OrganizationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,7 +19,7 @@ final class Organization extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name', 'slug', 'email', 'phone', 'country', 'currency', 'timezone',
+        'name', 'slug', 'email', 'phone', 'country', 'currency', 'timezone', 'business_type',
         'tax_number', 'logo_path', 'opens_at', 'closes_at', 'settings',
         'owner_user_id', 'status', 'trial_starts_at', 'trial_ends_at',
     ];
@@ -27,6 +28,7 @@ final class Organization extends Model
     {
         return [
             'status' => OrganizationStatus::class,
+            'business_type' => BusinessType::class,
             'settings' => 'array',
             'trial_starts_at' => 'datetime',
             'trial_ends_at' => 'datetime',

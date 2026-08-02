@@ -116,7 +116,7 @@
 
                 <div class="mt-8 rounded-2xl border border-gray-200 bg-white p-4 text-sm text-gray-500">
                     <p class="font-semibold text-gray-900">Need an account?</p>
-                    <p class="mt-1">There is no public registration. <a href="{{ route('request-access') }}" class="font-medium text-primary-700 hover:text-primary-800">Request a demo</a> and our team will create your organisation.</p>
+                    <p class="mt-1">New to {{ brand_name() }}? <a href="{{ route('register') }}" class="font-medium text-primary-700 hover:text-primary-800">Start your free trial</a> and create your business in minutes.</p>
                 </div>
 
                 <p class="mt-10 text-center text-xs text-gray-400">

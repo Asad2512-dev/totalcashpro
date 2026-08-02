@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Events\OrganizationRegistered;
+use App\Listeners\LogOrganizationRegistered;
+use App\Listeners\SendWelcomeEmail;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Event::listen(OrganizationRegistered::class, LogOrganizationRegistered::class);
+        Event::listen(OrganizationRegistered::class, SendWelcomeEmail::class);
+
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }

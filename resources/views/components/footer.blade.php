@@ -28,7 +28,7 @@
                     <li><a class="transition hover:text-white" href="{{ route('home') }}#features">Features</a></li>
                     <li><a class="transition hover:text-white" href="{{ route('home') }}#solutions">Solutions</a></li>
                     <li><a class="transition hover:text-white" href="{{ route('home') }}#pricing">Pricing</a></li>
-                    <li><a class="transition hover:text-white" href="{{ route('request-demo') }}">Request Demo</a></li>
+                    <li><a class="transition hover:text-white" href="{{ route('register') }}">Start Free Trial</a></li>
                 </ul>
             </div>
 

@@ -15,12 +15,12 @@
                 </p>
 
                 <p class="mt-4 max-w-lg text-base leading-relaxed text-mute sm:text-lg">
-                    Save time, reduce paperwork and keep your business organised. Choose Basic (£19.99/month) or Professional (£29.99/month), then request access — our team creates your account.
+                    Choose Basic (£19.99/month) or Professional (£29.99/month), then start your free 14-day trial instantly.
                 </p>
 
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <x-button href="{{ route('request-demo') }}" variant="primary" size="lg">Request Demo</x-button>
-                    <x-button href="#pricing" variant="secondary" size="lg">Choose Your Plan</x-button>
+                    <x-button href="{{ route('register') }}" variant="primary" size="lg">Start Your Free 14-Day Trial</x-button>
+                    <x-button href="#features" variant="secondary" size="lg">View Features</x-button>
                 </div>
 
                 <dl class="mt-10 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-8 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">

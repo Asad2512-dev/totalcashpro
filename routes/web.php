@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
-use App\Http\Controllers\Marketing\AccessRequestController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Marketing\ContactController;
 use App\Http\Controllers\Marketing\HomeController;
 use App\Http\Controllers\Marketing\PageController as MarketingPageController;
@@ -28,10 +29,20 @@ Route::controller(ContactController::class)->group(function (): void {
 });
 
 Route::controller(AccessRequestController::class)->group(function (): void {
-    Route::get('/request-access', 'create')->name('request-access');
-    Route::get('/request-demo', 'create')->name('request-demo');
-    Route::post('/request-access', 'store')->name('request-access.store');
-    Route::get('/request-access/thanks', 'thanks')->name('request-access.thanks');
+    Route::redirect('/request-access', '/register')->name('request-access');
+    Route::redirect('/request-demo', '/register')->name('request-demo');
+    Route::redirect('/request-access/thanks', '/register')->name('request-access.thanks');
+});
+
+Route::middleware('guest')->controller(RegisterController::class)->group(function (): void {
+    Route::get('/register', 'create')->name('register');
+    Route::post('/register', 'store')->name('register.store');
+});
+
+Route::middleware('auth')->controller(VerifyEmailController::class)->group(function (): void {
+    Route::get('/email/verify', 'notice')->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', 'verify')->middleware('signed')->name('verification.verify');
+    Route::post('/email/verification-notification', 'send')->middleware('throttle:6,1')->name('verification.send');
 });
 
 Route::middleware('guest')->controller(LoginController::class)->group(function (): void {
@@ -50,7 +61,7 @@ Route::post('/logout', [LoginController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-Route::redirect('/get-started', '/request-demo')->name('register');
+Route::redirect('/get-started', '/register');
 Route::redirect('/buy', '/#pricing')->name('buy');
 
 Route::prefix('super-admin')
@@ -61,6 +72,18 @@ Route::prefix('super-admin')
 Route::prefix('business-admin')
     ->name('business-admin.')
     ->middleware(['auth', 'business_admin', 'org_active'])
+    ->group(function (): void {
+        Route::get('/onboarding', [\App\Http\Controllers\BusinessAdmin\OnboardingController::class, 'show'])->name('onboarding');
+        Route::post('/onboarding', [\App\Http\Controllers\BusinessAdmin\OnboardingController::class, 'store'])->name('onboarding.store');
+        Route::post('/onboarding/skip', [\App\Http\Controllers\BusinessAdmin\OnboardingController::class, 'skip'])->name('onboarding.skip');
+
+        Route::get('/subscription/choose-plan', [\App\Http\Controllers\BusinessAdmin\PlanSelectionController::class, 'create'])->name('subscription.choose-plan');
+        Route::post('/subscription/choose-plan', [\App\Http\Controllers\BusinessAdmin\PlanSelectionController::class, 'store'])->name('subscription.choose-plan.store');
+    });
+
+Route::prefix('business-admin')
+    ->name('business-admin.')
+    ->middleware(['auth', 'business_admin', 'org_active', 'plan_selected', 'onboarding_complete'])
     ->group(base_path('routes/business-admin.php'));
 
 Route::prefix('staff')

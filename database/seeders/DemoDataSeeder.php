@@ -151,6 +151,7 @@ final class DemoDataSeeder extends Seeder
                     'role_id' => $adminRole?->id,
                     'status' => 'active',
                     'email_verified_at' => now()->subDays(20 - $index),
+                    'onboarding_completed_at' => now()->subDays(20 - $index),
                 ],
             );
 

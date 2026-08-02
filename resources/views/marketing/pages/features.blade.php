@@ -24,7 +24,7 @@
                 @endforeach
             </div>
             <div class="mt-12 flex flex-col gap-3 sm:flex-row">
-                <x-button href="{{ route('request-demo') }}" variant="primary">Request Demo</x-button>
+                <x-button href="{{ route('register') }}" variant="primary">Get Started</x-button>
                 <x-button href="{{ route('pricing') }}" variant="secondary">View Pricing</x-button>
             </div>
         </x-container>

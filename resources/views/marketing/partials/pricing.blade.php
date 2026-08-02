@@ -8,7 +8,7 @@
                 Choose your plan
             </h2>
             <p class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[#6B7280] sm:text-lg">
-                Monthly cloud subscriptions for restaurants and retail. Request access — accounts are reviewed and created by our team.
+                Monthly cloud subscriptions for restaurants and retail. Start with a 14-day Professional trial — no setup fees.
             </p>
         </div>
 
@@ -31,7 +31,7 @@
         </div>
 
         <p class="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-[#6B7280]" data-reveal>
-            There is no free trial and no instant signup. Submit a request, and we will review it before creating your account.
+            ✔ 14-Day Free Trial · ✔ No Setup Fees · ✔ Cancel Anytime
         </p>
     </x-container>
 </section>

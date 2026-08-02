@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Models\AccessRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -21,7 +20,7 @@ final class MarketingPagesTest extends TestCase
         $response->assertSee('TotalCashPro', false);
         $response->assertSee('Basic Plan', false);
         $response->assertSee('Professional Plan', false);
-        $response->assertSee('Request Demo', false);
+        $response->assertSee('Start Your Free 14-Day Trial', false);
     }
 
     public function test_marketing_section_routes_redirect_to_home_anchors(): void
@@ -31,29 +30,11 @@ final class MarketingPagesTest extends TestCase
         $this->get(route('pricing'))->assertRedirect('/#pricing');
     }
 
-    public function test_request_access_page_and_submission(): void
+    public function test_register_page_renders(): void
     {
-        Mail::fake();
-
-        $this->get(route('request-demo', ['plan' => 'professional']))
+        $this->get(route('register'))
             ->assertOk()
-            ->assertSee('Request Access', false);
-
-        $response = $this->post(route('request-access.store'), [
-            'business_name' => 'Harbour Retail',
-            'owner_name' => 'Daniel Okoye',
-            'email' => 'daniel@example.com',
-            'phone' => '+44 7700 900123',
-            'business_address' => '12 Harbour Road',
-            'country' => 'United Kingdom',
-            'business_type' => 'Retail Store',
-            'number_of_employees' => '6-15',
-            'selected_plan' => 'professional',
-            'additional_notes' => 'Two branches',
-        ]);
-
-        $response->assertRedirect(route('request-access.thanks'));
-        $this->assertSame(1, AccessRequest::query()->count());
+            ->assertSee('Start My Free Trial', false);
     }
 
     public function test_login_page_renders(): void

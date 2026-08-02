@@ -160,6 +160,7 @@ final class BusinessAdminPanelTest extends TestCase
             'organization_id' => $organization->id,
             'status' => 'active',
             'email_verified_at' => now(),
+            'onboarding_completed_at' => now(),
         ]);
 
         $organization->update(['owner_user_id' => $admin->id]);

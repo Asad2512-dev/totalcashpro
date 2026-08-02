@@ -17,8 +17,8 @@
                     Choose Basic or Professional, submit your business request, and our team will review it before creating your account.
                 </p>
                 <div class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                    <a href="{{ route('request-demo') }}" class="btn-ripple inline-flex items-center justify-center rounded-2xl bg-primary-600 px-6 py-3.5 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-700">
-                        Request Demo
+                    <a href="{{ route('register') }}" class="btn-ripple inline-flex items-center justify-center rounded-2xl bg-primary-600 px-6 py-3.5 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-700">
+                        Start Free Trial
                     </a>
                     <a href="#pricing" class="inline-flex items-center justify-center rounded-2xl border border-white/40 bg-transparent px-6 py-3.5 text-base font-semibold text-white transition hover:bg-white/10">
                         Choose Your Plan

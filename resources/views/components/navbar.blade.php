@@ -33,7 +33,7 @@
 
             <div class="hidden items-center gap-2 lg:flex">
                 <x-button :href="route('login')" variant="ghost" size="sm">Login</x-button>
-                <x-button :href="route('request-demo')" variant="primary" size="sm">Request Demo</x-button>
+                <x-button :href="route('register')" variant="primary" size="sm">Start Free Trial</x-button>
             </div>
 
             <button
@@ -76,7 +76,7 @@
             @endforeach
             <div class="mt-2 flex flex-col gap-2 border-t border-line pt-4">
                 <x-button :href="route('login')" variant="outline" class="w-full" x-on:click="close()">Login</x-button>
-                <x-button :href="route('request-demo')" variant="primary" class="w-full" x-on:click="close()">Request Demo</x-button>
+                <x-button :href="route('register')" variant="primary" class="w-full" x-on:click="close()">Start Free Trial</x-button>
             </div>
         </x-container>
     </div>

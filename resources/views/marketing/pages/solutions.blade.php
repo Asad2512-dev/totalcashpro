@@ -21,7 +21,7 @@
                 @endforeach
             </div>
             <div class="mt-12">
-                <x-button href="{{ route('request-demo') }}" variant="primary">Request Demo</x-button>
+                <x-button href="{{ route('register') }}" variant="primary">Get Started</x-button>
             </div>
         </x-container>
     </section>

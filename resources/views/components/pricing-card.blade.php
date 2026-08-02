@@ -50,7 +50,7 @@
             <span class="font-display text-5xl font-extrabold tracking-tight text-[#111827] sm:text-[3.25rem]">{{ $price }}</span>
             <span class="mb-2 text-base font-semibold text-[#6B7280]">{{ $period }}</span>
         </div>
-        <p class="mt-2 text-sm font-medium text-[#6B7280]">Cloud SaaS · Request access to get started</p>
+        <p class="mt-2 text-sm font-medium text-[#6B7280]">Cloud SaaS · 14-day free trial included</p>
     </div>
 
     <div class="relative flex flex-1 flex-col border-t border-[#E5E7EB] px-7 py-7 sm:px-8">

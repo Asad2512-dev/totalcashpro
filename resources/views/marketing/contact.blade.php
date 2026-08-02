@@ -40,7 +40,7 @@
                         </div>
                         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                             <x-button href="mailto:{{ config('totalcashpro.support_email') }}" variant="primary">Email TotalCashPro</x-button>
-                            <x-button href="{{ route('request-access') }}" variant="secondary">Request Access</x-button>
+                            <x-button href="{{ route('register') }}" variant="secondary">Start Free Trial</x-button>
                         </div>
                     </article>
 

@@ -18,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'staff' => \App\Http\Middleware\EnsureStaff::class,
             'org_active' => \App\Http\Middleware\EnsureOrganizationActive::class,
             'plan_feature' => \App\Http\Middleware\EnsurePlanFeature::class,
+            'onboarding_complete' => \App\Http\Middleware\EnsureOnboardingComplete::class,
+            'plan_selected' => \App\Http\Middleware\EnsurePlanSelected::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('login'));

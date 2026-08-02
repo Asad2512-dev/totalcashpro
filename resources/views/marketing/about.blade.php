@@ -28,7 +28,7 @@
             </x-card>
 
             <div class="flex flex-col gap-3 sm:flex-row">
-                <x-button href="{{ route('request-access') }}" variant="primary">Request Access</x-button>
+                <x-button href="{{ route('register') }}" variant="primary">Start Free Trial</x-button>
                 <x-button href="{{ route('home') }}#pricing" variant="secondary">Choose Your Plan</x-button>
             </div>
         </x-container>

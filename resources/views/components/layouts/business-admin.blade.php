@@ -60,6 +60,12 @@
             </x-admin.topbar>
 
             <main class="admin-fade-in flex-1 px-4 py-6 sm:px-6 lg:px-8">
+                @if ($user && ! $user->hasVerifiedEmail())
+                    <div class="mb-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/40 dark:bg-amber-900/20 dark:text-amber-100">
+                        Please verify your email address.
+                        <a href="{{ route('verification.notice') }}" class="font-semibold underline">Resend verification link</a>
+                    </div>
+                @endif
                 @if (session('status'))
                     <div class="mb-5">
                         <x-admin.alert tone="success">{{ session('status') }}</x-admin.alert>

@@ -28,7 +28,7 @@ final class Navbar extends Component
         return match (true) {
             request()->routeIs('about') => 'about',
             request()->routeIs('contact') => 'contact',
-            request()->routeIs('request-access*'), request()->routeIs('request-demo') => 'request-demo',
+            request()->routeIs('register'), request()->routeIs('register.store') => 'register',
             request()->routeIs('home') => 'home',
             default => '',
         };

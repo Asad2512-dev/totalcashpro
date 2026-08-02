@@ -17,9 +17,9 @@ final class Subscription extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'organization_id', 'plan_id', 'status', 'starts_at', 'ends_at',
+        'organization_id', 'plan_id', 'pending_plan_id', 'status', 'starts_at', 'ends_at',
         'trial_starts_at', 'trial_ends_at', 'current_period_start',
-        'current_period_end', 'cancelled_at',
+        'current_period_end', 'cancelled_at', 'stripe_customer_id', 'stripe_subscription_id',
     ];
 
     protected function casts(): array

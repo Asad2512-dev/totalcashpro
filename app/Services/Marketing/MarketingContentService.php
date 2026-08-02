@@ -17,10 +17,10 @@ final class MarketingContentService implements ServiceInterface
     public function heroStats(): array
     {
         return [
+            ['value' => '14 days', 'label' => 'Free trial'],
             ['value' => '£19.99', 'label' => 'Basic / month'],
             ['value' => '£29.99', 'label' => 'Pro / month'],
-            ['value' => 'Cloud', 'label' => 'Secure SaaS'],
-            ['value' => '24h', 'label' => 'Request review'],
+            ['value' => 'Instant', 'label' => 'Signup'],
         ];
     }
 
@@ -156,33 +156,28 @@ final class MarketingContentService implements ServiceInterface
         return [
             [
                 'step' => '01',
-                'title' => 'Choose Your Plan',
-                'description' => 'Select Basic or Professional based on the tools your business needs.',
+                'title' => 'Create Account',
+                'description' => 'Sign up with your business details and start instantly — no approval wait.',
             ],
             [
                 'step' => '02',
-                'title' => 'Submit Business Request',
-                'description' => 'Complete the Request Access form with your business details.',
+                'title' => 'Verify Email',
+                'description' => 'Confirm your email address to secure your account.',
             ],
             [
                 'step' => '03',
-                'title' => 'Our Team Reviews Your Request',
-                'description' => 'A TotalCashPro super admin reviews every submission carefully.',
+                'title' => 'Create Business',
+                'description' => 'Your organisation and Main Branch are created automatically.',
             ],
             [
                 'step' => '04',
-                'title' => 'Account Created by TotalCashPro',
-                'description' => 'We manually create your organisation and admin account.',
+                'title' => 'Automatic Trial',
+                'description' => 'Enjoy 14 days of Professional features — no payment required.',
             ],
             [
                 'step' => '05',
-                'title' => 'Login Credentials Sent',
-                'description' => 'You receive secure login details by email when your account is ready.',
-            ],
-            [
-                'step' => '06',
-                'title' => 'Start Managing Your Business',
-                'description' => 'Log in and begin using cash up, staff tools, reports and more.',
+                'title' => 'Start Managing',
+                'description' => 'Open your dashboard and run cash up, staff, attendance and more.',
             ],
         ];
     }
@@ -226,8 +221,8 @@ final class MarketingContentService implements ServiceInterface
                 'icon' => 'reports',
             ],
             [
-                'title' => 'Reviewed Onboarding',
-                'description' => 'There is no instant signup. Our team reviews each request and sets up your account.',
+                'title' => 'Instant Signup',
+                'description' => 'Create your account in minutes with a 14-day Professional trial — no manual approval.',
                 'icon' => 'security',
             ],
             [
@@ -278,12 +273,12 @@ final class MarketingContentService implements ServiceInterface
                 'badge' => 'Monthly Subscription',
                 'popularBadge' => null,
                 'description' => 'Perfect for small restaurants, cafés, takeaways and retail businesses.',
-                'cta' => 'Request Basic Plan',
+                'cta' => 'Start Free Trial',
                 'featured' => false,
-                'ctaHref' => route('request-demo', ['plan' => 'basic']),
+                'ctaHref' => route('register'),
                 'assurances' => [
-                    'Monthly Subscription',
-                    'Secure Cloud Access',
+                    '14-Day Free Trial',
+                    'No Setup Fees',
                     'Cancel Anytime',
                 ],
                 'features' => [
@@ -312,12 +307,12 @@ final class MarketingContentService implements ServiceInterface
                 'badge' => 'Monthly Subscription',
                 'popularBadge' => 'MOST POPULAR',
                 'description' => 'Everything included in Basic plus complete business management tools.',
-                'cta' => 'Request Professional Plan',
+                'cta' => 'Start Free Trial',
                 'featured' => true,
-                'ctaHref' => route('request-demo', ['plan' => 'professional']),
+                'ctaHref' => route('register'),
                 'assurances' => [
-                    'Monthly Subscription',
-                    'Secure Cloud Access',
+                    '14-Day Free Trial',
+                    'No Setup Fees',
                     'Cancel Anytime',
                 ],
                 'features' => [
@@ -354,19 +349,19 @@ final class MarketingContentService implements ServiceInterface
     {
         return [
             [
-                'quote' => 'We requested access, got our account set up properly, and now cash up and attendance sit in one place for the café.',
+                'quote' => 'We signed up in minutes, verified email, and had cash up and attendance running the same day.',
                 'name' => 'Amelia Hart',
                 'role' => 'Operations Manager',
                 'business' => 'Northbridge Kitchen',
             ],
             [
-                'quote' => 'Professional covers inventory, payroll and branches. The monthly plan is clear, and the onboarding felt careful rather than rushed.',
+                'quote' => 'The 14-day Professional trial let us test inventory and payroll before choosing a plan.',
                 'name' => 'Daniel Okoye',
                 'role' => 'Owner',
                 'business' => 'Harbour Retail Group',
             ],
             [
-                'quote' => 'Our managers close the day without chasing spreadsheets. Requesting an account and receiving login details by email worked well for us.',
+                'quote' => 'Instant signup, automatic branch setup, and a clear dashboard — exactly what our managers needed.',
                 'name' => 'Sofia Mendes',
                 'role' => 'Regional Director',
                 'business' => 'Lumen Coffee Co.',
@@ -386,7 +381,11 @@ final class MarketingContentService implements ServiceInterface
             ],
             [
                 'question' => 'Can I sign up instantly?',
-                'answer' => 'No. There is no instant registration, automatic account creation or free trial. You submit a request, our team reviews it, then we create your organisation and send login credentials by email.',
+                'answer' => 'Yes. Create your account in minutes, verify your email, and your organisation with a Main Branch and 14-day Professional trial is set up automatically.',
+            ],
+            [
+                'question' => 'Is there a free trial?',
+                'answer' => 'Every new customer receives a 14-day Professional trial with full feature access. No credit card is required at signup.',
             ],
             [
                 'question' => 'What is included in the Basic plan?',
@@ -398,7 +397,7 @@ final class MarketingContentService implements ServiceInterface
             ],
             [
                 'question' => 'How long does account setup take?',
-                'answer' => 'Our team aims to review requests and contact you within 24 hours. Once approved, your organisation and admin account are created manually, then credentials are emailed to you.',
+                'answer' => 'Setup is instant. After registration your business, branch, and trial are created automatically and you can start using the dashboard immediately.',
             ],
             [
                 'question' => 'Who is TotalCashPro for?',
@@ -409,8 +408,8 @@ final class MarketingContentService implements ServiceInterface
                 'answer' => 'Yes. Subscriptions are monthly and can be cancelled anytime. You keep access while your subscription is active.',
             ],
             [
-                'question' => 'How do I request access?',
-                'answer' => 'Choose a plan, open the Request Access form, submit your business details, and wait for our team to review your request.',
+                'question' => 'How do I get started?',
+                'answer' => 'Click Start Free Trial, complete registration, verify your email, and follow the welcome wizard into your Business Admin dashboard.',
             ],
         ];
     }
