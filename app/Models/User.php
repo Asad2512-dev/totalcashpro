@@ -29,6 +29,10 @@ final class User extends Authenticatable
         'branch_id',
         'status',
         'last_login_at',
+        'pin_code',
+        'hourly_rate',
+        'notes',
+        'address',
     ];
 
     protected $hidden = [
@@ -45,6 +49,7 @@ final class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'password' => 'hashed',
+            'hourly_rate' => 'decimal:2',
         ];
     }
 

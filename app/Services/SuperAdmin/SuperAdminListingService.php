@@ -322,7 +322,7 @@ final class SuperAdminListingService implements ServiceInterface
                 'price' => $plan->formattedPrice(),
                 'period' => $plan->formattedPrice() === 'Custom' ? '' : '/'.$plan->billing_interval,
                 'description' => $plan->description ?? '',
-                'features' => $plan->features ?? [],
+                'features' => $plan->marketingBullets(),
                 'featured' => (bool) $plan->is_featured,
                 'is_active' => (bool) $plan->is_active,
             ])->all(),

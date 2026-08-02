@@ -43,4 +43,27 @@ final class Plan extends Model
 
         return '£'.number_format((float) $this->price_monthly, 2);
     }
+
+    /**
+     * Marketing bullet lines for UI cards (supports legacy list + structured features).
+     *
+     * @return list<string>
+     */
+    public function marketingBullets(): array
+    {
+        $features = $this->features ?? [];
+
+        if (isset($features['bullets']) && is_array($features['bullets'])) {
+            return array_values(array_filter(array_map('strval', $features['bullets'])));
+        }
+
+        $bullets = [];
+        foreach ($features as $item) {
+            if (is_string($item) && $item !== '') {
+                $bullets[] = $item;
+            }
+        }
+
+        return $bullets;
+    }
 }

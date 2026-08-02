@@ -19,13 +19,15 @@ final class Organization extends Model
 
     protected $fillable = [
         'name', 'slug', 'email', 'phone', 'country', 'currency', 'timezone',
-        'tax_number', 'owner_user_id', 'status', 'trial_starts_at', 'trial_ends_at',
+        'tax_number', 'logo_path', 'opens_at', 'closes_at', 'settings',
+        'owner_user_id', 'status', 'trial_starts_at', 'trial_ends_at',
     ];
 
     protected function casts(): array
     {
         return [
             'status' => OrganizationStatus::class,
+            'settings' => 'array',
             'trial_starts_at' => 'datetime',
             'trial_ends_at' => 'datetime',
         ];

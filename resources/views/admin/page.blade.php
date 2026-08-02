@@ -71,43 +71,49 @@
         @endif
 
     @elseif (($layout ?? 'table') === 'settings')
-        <div class="grid gap-4 lg:grid-cols-[16rem_1fr]" x-data="adminSettings">
+        @php
+            $settingsTabNames = array_keys($settingsTabs ?? []);
+            $activeSettingsTab = request()->input('tab', $settingsTabNames[0] ?? 'General');
+            if (! in_array($activeSettingsTab, $settingsTabNames, true)) {
+                $activeSettingsTab = $settingsTabNames[0] ?? 'General';
+            }
+            $activeSettingsFields = $settingsTabs[$activeSettingsTab] ?? [];
+        @endphp
+        <div class="grid gap-4 lg:grid-cols-[16rem_1fr]">
             <aside class="admin-card h-fit p-3">
                 <nav class="space-y-1 text-sm">
-                    @foreach (array_keys($settingsTabs ?? []) as $tab)
-                        <button
-                            type="button"
-                            @click="tab = @js($tab)"
-                            :class="tab === @js($tab) ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'"
-                            class="block w-full rounded-xl px-3 py-2.5 text-left font-medium transition"
-                        >{{ $tab }}</button>
+                    @foreach ($settingsTabNames as $tab)
+                        <a
+                            href="{{ route('super-admin.settings', ['tab' => $tab]) }}"
+                            @class([
+                                'block w-full rounded-xl px-3 py-2.5 text-left font-medium transition',
+                                'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300' => $tab === $activeSettingsTab,
+                                'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800' => $tab !== $activeSettingsTab,
+                            ])
+                        >{{ $tab }}</a>
                     @endforeach
                 </nav>
             </aside>
 
-            <div>
-                @foreach (($settingsTabs ?? []) as $tabName => $fields)
-                    <div x-show="tab === @js($tabName)" x-cloak class="admin-slide-up">
-                        <x-admin.card>
-                            <h3 class="font-display text-lg font-bold text-gray-900 dark:text-white">{{ $tabName }} settings</h3>
-                            <p class="mt-1 text-sm text-gray-500">Changes are saved to the database immediately.</p>
-                            <form method="POST" action="{{ route('super-admin.settings.update') }}" class="mt-6 space-y-5">
-                                @csrf
-                                @method('PUT')
-                                <div class="grid gap-4 sm:grid-cols-2">
-                                    @foreach ($fields as $field)
-                                        <x-admin.input
-                                            :label="$field['label']"
-                                            :name="'settings['.$field['group'].']['.$field['key'].']'"
-                                            :value="$field['value']"
-                                        />
-                                    @endforeach
-                                </div>
-                                <x-admin.button type="submit">Save changes</x-admin.button>
-                            </form>
-                        </x-admin.card>
-                    </div>
-                @endforeach
+            <div class="admin-slide-up">
+                <x-admin.card>
+                    <h3 class="font-display text-lg font-bold text-gray-900 dark:text-white">{{ $activeSettingsTab }} settings</h3>
+                    <p class="mt-1 text-sm text-gray-500">Changes are saved to the database immediately.</p>
+                    <form method="POST" action="{{ route('super-admin.settings.update') }}" class="mt-6 space-y-5">
+                        @csrf
+                        @method('PUT')
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            @foreach ($activeSettingsFields as $field)
+                                <x-admin.input
+                                    :label="$field['label']"
+                                    :name="'settings['.$field['group'].']['.$field['key'].']'"
+                                    :value="$field['value']"
+                                />
+                            @endforeach
+                        </div>
+                        <x-admin.button type="submit">Save changes</x-admin.button>
+                    </form>
+                </x-admin.card>
             </div>
         </div>
 

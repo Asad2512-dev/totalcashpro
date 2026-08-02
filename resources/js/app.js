@@ -200,24 +200,15 @@ document.addEventListener('alpine:init', () => {
         commandOpen: false,
         commandQuery: '',
         searchResults: [],
-        // Default expanded; only collapse when user explicitly chose it.
-        collapsed: window.localStorage.getItem('tcp-admin-collapsed') === '1',
+        logoutConfirm: false,
+        collapsed: false,
         dark: window.localStorage.getItem('tcp-admin-theme') === 'dark',
 
         init() {
-            // Recover from a previously broken collapsed/cloak state.
-            if (window.localStorage.getItem('tcp-admin-sidebar-v') !== '2') {
-                window.localStorage.setItem('tcp-admin-collapsed', '0');
-                window.localStorage.setItem('tcp-admin-sidebar-v', '2');
-                this.collapsed = false;
-            }
+            window.localStorage.setItem('tcp-admin-collapsed', '0');
 
             this.$watch('dark', (value) => {
                 window.localStorage.setItem('tcp-admin-theme', value ? 'dark' : 'light');
-            });
-
-            this.$watch('collapsed', (value) => {
-                window.localStorage.setItem('tcp-admin-collapsed', value ? '1' : '0');
             });
 
             this.$watch('commandOpen', (value) => {
@@ -227,12 +218,24 @@ document.addEventListener('alpine:init', () => {
                 }
             });
 
+            this.$el.addEventListener('confirm-logout', () => {
+                this.logoutConfirm = true;
+            });
+
             window.addEventListener('keydown', (event) => {
                 if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
                     event.preventDefault();
                     this.commandOpen = true;
                 }
             });
+        },
+
+        requestLogout() {
+            this.logoutConfirm = true;
+        },
+
+        cancelLogout() {
+            this.logoutConfirm = false;
         },
     }));
 
@@ -251,6 +254,484 @@ document.addEventListener('alpine:init', () => {
         },
         toggleAll(ids) {
             this.selected = this.selected.length === ids.length ? [] : [...ids];
+        },
+    }));
+
+    Alpine.data('cashUpWizard', (config = {}) => ({
+        view: 'cashup',
+        step: Number(config.initialStep || 0),
+        steps: ['Coins', 'Notes', 'Cards', 'Expenses', 'Online'],
+        date: config.initialDate,
+        shift: config.initialShift,
+        coins: config.coins || [],
+        notes: config.notes || [],
+        cards: config.cards || [],
+        refundAmount: config.refundAmount || 0,
+        expenses: config.expenses || [],
+        platforms: config.platforms || [],
+        deductions: config.deductions || [],
+        loading: false,
+        error: false,
+        statusMessage: '',
+        saveUrl: config.saveUrl,
+        deductionsUrl: config.deductionsUrl,
+        csrf: config.csrf,
+
+        money(value) {
+            return '£' + Number(value || 0).toFixed(2);
+        },
+
+        get coinsTotal() {
+            return this.coins.reduce((sum, row) => sum + (Number(row.value) * Number(row.qty || 0)), 0);
+        },
+        get notesTotal() {
+            return this.notes.reduce((sum, row) => {
+                if (row.is_qty) {
+                    return sum + (Number(row.value) * Number(row.qty || 0));
+                }
+                return sum + Number(row.amount || 0);
+            }, 0);
+        },
+        get cardsTotal() {
+            const machines = this.cards.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+            return machines - Number(this.refundAmount || 0);
+        },
+        get expensesTotal() {
+            return this.expenses.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+        },
+        get onlineTotal() {
+            return this.platforms.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+        },
+        get deductionsTotal() {
+            return this.deductions.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+        },
+
+        addCardMachine() {
+            this.cards.push({
+                payment_type: `Card Machine ${this.cards.length + 1}`,
+                type: 'machine',
+                amount: 0,
+            });
+        },
+
+        syncStep() {
+            const url = new URL(window.location.href);
+            url.searchParams.set('step', String(this.step));
+            url.searchParams.set('date', this.date);
+            url.searchParams.set('shift', this.shift);
+            url.searchParams.set('view', 'cashup');
+            window.history.replaceState({}, '', url.toString());
+        },
+
+        reloadForDate() {
+            const params = new URLSearchParams({
+                date: this.date,
+                shift: this.shift,
+                view: new URLSearchParams(window.location.search).get('view') || 'cashup',
+                step: String(this.step || 0),
+            });
+            window.location = `${window.location.pathname}?${params.toString()}`;
+        },
+
+        async postJson(url, body) {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': this.csrf,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (! res.ok) {
+                const error = new Error(data.message || 'Save failed');
+                error.data = data;
+                throw error;
+            }
+            return data;
+        },
+
+        async saveCashUp(overwrite = false) {
+            this.loading = true;
+            this.error = false;
+            this.statusMessage = '';
+
+            const cards = this.cards
+                .filter((row) => Number(row.amount || 0) > 0)
+                .map((row) => ({
+                    payment_type: row.payment_type,
+                    type: 'machine',
+                    amount: Number(row.amount || 0),
+                }));
+            if (Number(this.refundAmount || 0) > 0) {
+                cards.push({
+                    payment_type: 'Refunds',
+                    type: 'refund',
+                    amount: Number(this.refundAmount || 0),
+                });
+            }
+
+            try {
+                await this.postJson(this.saveUrl, {
+                    cashup_date: this.date,
+                    shift: this.shift,
+                    overwrite,
+                    coins: this.coins,
+                    notes: this.notes,
+                    cards,
+                    expenses: this.expenses,
+                    online: this.platforms,
+                });
+                this.statusMessage = 'Cash up saved.';
+            } catch (e) {
+                if (e.data?.code === 'ALREADY_EXISTS' && ! overwrite) {
+                    if (window.confirm('Cash Up already exists for this date and shift. Overwrite it?')) {
+                        return this.saveCashUp(true);
+                    }
+                }
+                this.error = true;
+                this.statusMessage = e.data?.errors?.cashup?.[0] || e.message || 'Unable to save cash up.';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async saveDeductions(overwrite = false) {
+            this.loading = true;
+            this.error = false;
+            this.statusMessage = '';
+
+            try {
+                await this.postJson(this.deductionsUrl, {
+                    cashup_date: this.date,
+                    shift: this.shift,
+                    overwrite,
+                    deductions: this.deductions,
+                });
+                this.statusMessage = 'Platform deductions saved.';
+            } catch (e) {
+                if (e.data?.code === 'ALREADY_EXISTS' && ! overwrite) {
+                    if (window.confirm('Platform deductions already exist for this shift. Overwrite them?')) {
+                        return this.saveDeductions(true);
+                    }
+                }
+                this.error = true;
+                this.statusMessage = e.data?.errors?.cashup?.[0] || e.message || 'Unable to save deductions.';
+            } finally {
+                this.loading = false;
+            }
+        },
+    }));
+
+    Alpine.data('staffClock', (config = {}) => ({
+        state: config.initialState || 'not_checked_in',
+        userName: config.userName || '',
+        hours: config.hours ?? null,
+        breakEndsAt: config.breakEndsAt || null,
+        message: '',
+        statusMessage: '',
+        error: false,
+        loading: false,
+        actionUrl: config.actionUrl,
+        statusUrl: config.statusUrl,
+        csrf: config.csrf,
+
+        init() {
+            this.message = this.stateMessage({
+                state: this.state,
+                break_ends_at: this.breakEndsAt,
+            });
+        },
+
+        stateMessage(data) {
+            if (data.state === 'auto_checked_in' || data.state === 'checked_in') {
+                return 'You are currently clocked in.\nChoose an action below.';
+            }
+            if (data.state === 'on_break') {
+                const ends = data.break_ends_at
+                    ? new Date(data.break_ends_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    : '';
+                return ends ? `You are on break until ${ends}.` : 'You are on break.';
+            }
+            return 'You are not clocked in yet.';
+        },
+
+        async act(action) {
+            if (this.loading) {
+                return;
+            }
+            this.loading = true;
+            this.error = false;
+            this.statusMessage = '';
+            try {
+                const res = await fetch(this.actionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': this.csrf,
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ action }),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (! res.ok) {
+                    throw new Error(data.message || data.errors?.action?.[0] || 'Action failed');
+                }
+                this.state = data.state;
+                this.userName = data.user?.name || this.userName;
+                this.hours = data.hours ?? this.hours;
+                this.breakEndsAt = data.break_ends_at || null;
+                this.message = this.stateMessage(data);
+                this.statusMessage = 'Updated.';
+            } catch (e) {
+                this.error = true;
+                this.statusMessage = e.message || 'Unable to update clock status.';
+            } finally {
+                this.loading = false;
+            }
+        },
+    }));
+
+    Alpine.data('clockKiosk', (config = {}) => ({
+        pin: '',
+        screen: 'pin',
+        state: null,
+        userName: '',
+        message: '',
+        error: false,
+        loading: false,
+        breakEndsAt: null,
+        verifyUrl: config.verifyUrl,
+        actionUrl: config.actionUrl,
+        csrf: config.csrf,
+
+        get availableActions() {
+            if (this.state === 'checked_in' || this.state === 'auto_checked_in') {
+                return [
+                    { id: 'clock-out', label: 'Clock Out' },
+                    { id: 'start-break', label: 'Start Break' },
+                ];
+            }
+            if (this.state === 'on_break') {
+                return [{ id: 'end-break', label: 'End Break' }];
+            }
+            if (this.state === 'not_checked_in') {
+                return [{ id: 'clock-in', label: 'Clock In' }];
+            }
+            return [];
+        },
+
+        press(digit) {
+            if (this.loading || this.pin.length >= 4) {
+                return;
+            }
+            this.pin += String(digit);
+            this.error = false;
+            this.message = '';
+            if (this.pin.length === 4) {
+                this.verify();
+            }
+        },
+
+        backspace() {
+            this.pin = this.pin.slice(0, -1);
+            this.error = false;
+            this.message = '';
+        },
+
+        resetToPin() {
+            this.pin = '';
+            this.screen = 'pin';
+            this.state = null;
+            this.userName = '';
+            this.message = '';
+            this.error = false;
+            this.breakEndsAt = null;
+        },
+
+        stateMessage(data) {
+            if (data.state === 'auto_checked_in') {
+                return 'You have been clocked in automatically.';
+            }
+            if (data.state === 'checked_in') {
+                return 'You are currently clocked in.\nChoose an action below.';
+            }
+            if (data.state === 'on_break') {
+                const ends = data.break_ends_at ? new Date(data.break_ends_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                return ends ? `You are on break until ${ends}.` : 'You are on break.';
+            }
+            if (data.state === 'not_checked_in') {
+                return data.message || 'You are not clocked in yet.';
+            }
+            return 'Choose an action';
+        },
+
+        async verify() {
+            if (this.pin.length !== 4 || this.loading) {
+                return;
+            }
+
+            this.loading = true;
+            this.error = false;
+            this.message = '';
+
+            try {
+                const res = await fetch(this.verifyUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': this.csrf,
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ pin: this.pin }),
+                });
+                const data = await res.json();
+                if (! res.ok) {
+                    throw data;
+                }
+                this.state = data.state;
+                this.userName = data.user?.name || '';
+                this.breakEndsAt = data.break_ends_at || null;
+                this.message = this.stateMessage(data);
+                this.screen = 'action';
+            } catch (e) {
+                this.error = true;
+                this.message = e?.errors?.pin?.[0] || e?.message || 'Invalid PIN.';
+                this.state = null;
+                this.userName = '';
+                this.pin = '';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async act(action) {
+            if (this.pin.length !== 4 || this.loading) {
+                return;
+            }
+
+            this.loading = true;
+            this.error = false;
+
+            try {
+                const res = await fetch(this.actionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': this.csrf,
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ pin: this.pin, action }),
+                });
+                const data = await res.json();
+                if (! res.ok) {
+                    throw data;
+                }
+                this.state = data.state;
+                this.userName = data.user?.name || '';
+                this.breakEndsAt = data.break_ends_at || null;
+
+                if (action === 'clock-out') {
+                    this.message = 'Clocked out' + (data.hours != null ? ` · ${data.hours} hrs` : '');
+                    setTimeout(() => this.resetToPin(), 1800);
+                    return;
+                }
+
+                this.message = this.stateMessage(data);
+            } catch (e) {
+                this.error = true;
+                this.message = e?.errors?.action?.[0] || e?.errors?.pin?.[0] || e?.message || 'Action failed.';
+            } finally {
+                this.loading = false;
+            }
+        },
+    }));
+
+    Alpine.data('rotaBoard', (config = {}) => ({
+        tab: 'weekly',
+        weekStart: config.weekStart,
+        days: config.days || [],
+        staff: config.staff || [],
+        sections: config.sections || [],
+        groups: config.groups || [],
+        morningGrid: config.morningGrid || [],
+        eveningGrid: config.eveningGrid || [],
+        shiftForm: {
+            id: null,
+            user_id: '',
+            shift_date: '',
+            shift_type: 'Morning',
+            rota_section_id: '',
+            start_time: '09:00',
+            end_time: '17:00',
+        },
+        sectionForm: { name: '', color: '#563d7c' },
+        groupForm: { name: '', color: '#007bff', display_order: 0, user_ids: [] },
+
+        calcHours() {
+            if (! this.shiftForm.start_time || ! this.shiftForm.end_time) {
+                return '0.0';
+            }
+            const [sh, sm] = this.shiftForm.start_time.split(':').map(Number);
+            const [eh, em] = this.shiftForm.end_time.split(':').map(Number);
+            let mins = (eh * 60 + em) - (sh * 60 + sm);
+            if (mins <= 0) {
+                mins += 24 * 60;
+            }
+            return (mins / 60).toFixed(1);
+        },
+
+        isOvernight() {
+            if (! this.shiftForm.start_time || ! this.shiftForm.end_time) {
+                return false;
+            }
+            return this.shiftForm.end_time <= this.shiftForm.start_time;
+        },
+
+        openShift(staffId, date, type, existing = null) {
+            const staff = this.staff.find((s) => s.id === staffId);
+            this.shiftForm = {
+                id: existing?.id || null,
+                user_id: staffId,
+                user_name: staff?.name || '',
+                shift_date: date,
+                shift_type: type,
+                rota_section_id: existing?.rota_section_id || (this.sections[0]?.id || ''),
+                start_time: existing?.start_time || (type === 'Morning' ? '09:00' : '17:00'),
+                end_time: existing?.end_time || (type === 'Morning' ? '17:00' : '23:00'),
+            };
+            this.$dispatch('open-modal', 'shift-modal');
+        },
+
+        cellLabel(shift) {
+            if (! shift) {
+                return '';
+            }
+            return `${shift.start_time}-${shift.end_time}`;
+        },
+
+        cellStyle(shift) {
+            if (! shift?.color) {
+                return '';
+            }
+            return `background:${shift.color}22;border-color:${shift.color};color:${shift.color}`;
+        },
+
+        prevWeek() {
+            const d = new Date(this.weekStart + 'T00:00:00');
+            d.setDate(d.getDate() - 7);
+            window.location = `?week=${d.toISOString().slice(0, 10)}`;
+        },
+
+        nextWeek() {
+            const d = new Date(this.weekStart + 'T00:00:00');
+            d.setDate(d.getDate() + 7);
+            window.location = `?week=${d.toISOString().slice(0, 10)}`;
         },
     }));
 });

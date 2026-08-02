@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Marketing\AccessRequestController;
 use App\Http\Controllers\Marketing\ContactController;
 use App\Http\Controllers\Marketing\HomeController;
@@ -36,8 +37,13 @@ Route::controller(AccessRequestController::class)->group(function (): void {
 Route::middleware('guest')->controller(LoginController::class)->group(function (): void {
     Route::get('/login', 'create')->name('login');
     Route::post('/login', 'store')->name('login.attempt');
-    Route::get('/forgot-password', 'forgot')->name('password.request');
-    Route::post('/forgot-password', 'sendReset')->name('password.email');
+});
+
+Route::middleware('guest')->controller(PasswordResetController::class)->group(function (): void {
+    Route::get('/forgot-password', 'requestForm')->name('password.request');
+    Route::post('/forgot-password', 'sendResetLink')->name('password.email');
+    Route::get('/reset-password/{token}', 'resetForm')->name('password.reset');
+    Route::post('/reset-password', 'reset')->name('password.update');
 });
 
 Route::post('/logout', [LoginController::class, 'destroy'])
@@ -51,3 +57,13 @@ Route::prefix('super-admin')
     ->name('super-admin.')
     ->middleware(['auth', 'super_admin'])
     ->group(base_path('routes/super-admin.php'));
+
+Route::prefix('business-admin')
+    ->name('business-admin.')
+    ->middleware(['auth', 'business_admin', 'org_active'])
+    ->group(base_path('routes/business-admin.php'));
+
+Route::prefix('staff')
+    ->name('staff.')
+    ->middleware(['auth', 'staff', 'org_active'])
+    ->group(base_path('routes/staff.php'));

@@ -93,5 +93,7 @@
     </div>
 
     <div x-cloak x-show="sidebarOpen" class="fixed inset-0 z-30 bg-gray-900/40 lg:hidden" @click="sidebarOpen = false"></div>
+
+    <x-admin.logout-confirm :user-name="$user?->name" />
 </body>
 </html>

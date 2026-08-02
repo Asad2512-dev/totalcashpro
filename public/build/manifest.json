@@ -1,7 +1,7 @@
 {
-  "_fonts-DegYDVgI.css": {
-    "file": "assets/fonts-DegYDVgI.css",
-    "src": "_fonts-DegYDVgI.css"
+  "_fonts-Ixmyid_h.css": {
+    "file": "assets/fonts-Ixmyid_h.css",
+    "src": "_fonts-Ixmyid_h.css"
   },
   "_manrope-500-normal-BYYD-dBL.woff2": {
     "file": "assets/manrope-500-normal-BYYD-dBL.woff2",
@@ -68,7 +68,7 @@
     "src": "_plus-jakarta-sans-700-normal-DqEcQeE5.woff"
   },
   "resources/css/app.css": {
-    "file": "assets/app-FLFy3z6a.css",
+    "file": "assets/app-Q1-0fxi4.css",
     "name": "app",
     "names": [
       "app.css"
@@ -77,7 +77,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-5nnM1X7K.js",
+    "file": "assets/app-DA4yea6L.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

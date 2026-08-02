@@ -2,6 +2,7 @@
     'nav' => [],
     'active' => 'dashboard',
     'businessTree' => [],
+    'homeRoute' => 'super-admin.dashboard',
 ])
 
 @php
@@ -25,7 +26,7 @@
         class="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200 px-3 dark:border-gray-800"
         :class="collapsed ? 'justify-center px-2' : 'justify-between px-4'"
     >
-        <a href="{{ route('super-admin.dashboard') }}" class="inline-flex min-w-0 items-center overflow-hidden rounded-lg dark:bg-white dark:px-2 dark:py-1">
+        <a href="{{ route($homeRoute) }}" class="inline-flex min-w-0 items-center overflow-hidden rounded-lg dark:bg-white dark:px-2 dark:py-1">
             <span class="inline-flex" x-bind:class="collapsed ? 'hidden' : ''">
                 <x-brand-logo height="h-8" class="max-w-none" />
             </span>
@@ -34,16 +35,6 @@
                 x-bind:class="collapsed ? '!inline-flex' : 'hidden'"
             >T</span>
         </a>
-
-        <button
-            type="button"
-            @click="collapsed = !collapsed"
-            class="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-gray-200 text-gray-600 transition hover:bg-gray-50 lg:inline-flex dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-            :title="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
-            aria-label="Toggle sidebar"
-        >
-            <x-admin.icon name="panel" class="h-4 w-4" />
-        </button>
     </div>
 
     <div class="shrink-0 border-b border-gray-200 px-3 py-3 dark:border-gray-800" x-bind:class="collapsed ? 'hidden' : ''">
@@ -63,7 +54,15 @@
                 <ul class="mt-2 space-y-0.5">
                     @foreach ($group['items'] as $item)
                         @php
-                            $routeKey = str_replace('super-admin.', '', $item['route']);
+                            $routeKey = \Illuminate\Support\Str::afterLast($item['route'], '.');
+                            // Prefer full suffix after panel prefix (e.g. cash-history)
+                            if (str_starts_with($item['route'], 'super-admin.')) {
+                                $routeKey = str_replace('super-admin.', '', $item['route']);
+                            } elseif (str_starts_with($item['route'], 'business-admin.')) {
+                                $routeKey = str_replace('business-admin.', '', $item['route']);
+                            } elseif (str_starts_with($item['route'], 'staff.')) {
+                                $routeKey = str_replace('staff.', '', $item['route']);
+                            }
                             $isActive = $active === $routeKey
                                 || $active === \Illuminate\Support\Str::afterLast($item['route'], '.')
                                 || ($active === 'dashboard' && $routeKey === 'dashboard')
@@ -162,16 +161,14 @@
     </nav>
 
     <div class="shrink-0 space-y-2 border-t border-gray-200 p-3 dark:border-gray-800">
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button
-                type="submit"
-                class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
-                :class="collapsed ? 'justify-center px-2' : ''"
-            >
-                <x-admin.icon name="logout" class="h-4 w-4 shrink-0" />
-                <span x-bind:class="collapsed ? 'hidden' : ''">Logout</span>
-            </button>
-        </form>
+        <button
+            type="button"
+            class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+            :class="collapsed ? 'justify-center px-2' : ''"
+            @click="requestLogout()"
+        >
+            <x-admin.icon name="logout" class="h-4 w-4 shrink-0" />
+            <span x-bind:class="collapsed ? 'hidden' : ''">Logout</span>
+        </button>
     </div>
 </aside>

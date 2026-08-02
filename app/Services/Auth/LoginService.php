@@ -19,11 +19,11 @@ final class LoginService implements ServiceInterface
     ) {}
 
     /**
-     * Authenticate Super Admin only for Phase 2.x.
+     * Authenticate Super Admin or Business Admin and return the post-login route name.
      *
      * @throws ValidationException
      */
-    public function attemptSuperAdmin(string $email, string $password, bool $remember = false): User
+    public function attempt(string $email, string $password, bool $remember = false): array
     {
         if (! Auth::attempt(['email' => $email, 'password' => $password], $remember)) {
             throw ValidationException::withMessages([
@@ -43,7 +43,44 @@ final class LoginService implements ServiceInterface
             ]);
         }
 
-        if (! $user->isSuperAdmin()) {
+        if ($user->isSuperAdmin()) {
+            $user->forceFill(['last_login_at' => now()])->save();
+            $this->logLogin($user, 'Super Admin signed in', 'auth.login');
+
+            return ['user' => $user, 'route' => 'super-admin.dashboard'];
+        }
+
+        if ($user->isAdmin() && $user->organization_id !== null) {
+            $user->forceFill(['last_login_at' => now()])->save();
+            $this->logLogin($user, 'Business Admin signed in', 'auth.login.business');
+
+            return ['user' => $user, 'route' => 'business-admin.dashboard'];
+        }
+
+        if ($user->isStaff() && $user->organization_id !== null) {
+            $user->forceFill(['last_login_at' => now()])->save();
+            $this->logLogin($user, 'Staff signed in', 'auth.login.staff');
+
+            return ['user' => $user, 'route' => 'staff.dashboard'];
+        }
+
+        Auth::logout();
+
+        throw ValidationException::withMessages([
+            'email' => 'This account cannot sign in.',
+        ]);
+    }
+
+    /**
+     * @deprecated Use attempt() — kept for any Super Admin-only callers.
+     *
+     * @throws ValidationException
+     */
+    public function attemptSuperAdmin(string $email, string $password, bool $remember = false): User
+    {
+        $result = $this->attempt($email, $password, $remember);
+
+        if (! $result['user']->isSuperAdmin()) {
             Auth::logout();
 
             throw ValidationException::withMessages([
@@ -51,26 +88,27 @@ final class LoginService implements ServiceInterface
             ]);
         }
 
-        $user->forceFill(['last_login_at' => now()])->save();
-
-        $this->activityLogger->log(
-            event: 'user.login',
-            description: 'Super Admin signed in',
-            actor: $user,
-            subject: $user,
-        );
-
-        $this->auditLogger->log(
-            action: 'auth.login',
-            user: $user,
-            target: $user,
-        );
-
-        return $user;
+        return $result['user'];
     }
 
     public function logout(): void
     {
         Auth::logout();
+    }
+
+    private function logLogin(User $user, string $description, string $action): void
+    {
+        $this->activityLogger->log(
+            event: 'user.login',
+            description: $description,
+            actor: $user,
+            subject: $user,
+        );
+
+        $this->auditLogger->log(
+            action: $action,
+            user: $user,
+            target: $user,
+        );
     }
 }

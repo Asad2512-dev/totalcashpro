@@ -162,7 +162,27 @@ final class OrganizationController extends Controller
 
     public function loginAs(Organization $organization): RedirectResponse
     {
-        return back()->with('status', 'Login as business will be available when the Business Admin panel ships.');
+        $this->authorize('view', $organization);
+
+        $owner = $organization->owner
+            ?? User::query()
+                ->where('organization_id', $organization->id)
+                ->whereHas('role', fn ($q) => $q->where('slug', 'admin'))
+                ->orderBy('id')
+                ->first();
+
+        if ($owner === null) {
+            return back()->withErrors(['organization' => 'This business has no admin owner to sign in as.']);
+        }
+
+        $superAdminId = auth()->id();
+        auth()->login($owner);
+        session()->put('impersonator_id', $superAdminId);
+        session()->regenerate();
+
+        return redirect()
+            ->route('business-admin.dashboard')
+            ->with('status', 'Signed in as '.$owner->name.' ('.$organization->name.').');
     }
 
     public function bulk(Request $request): RedirectResponse

@@ -19,8 +19,17 @@ final class LoginController extends Controller
 
     public function create(): View|RedirectResponse
     {
-        if (Auth::check() && Auth::user()?->isSuperAdmin()) {
-            return redirect()->route('super-admin.dashboard');
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user?->isSuperAdmin()) {
+                return redirect()->route('super-admin.dashboard');
+            }
+            if ($user?->isAdmin() && $user->organization_id) {
+                return redirect()->route('business-admin.dashboard');
+            }
+            if ($user?->isStaff() && $user->organization_id) {
+                return redirect()->route('staff.dashboard');
+            }
         }
 
         return view('auth.login');
@@ -34,7 +43,7 @@ final class LoginController extends Controller
             'remember' => ['sometimes', 'boolean'],
         ]);
 
-        $this->loginService->attemptSuperAdmin(
+        $result = $this->loginService->attempt(
             $credentials['email'],
             $credentials['password'],
             (bool) ($credentials['remember'] ?? false),
@@ -42,7 +51,7 @@ final class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('super-admin.dashboard'));
+        return redirect()->intended(route($result['route']));
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -55,19 +64,4 @@ final class LoginController extends Controller
         return redirect()->route('login');
     }
 
-    public function forgot(): View
-    {
-        return view('auth.forgot-password');
-    }
-
-    public function sendReset(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'email' => ['required', 'email'],
-        ]);
-
-        return redirect()
-            ->route('login')
-            ->with('status', 'Password reset will be available in a later phase. Contact support if needed.');
-    }
 }

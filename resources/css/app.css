@@ -256,6 +256,88 @@
     .admin-slide-up {
         animation: admin-slide-up 0.3s ease-out both;
     }
+
+    /* Cash Up Pro–style bordered wizard tables */
+    .cashup-table {
+        @apply w-full border-collapse overflow-hidden rounded-xl border border-gray-200 text-sm dark:border-gray-700;
+    }
+
+    .cashup-table th,
+    .cashup-table td {
+        @apply border border-gray-200 px-3 py-2.5 align-middle dark:border-gray-700;
+    }
+
+    .cashup-table thead th {
+        @apply bg-gray-50 text-left text-xs font-semibold uppercase tracking-[0.08em] text-gray-500 dark:bg-gray-800/80 dark:text-gray-400;
+    }
+
+    .cashup-table tfoot td {
+        @apply bg-gray-50 dark:bg-gray-800/60;
+    }
+
+    .cashup-table:not(table) {
+        @apply block;
+    }
+
+    .cashup-row {
+        @apply grid grid-cols-[34%_38%_28%] items-center border-b border-gray-200 px-3 py-2.5 dark:border-gray-700;
+    }
+
+    .cashup-row:last-child {
+        @apply border-b-0;
+    }
+
+    .cashup-head {
+        @apply bg-gray-50 text-xs font-semibold uppercase tracking-[0.08em] text-gray-500 dark:bg-gray-800/80 dark:text-gray-400;
+    }
+
+    .cashup-foot {
+        @apply bg-gray-50 dark:bg-gray-800/60;
+    }
+
+    .cashup-span-2 {
+        grid-column: span 2 / span 2;
+    }
+
+    .cashup-col-label {
+        width: 34%;
+    }
+
+    .cashup-col-input {
+        width: 38%;
+    }
+
+    .cashup-col-total {
+        width: 28%;
+        @apply text-right;
+    }
+
+    .cashup-total {
+        @apply text-right tabular-nums text-gray-900 dark:text-gray-100;
+    }
+
+    .cashup-input {
+        @apply w-full max-w-[11rem] rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100;
+        /* Hide number spinners that block typing on some browsers */
+        appearance: textfield;
+    }
+
+    .cashup-input::-webkit-outer-spin-button,
+    .cashup-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .cashup-input-wide {
+        @apply max-w-none;
+    }
+
+    .cashup-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        align-items: center;
+        gap: 0.75rem;
+    }
 }
 
 @keyframes admin-fade-in {

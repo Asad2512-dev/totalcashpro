@@ -14,10 +14,30 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'super_admin' => \App\Http\Middleware\EnsureSuperAdmin::class,
+            'business_admin' => \App\Http\Middleware\EnsureBusinessAdmin::class,
+            'staff' => \App\Http\Middleware\EnsureStaff::class,
+            'org_active' => \App\Http\Middleware\EnsureOrganizationActive::class,
+            'plan_feature' => \App\Http\Middleware\EnsurePlanFeature::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('login'));
-        $middleware->redirectUsersTo(fn () => route('super-admin.dashboard'));
+        $middleware->redirectUsersTo(function () {
+            $user = auth()->user();
+
+            if ($user?->isSuperAdmin()) {
+                return route('super-admin.dashboard');
+            }
+
+            if ($user?->isAdmin() && $user->organization_id) {
+                return route('business-admin.dashboard');
+            }
+
+            if ($user?->isStaff() && $user->organization_id) {
+                return route('staff.dashboard');
+            }
+
+            return route('login');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

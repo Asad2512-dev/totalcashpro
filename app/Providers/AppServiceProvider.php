@@ -25,5 +25,13 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
+
+        // Keep generated asset/route URLs on the host the browser is actually using in local.
+        if ($this->app->environment('local') && ! $this->app->runningInConsole()) {
+            $request = $this->app['request'] ?? null;
+            if ($request !== null && filled($request->getSchemeAndHttpHost())) {
+                URL::forceRootUrl($request->getSchemeAndHttpHost());
+            }
+        }
     }
 }
