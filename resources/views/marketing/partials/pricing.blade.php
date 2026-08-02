@@ -12,7 +12,7 @@
             </p>
         </div>
 
-        <div id="buy" class="scroll-mt-28 mx-auto mt-14 grid max-w-5xl items-stretch gap-6 lg:grid-cols-2 lg:gap-8 lg:items-center">
+        <div id="buy" class="scroll-mt-28 mx-auto mt-16 grid max-w-5xl items-stretch gap-6 pt-4 lg:grid-cols-2 lg:gap-8 lg:items-center">
             @foreach ($pricingPlans as $plan)
                 <x-pricing-card
                     :name="$plan['name']"

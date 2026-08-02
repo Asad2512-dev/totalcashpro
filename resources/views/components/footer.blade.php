@@ -2,16 +2,13 @@
     <x-container class="relative py-16 lg:py-20">
         <div class="grid gap-12 lg:grid-cols-[1.35fr_repeat(4,1fr)]">
             <div class="max-w-sm">
-                <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5">
-                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white font-display text-sm font-extrabold text-[#0F172A]">
-                        TC
-                    </span>
-                    <span class="font-display text-lg font-extrabold tracking-tight text-white">{{ brand_name() }}</span>
+                <a href="{{ route('home') }}" class="inline-flex shrink-0 items-center rounded-xl bg-white px-3 py-2" aria-label="{{ brand_name() }} home">
+                    <x-brand-logo height="h-8" class="max-w-none" />
                 </a>
                 <p class="mt-5 text-sm leading-relaxed text-white/70">
                     {{ brand_tagline() }}
                 </p>
-                <p class="mt-4 text-sm font-semibold text-[#38BDF8]">From £19.99/month · Cloud SaaS</p>
+                <p class="mt-4 text-sm font-semibold text-primary-300">From £19.99/month · Cloud SaaS</p>
                 <div class="mt-6 flex items-center gap-2">
                     @foreach (config('totalcashpro.social') as $network => $url)
                         <a
@@ -29,9 +26,9 @@
                 <h3 class="font-display text-xs font-bold uppercase tracking-[0.18em] text-white/50">Quick Links</h3>
                 <ul class="mt-4 space-y-3 text-sm text-white/75">
                     <li><a class="transition hover:text-white" href="{{ route('home') }}#features">Features</a></li>
-                    <li><a class="transition hover:text-white" href="{{ route('home') }}#showcase">Product</a></li>
+                    <li><a class="transition hover:text-white" href="{{ route('home') }}#solutions">Solutions</a></li>
                     <li><a class="transition hover:text-white" href="{{ route('home') }}#pricing">Pricing</a></li>
-                    <li><a class="transition hover:text-white" href="{{ route('request-access') }}">Request Access</a></li>
+                    <li><a class="transition hover:text-white" href="{{ route('request-demo') }}">Request Demo</a></li>
                 </ul>
             </div>
 
@@ -39,7 +36,7 @@
                 <h3 class="font-display text-xs font-bold uppercase tracking-[0.18em] text-white/50">Resources</h3>
                 <ul class="mt-4 space-y-3 text-sm text-white/75">
                     <li><a class="transition hover:text-white" href="{{ route('home') }}#faq">FAQ</a></li>
-                    <li><a class="transition hover:text-white" href="{{ route('home') }}#industries">Industries</a></li>
+                    <li><a class="transition hover:text-white" href="{{ route('home') }}#solutions">Solutions</a></li>
                     <li><a class="transition hover:text-white" href="{{ route('home') }}#workflow">Workflow</a></li>
                     <li><a class="transition hover:text-white" href="{{ route('home') }}#why">Why TotalCashPro</a></li>
                 </ul>

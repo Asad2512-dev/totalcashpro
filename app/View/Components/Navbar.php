@@ -15,53 +15,28 @@ final class Navbar extends Component
     public function links(): array
     {
         return [
-            [
-                'label' => 'Features',
-                'href' => route('home').'#features',
-                'match' => 'home#features',
-            ],
-            [
-                'label' => 'How Access Works',
-                'href' => route('home').'#workflow',
-                'match' => 'home#workflow',
-            ],
-            [
-                'label' => 'Pricing',
-                'href' => route('home').'#pricing',
-                'match' => 'home#pricing',
-            ],
-            [
-                'label' => 'About',
-                'href' => route('about'),
-                'match' => 'about',
-            ],
-            [
-                'label' => 'Contact',
-                'href' => route('contact'),
-                'match' => 'contact',
-            ],
+            ['label' => 'Features', 'href' => route('home').'#features', 'match' => 'features'],
+            ['label' => 'Solutions', 'href' => route('home').'#solutions', 'match' => 'solutions'],
+            ['label' => 'Pricing', 'href' => route('home').'#pricing', 'match' => 'pricing'],
+            ['label' => 'About', 'href' => route('about'), 'match' => 'about'],
+            ['label' => 'Contact', 'href' => route('contact'), 'match' => 'contact'],
         ];
     }
 
     public function currentMatch(): string
     {
-        if (request()->routeIs('about')) {
-            return 'about';
-        }
+        return match (true) {
+            request()->routeIs('about') => 'about',
+            request()->routeIs('contact') => 'contact',
+            request()->routeIs('request-access*'), request()->routeIs('request-demo') => 'request-demo',
+            request()->routeIs('home') => 'home',
+            default => '',
+        };
+    }
 
-        if (request()->routeIs('contact')) {
-            return 'contact';
-        }
-
-        if (request()->routeIs('request-access*')) {
-            return 'request-access';
-        }
-
-        if (request()->routeIs('home')) {
-            return 'home';
-        }
-
-        return '';
+    public function isHome(): bool
+    {
+        return request()->routeIs('home');
     }
 
     public function render(): View

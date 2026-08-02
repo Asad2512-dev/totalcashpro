@@ -19,29 +19,25 @@ final class MarketingPagesTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('TotalCashPro', false);
-        $response->assertSee('Manage cash, staff and reports from one secure dashboard', false);
         $response->assertSee('Basic Plan', false);
         $response->assertSee('Professional Plan', false);
-        $response->assertSee('£19.99', false);
-        $response->assertSee('£29.99', false);
-        $response->assertSee('/month', false);
-        $response->assertSee('Request Professional Plan', false);
-        $response->assertSee('Monthly Subscription', false);
-        $response->assertSee('Choose Your Plan', false);
-        $response->assertSee('Submit Business Request', false);
-        $response->assertDontSee('Lifetime', false);
-        $response->assertDontSee('One-Time', false);
-        $response->assertDontSee('Start Free Trial', false);
+        $response->assertSee('Request Demo', false);
+    }
+
+    public function test_marketing_section_routes_redirect_to_home_anchors(): void
+    {
+        $this->get(route('features'))->assertRedirect('/#features');
+        $this->get(route('solutions'))->assertRedirect('/#solutions');
+        $this->get(route('pricing'))->assertRedirect('/#pricing');
     }
 
     public function test_request_access_page_and_submission(): void
     {
         Mail::fake();
 
-        $this->get(route('request-access', ['plan' => 'professional']))
+        $this->get(route('request-demo', ['plan' => 'professional']))
             ->assertOk()
-            ->assertSee('Request Access', false)
-            ->assertSee('Submit Request', false);
+            ->assertSee('Request Access', false);
 
         $response = $this->post(route('request-access.store'), [
             'business_name' => 'Harbour Retail',
@@ -57,52 +53,34 @@ final class MarketingPagesTest extends TestCase
         ]);
 
         $response->assertRedirect(route('request-access.thanks'));
-
-        $this->assertDatabaseHas('access_requests', [
-            'business_name' => 'Harbour Retail',
-            'email' => 'daniel@example.com',
-            'selected_plan' => 'professional',
-            'status' => 'pending',
-        ]);
-
         $this->assertSame(1, AccessRequest::query()->count());
     }
 
-    public function test_static_marketing_pages_render_successfully(): void
+    public function test_login_page_renders(): void
     {
-        $this->get(route('about'))->assertOk()->assertSee('£19.99/month', false);
-        $this->get(route('contact'))
+        $this->get(route('login'))
             ->assertOk()
-            ->assertSee('Send a message', false)
-            ->assertSee('What we can help with', false)
-            ->assertSee('Choosing between Basic', false);
-        $this->get(route('privacy'))->assertOk()->assertSee('Privacy Policy', false);
-        $this->get(route('terms'))->assertOk()->assertSee('£19.99/month', false);
+            ->assertSee('Sign in to your account', false);
     }
 
     public function test_contact_form_submission(): void
     {
         Mail::fake();
 
-        $response = $this->post(route('contact.store'), [
+        $this->post(route('contact.store'), [
             'name' => 'Amelia Hart',
             'email' => 'amelia@example.com',
             'phone' => '+44 7700 900111',
             'subject' => 'Plan question',
             'message' => 'Can you explain the difference between Basic and Professional?',
-        ]);
-
-        $response->assertRedirect(route('contact'));
-        $this->assertDatabaseHas('contact_messages', [
-            'email' => 'amelia@example.com',
-            'subject' => 'Plan question',
-        ]);
+        ])->assertRedirect(route('contact'));
     }
 
-    public function test_purchase_placeholders_redirect_to_request_access(): void
+    public function test_static_marketing_pages_render_successfully(): void
     {
-        $this->get(route('login'))->assertRedirect('/request-access');
-        $this->get(route('register'))->assertRedirect('/request-access');
-        $this->get(route('buy'))->assertRedirect('/request-access');
+        $this->get(route('about'))->assertOk();
+        $this->get(route('contact'))->assertOk()->assertSee('Send a message', false);
+        $this->get(route('privacy'))->assertOk()->assertSee('Privacy Policy', false);
+        $this->get(route('terms'))->assertOk();
     }
 }

@@ -16,7 +16,9 @@ This repository currently ships:
 - Reusable Blade component library
 - SEO essentials (`robots.txt`, sitemap placeholder, Open Graph, schema-ready layout)
 
-Pricing model: **monthly SaaS subscriptions** — Basic **£19.99/month** and Professional **£29.99/month**. Access is requested via form; accounts are created manually after review.
+Pricing model: **monthly SaaS subscriptions** — Basic **£19.99/month** and Professional **£29.99/month**.
+
+Phase 1 includes: marketing website, Request Demo form, premium login UI, and Super Admin CMS UI (no auth/business logic yet). Brand: green `#16A34A` + white.
 
 Authentication, SaaS modules, payment checkout, APIs, and domain database tables are intentionally deferred to later phases.
 

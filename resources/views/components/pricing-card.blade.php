@@ -14,19 +14,19 @@
 
 <article
     @class([
-        'pricing-card relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border bg-white transition duration-300',
+        'pricing-card relative flex h-full flex-col overflow-visible rounded-[1.75rem] border bg-white transition duration-300',
         'border-line shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)] hover:-translate-y-1 hover:shadow-[0_24px_50px_-30px_rgba(15,23,42,0.28)]' => ! $featured,
-        'pricing-card--featured scale-[1.02] border-[#2563EB]/40 shadow-[0_28px_70px_-32px_rgba(37,99,235,0.45)] ring-1 ring-[#2563EB]/20 hover:-translate-y-1.5 hover:shadow-[0_36px_80px_-30px_rgba(37,99,235,0.55)] lg:scale-105' => $featured,
+        'pricing-card--featured z-10 scale-[1.02] border-[#16A34A]/40 shadow-[0_28px_70px_-32px_rgba(22,163,74,0.45)] ring-1 ring-[#16A34A]/20 hover:-translate-y-1.5 hover:shadow-[0_36px_80px_-30px_rgba(22,163,74,0.55)] lg:scale-105' => $featured,
     ])
     data-reveal
 >
     @if ($featured)
-        <div class="pointer-events-none absolute inset-0 pricing-card-glow" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.75rem] pricing-card-glow" aria-hidden="true"></div>
     @endif
 
     @if ($popularBadge)
-        <div class="absolute inset-x-0 top-0 z-10 flex justify-center">
-            <span class="inline-flex -translate-y-1/2 items-center gap-1.5 rounded-full bg-[#1E40AF] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-white shadow-md">
+        <div class="absolute inset-x-0 top-0 z-20 flex -translate-y-1/2 justify-center px-4">
+            <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#15803D] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-white shadow-md">
                 <span aria-hidden="true">★</span>
                 {{ $popularBadge }}
             </span>
@@ -35,10 +35,10 @@
 
     <div @class([
         'relative px-7 pb-6 pt-8 sm:px-8',
-        'pt-10' => (bool) $popularBadge,
+        'pt-11' => (bool) $popularBadge,
     ])>
         <div class="flex flex-wrap items-center gap-2">
-            <span class="inline-flex items-center rounded-full bg-[#EFF6FF] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#1E40AF] ring-1 ring-inset ring-[#2563EB]/15">
+            <span class="inline-flex items-center rounded-full bg-[#F0FDF4] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#15803D] ring-1 ring-inset ring-[#16A34A]/15">
                 {{ $badge }}
             </span>
         </div>
@@ -60,7 +60,7 @@
                     <span @class([
                         'mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full',
                         'bg-[#ECFDF5] text-[#059669]' => ! $featured,
-                        'bg-[#EFF6FF] text-[#2563EB]' => $featured,
+                        'bg-[#F0FDF4] text-[#16A34A]' => $featured,
                     ])>
                         <svg class="h-3 w-3" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                             <path d="M2.5 6.2L4.8 8.5L9.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -76,8 +76,8 @@
                 href="{{ $ctaHref }}"
                 @class([
                     'btn-ripple inline-flex w-full items-center justify-center rounded-2xl px-6 py-3.5 text-base font-semibold transition',
-                    'border border-[#E5E7EB] bg-white text-[#111827] hover:-translate-y-0.5 hover:border-[#2563EB]/40 hover:text-[#1E40AF]' => ! $featured,
-                    'bg-[#2563EB] text-white hover:-translate-y-0.5 hover:bg-[#1E40AF]' => $featured,
+                    'border border-[#E5E7EB] bg-white text-[#111827] hover:-translate-y-0.5 hover:border-[#16A34A]/40 hover:text-[#15803D]' => ! $featured,
+                    'bg-[#16A34A] text-white hover:-translate-y-0.5 hover:bg-[#15803D]' => $featured,
                 ])
             >
                 {{ $cta }}

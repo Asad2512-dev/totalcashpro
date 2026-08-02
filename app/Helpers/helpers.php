@@ -15,3 +15,17 @@ if (! function_exists('brand_tagline')) {
         return (string) config('totalcashpro.tagline');
     }
 }
+
+if (! function_exists('brand_logo_url')) {
+    function brand_logo_url(): string
+    {
+        return asset('logo.png');
+    }
+}
+
+if (! function_exists('brand_favicon_url')) {
+    function brand_favicon_url(): string
+    {
+        return asset('logo.png');
+    }
+}

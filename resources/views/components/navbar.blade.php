@@ -1,18 +1,12 @@
 <header
-    x-data="siteNav(@js($currentMatch()))"
+    x-data="siteNav(@js(['initialMatch' => $currentMatch(), 'isHome' => $isHome()]))"
     class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition duration-300"
     :class="scrolled ? 'nav-solid' : 'bg-transparent'"
 >
     <x-container>
         <nav class="flex items-center justify-between gap-4 py-4" aria-label="Primary">
-            <a href="{{ route('home') }}" class="group flex items-center gap-2.5" x-on:click="close()">
-                <span class="relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-navy-900">
-                    <span class="absolute inset-0 bg-gradient-to-br from-royal-600/40 via-transparent to-emerald-500/30"></span>
-                    <span class="relative font-display text-sm font-extrabold tracking-tight text-white">TC</span>
-                </span>
-                <span class="font-display text-lg font-extrabold tracking-tight text-navy-900">
-                    {{ brand_name() }}
-                </span>
+            <a href="{{ route('home') }}" class="inline-flex shrink-0 items-center self-center" x-on:click="setMatch('home'); close()" aria-label="{{ brand_name() }} home">
+                <x-brand-logo height="h-9" class="max-w-none" />
             </a>
 
             <div class="hidden items-center gap-8 lg:flex">
@@ -21,15 +15,15 @@
                         href="{{ $link['href'] }}"
                         @click="setMatch(@js($link['match']))"
                         :class="isActive(@js($link['match']))
-                            ? 'text-sm font-semibold text-navy-900'
-                            : 'text-sm font-medium text-mute transition hover:text-navy-900'"
+                            ? 'text-sm font-semibold text-primary-700'
+                            : 'text-sm font-medium text-mute transition hover:text-gray-900'"
                         :aria-current="isActive(@js($link['match'])) ? 'page' : null"
                     >
                         <span class="relative inline-flex flex-col items-center">
                             {{ $link['label'] }}
                             <span
-                                class="mt-1 h-0.5 w-full rounded-full bg-royal-600 transition"
-                                :class="isActive(@js($link['match'])) ? 'opacity-100' : 'opacity-0'"
+                                class="mt-1 h-0.5 w-full origin-center rounded-full bg-primary-600 transition duration-200"
+                                :class="isActive(@js($link['match'])) ? 'scale-x-100 opacity-100' : 'scale-x-50 opacity-0'"
                                 aria-hidden="true"
                             ></span>
                         </span>
@@ -38,22 +32,13 @@
             </div>
 
             <div class="hidden items-center gap-2 lg:flex">
-                <x-button href="{{ route('home') }}#pricing" variant="ghost" size="sm">Choose Your Plan</x-button>
-                <x-button
-                    :href="route('request-access')"
-                    variant="primary"
-                    size="sm"
-                    @class([
-                        'ring-2 ring-royal-600/30 ring-offset-2' => request()->routeIs('request-access*'),
-                    ])
-                >
-                    Request Access
-                </x-button>
+                <x-button :href="route('login')" variant="ghost" size="sm">Login</x-button>
+                <x-button :href="route('request-demo')" variant="primary" size="sm">Request Demo</x-button>
             </div>
 
             <button
                 type="button"
-                class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-line bg-snow/80 text-navy-900 lg:hidden"
+                class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-line bg-snow/80 text-gray-900 lg:hidden"
                 @click="open = !open"
                 :aria-expanded="open.toString()"
                 aria-controls="mobile-nav"
@@ -82,16 +67,16 @@
                     href="{{ $link['href'] }}"
                     @click="setMatch(@js($link['match'])); close()"
                     :class="isActive(@js($link['match']))
-                        ? 'rounded-2xl bg-royal-50 px-4 py-3 text-sm font-semibold text-royal-700'
-                        : 'rounded-2xl px-4 py-3 text-sm font-medium text-navy-800 hover:bg-paper'"
+                        ? 'rounded-2xl bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-700'
+                        : 'rounded-2xl px-4 py-3 text-sm font-medium text-gray-800 hover:bg-paper'"
                     :aria-current="isActive(@js($link['match'])) ? 'page' : null"
                 >
                     {{ $link['label'] }}
                 </a>
             @endforeach
             <div class="mt-2 flex flex-col gap-2 border-t border-line pt-4">
-                <x-button href="{{ route('home') }}#pricing" variant="outline" class="w-full" x-on:click="close()">Choose Your Plan</x-button>
-                <x-button :href="route('request-access')" variant="primary" class="w-full" x-on:click="close()">Request Access</x-button>
+                <x-button :href="route('login')" variant="outline" class="w-full" x-on:click="close()">Login</x-button>
+                <x-button :href="route('request-demo')" variant="primary" class="w-full" x-on:click="close()">Request Demo</x-button>
             </div>
         </x-container>
     </div>

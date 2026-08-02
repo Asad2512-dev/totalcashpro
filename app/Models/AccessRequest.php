@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 final class AccessRequest extends Model
 {
     protected $fillable = [
+        'organization_id',
+        'reviewed_by',
         'business_name',
         'owner_name',
         'email',
@@ -21,7 +23,9 @@ final class AccessRequest extends Model
         'number_of_employees',
         'selected_plan',
         'additional_notes',
+        'admin_notes',
         'status',
+        'reviewed_at',
     ];
 
     /**
@@ -32,6 +36,7 @@ final class AccessRequest extends Model
         return [
             'selected_plan' => SubscriptionPlan::class,
             'status' => AccessRequestStatus::class,
+            'reviewed_at' => 'datetime',
         ];
     }
 }

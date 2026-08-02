@@ -1,0 +1,4 @@
+<form method="POST" action="{{ route('super-admin.users.activate', $user) }}" class="inline">@csrf<x-admin.button size="sm" variant="soft" type="submit">Activate</x-admin.button></form>
+<form method="POST" action="{{ route('super-admin.users.deactivate', $user) }}" class="inline">@csrf<x-admin.button size="sm" variant="secondary" type="submit">Deactivate</x-admin.button></form>
+<form method="POST" action="{{ route('super-admin.users.reset-password', $user) }}" class="inline">@csrf<x-admin.button size="sm" variant="ghost" type="submit">Reset Password</x-admin.button></form>
+<form method="POST" action="{{ route('super-admin.users.destroy', $user) }}" class="inline" onsubmit="return confirm('Delete this user?')">@csrf @method('DELETE')<x-admin.button size="sm" variant="danger" type="submit">Delete</x-admin.button></form>

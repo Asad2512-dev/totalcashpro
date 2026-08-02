@@ -5,53 +5,74 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Manrope', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 
-    /* Deep Navy */
-    --color-navy-50: #f1f5f9;
-    --color-navy-100: #e2e8f0;
-    --color-navy-200: #cbd5e1;
-    --color-navy-700: #1e293b;
-    --color-navy-800: #152033;
-    --color-navy-900: #0f172a;
-    --color-navy-950: #0a1020;
+    /* Primary Green */
+    --color-primary-50: #f0fdf4;
+    --color-primary-100: #dcfce7;
+    --color-primary-200: #bbf7d0;
+    --color-primary-300: #86efac;
+    --color-primary-400: #4ade80;
+    --color-primary-500: #22c55e;
+    --color-primary-600: #16a34a;
+    --color-primary-700: #15803d;
+    --color-primary-800: #166534;
+    --color-primary-900: #14532d;
 
-    /* Royal Blue */
-    --color-royal-50: #eff6ff;
-    --color-royal-100: #dbeafe;
-    --color-royal-500: #3b82f6;
-    --color-royal-600: #2563eb;
-    --color-royal-700: #1d4ed8;
-    --color-royal-800: #1e40af;
+    /* Legacy aliases used across marketing components */
+    --color-royal-50: #f0fdf4;
+    --color-royal-100: #dcfce7;
+    --color-royal-500: #22c55e;
+    --color-royal-600: #16a34a;
+    --color-royal-700: #15803d;
+    --color-royal-800: #166534;
 
-    /* Emerald */
-    --color-emerald-50: #ecfdf5;
-    --color-emerald-100: #d1fae5;
-    --color-emerald-500: #10b981;
-    --color-emerald-600: #059669;
+    --color-emerald-50: #f0fdf4;
+    --color-emerald-100: #dcfce7;
+    --color-emerald-500: #22c55e;
+    --color-emerald-600: #16a34a;
 
-    /* Sky */
-    --color-sky-50: #f0f9ff;
-    --color-sky-100: #e0f2fe;
-    --color-sky-400: #38bdf8;
-    --color-sky-500: #0ea5e9;
+    --color-navy-50: #f9fafb;
+    --color-navy-100: #f3f4f6;
+    --color-navy-200: #e5e7eb;
+    --color-navy-700: #374151;
+    --color-navy-800: #1f2937;
+    --color-navy-900: #111827;
+    --color-navy-950: #030712;
 
-    /* Surfaces & text */
-    --color-paper: #f8fafc;
+    --color-sky-50: #eff6ff;
+    --color-sky-100: #dbeafe;
+    --color-sky-400: #60a5fa;
+    --color-sky-500: #3b82f6;
+
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+
+    --color-paper: #f9fafb;
     --color-snow: #ffffff;
     --color-line: #e5e7eb;
     --color-ink: #111827;
     --color-mute: #6b7280;
 
-    /* Status */
     --color-success: #22c55e;
     --color-warning: #f59e0b;
     --color-danger: #ef4444;
+    --color-info: #3b82f6;
 
-    --shadow-soft: 0 24px 60px -36px rgb(15 23 42 / 0.32);
-    --shadow-lift: 0 18px 40px -28px rgb(15 23 42 / 0.24);
+    --shadow-soft: 0 24px 60px -36px rgb(17 24 39 / 0.28);
+    --shadow-lift: 0 14px 30px -22px rgb(17 24 39 / 0.22);
 }
 
 @layer base {
@@ -64,7 +85,7 @@
     }
 
     ::selection {
-        @apply bg-royal-100 text-navy-900;
+        @apply bg-primary-100 text-primary-900;
     }
 }
 
@@ -75,19 +96,19 @@
 
     .mesh-hero {
         background:
-            radial-gradient(ellipse 50% 40% at 10% 15%, rgb(37 99 235 / 0.08), transparent 55%),
-            radial-gradient(ellipse 40% 35% at 90% 10%, rgb(16 185 129 / 0.08), transparent 50%),
-            radial-gradient(ellipse 45% 40% at 70% 90%, rgb(56 189 248 / 0.08), transparent 55%),
-            linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
+            radial-gradient(ellipse 50% 40% at 12% 18%, rgb(22 163 74 / 0.1), transparent 55%),
+            radial-gradient(ellipse 40% 35% at 88% 12%, rgb(34 197 94 / 0.08), transparent 50%),
+            radial-gradient(ellipse 45% 40% at 70% 90%, rgb(59 130 246 / 0.05), transparent 55%),
+            linear-gradient(180deg, #ffffff 0%, #f9fafb 55%, #ffffff 100%);
     }
 
     .dot-field {
-        background-image: radial-gradient(rgb(15 23 42 / 0.07) 1px, transparent 1px);
+        background-image: radial-gradient(rgb(17 24 39 / 0.06) 1px, transparent 1px);
         background-size: 22px 22px;
     }
 
     .hairline {
-        background: linear-gradient(90deg, transparent, rgb(15 23 42 / 0.12), transparent);
+        background: linear-gradient(90deg, transparent, rgb(17 24 39 / 0.1), transparent);
     }
 
     .btn-ripple {
@@ -141,23 +162,121 @@
     }
 
     .nav-solid {
-        @apply border-line bg-snow/90 shadow-[0_8px_30px_-20px_rgb(15_23_42_/_0.28)] backdrop-blur-xl;
+        @apply border-line bg-snow/90 shadow-[0_8px_30px_-20px_rgb(17_24_39_/_0.2)] backdrop-blur-xl;
     }
 
     .device-bezel {
-        @apply rounded-[1.4rem] border border-white/60 bg-gradient-to-b from-white to-navy-50 shadow-soft;
+        @apply rounded-[1.4rem] border border-white/60 bg-gradient-to-b from-white to-gray-50 shadow-soft;
     }
 
     .pricing-spotlight {
         background:
-            radial-gradient(ellipse 60% 50% at 50% 0%, rgb(37 99 235 / 0.1), transparent 60%),
-            #f8fafc;
+            radial-gradient(ellipse 60% 50% at 50% 0%, rgb(22 163 74 / 0.1), transparent 60%),
+            #f9fafb;
     }
 
     .pricing-card-glow {
         background:
-            radial-gradient(ellipse 80% 55% at 50% -10%, rgb(37 99 235 / 0.14), transparent 55%),
-            radial-gradient(ellipse 50% 40% at 100% 100%, rgb(16 185 129 / 0.06), transparent 50%);
+            radial-gradient(ellipse 80% 55% at 50% -10%, rgb(22 163 74 / 0.14), transparent 55%),
+            radial-gradient(ellipse 50% 40% at 100% 100%, rgb(34 197 94 / 0.06), transparent 50%);
+    }
+
+    .auth-shell {
+        background:
+            radial-gradient(ellipse 50% 40% at 20% 20%, rgb(22 163 74 / 0.18), transparent 55%),
+            radial-gradient(ellipse 40% 35% at 80% 80%, rgb(34 197 94 / 0.12), transparent 50%),
+            linear-gradient(160deg, #111827 0%, #14532d 48%, #166534 100%);
+    }
+
+    .auth-loader-overlay {
+        @apply fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/45 backdrop-blur-sm;
+    }
+
+    .auth-loader-panel {
+        @apply flex flex-col items-center gap-4 rounded-3xl border border-white/20 bg-white px-8 py-7 shadow-soft;
+    }
+
+    .auth-loader-spinner {
+        @apply h-10 w-10 animate-spin rounded-full border-[3px] border-primary-100 border-t-primary-600;
+    }
+
+    .glass-panel {
+        @apply border border-white/15 bg-white/10 shadow-soft backdrop-blur-xl;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    .admin-shell {
+        @apply min-h-screen bg-gray-50 text-gray-900;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .admin-shell {
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .admin-shell .font-display {
+        font-family: var(--font-display);
+    }
+
+    .admin-shell.dark {
+        @apply bg-gray-900 text-gray-100;
+    }
+
+    .admin-card {
+        @apply rounded-2xl border border-gray-200 bg-white shadow-[0_1px_0_rgb(17_24_39_/_0.03)];
+    }
+
+    .dark .admin-card {
+        @apply border-gray-700 bg-gray-800;
+    }
+
+    .admin-input {
+        @apply w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20;
+    }
+
+    .dark .admin-input {
+        @apply border-gray-700 bg-gray-900 text-gray-100;
+    }
+
+    .admin-label {
+        @apply text-sm font-medium text-gray-700 dark:text-gray-200;
+    }
+
+    .admin-skeleton {
+        @apply animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700;
+    }
+
+    .admin-fade-in {
+        animation: admin-fade-in 0.28s ease-out both;
+    }
+
+    .admin-slide-up {
+        animation: admin-slide-up 0.3s ease-out both;
+    }
+}
+
+@keyframes admin-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes admin-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 

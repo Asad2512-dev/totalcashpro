@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0F172A">
+    <meta name="theme-color" content="#16A34A">
 
     @php
         $seoTitle = $seo['title'] ?? config('totalcashpro.seo.title');
@@ -42,13 +42,16 @@
             '@type' => 'Organization',
             'name' => brand_name(),
             'url' => config('totalcashpro.domain'),
+            'logo' => brand_logo_url(),
             'description' => config('totalcashpro.seo.description'),
             'email' => config('totalcashpro.support_email'),
             'sameAs' => array_values(array_filter(config('totalcashpro.social'), fn ($url) => $url !== '#')),
         ], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT) !!}
     </script>
 
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ brand_favicon_url() }}" type="image/png" sizes="any">
+    <link rel="apple-touch-icon" href="{{ brand_favicon_url() }}">
+    <link rel="shortcut icon" href="{{ brand_favicon_url() }}">
     <style>[x-cloak]{display:none!important}</style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

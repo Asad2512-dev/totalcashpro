@@ -1,4 +1,4 @@
-<section id="industries" class="scroll-mt-24 bg-paper py-20 lg:py-28" aria-labelledby="industries-heading">
+<section id="solutions" class="scroll-mt-24 bg-paper py-20 lg:py-28" aria-labelledby="industries-heading">
     <x-container>
         <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
             <div class="lg:sticky lg:top-28 lg:self-start" data-reveal>

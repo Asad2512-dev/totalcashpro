@@ -4,7 +4,7 @@
     <x-container class="relative">
         <div class="grid items-center gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10 xl:gap-16">
             <div class="max-w-xl" data-reveal>
-                <x-badge tone="emerald">Cloud SaaS for restaurants & retail</x-badge>
+                <x-badge tone="emerald">Cloud software for restaurants & retail</x-badge>
 
                 <h1 id="hero-heading" class="mt-5 font-display text-[2.45rem] font-extrabold leading-[1.08] tracking-[-0.04em] text-navy-900 sm:text-5xl lg:text-[3.35rem]">
                     Manage cash, staff and reports from one secure dashboard
@@ -19,7 +19,7 @@
                 </p>
 
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <x-button href="{{ route('request-access') }}" variant="primary" size="lg">Request Access</x-button>
+                    <x-button href="{{ route('request-demo') }}" variant="primary" size="lg">Request Demo</x-button>
                     <x-button href="#pricing" variant="secondary" size="lg">Choose Your Plan</x-button>
                 </div>
 

@@ -8,24 +8,20 @@ use Illuminate\Support\ServiceProvider;
 
 /**
  * Bind repository contracts to their Eloquent implementations.
- *
- * Register new repository bindings here as SaaS modules are introduced.
  */
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
-     * Repository interface => implementation map.
-     *
      * @var array<class-string, class-string>
      */
     public array $bindings = [
-        // Example for Phase 2+:
-        // \App\Repositories\Contracts\UserRepositoryInterface::class => \App\Repositories\Eloquent\UserRepository::class,
+        \App\Repositories\Contracts\RoleRepositoryInterface::class => \App\Repositories\Eloquent\RoleRepository::class,
+        \App\Repositories\Contracts\OrganizationRepositoryInterface::class => \App\Repositories\Eloquent\OrganizationRepository::class,
+        \App\Repositories\Contracts\PlanRepositoryInterface::class => \App\Repositories\Eloquent\PlanRepository::class,
+        \App\Repositories\Contracts\SubscriptionRepositoryInterface::class => \App\Repositories\Eloquent\SubscriptionRepository::class,
+        \App\Repositories\Contracts\PaymentRepositoryInterface::class => \App\Repositories\Eloquent\PaymentRepository::class,
     ];
 
-    /**
-     * Register repository bindings.
-     */
     public function register(): void
     {
         foreach ($this->bindings as $abstract => $concrete) {

@@ -280,7 +280,7 @@ final class MarketingContentService implements ServiceInterface
                 'description' => 'Perfect for small restaurants, cafés, takeaways and retail businesses.',
                 'cta' => 'Request Basic Plan',
                 'featured' => false,
-                'ctaHref' => route('request-access', ['plan' => 'basic']),
+                'ctaHref' => route('request-demo', ['plan' => 'basic']),
                 'assurances' => [
                     'Monthly Subscription',
                     'Secure Cloud Access',
@@ -314,7 +314,7 @@ final class MarketingContentService implements ServiceInterface
                 'description' => 'Everything included in Basic plus complete business management tools.',
                 'cta' => 'Request Professional Plan',
                 'featured' => true,
-                'ctaHref' => route('request-access', ['plan' => 'professional']),
+                'ctaHref' => route('request-demo', ['plan' => 'professional']),
                 'assurances' => [
                     'Monthly Subscription',
                     'Secure Cloud Access',
