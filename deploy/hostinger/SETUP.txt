@@ -39,7 +39,17 @@ First-time / after big pull:
   cp .env.example .env   # only if .env missing
   php artisan key:generate
   php artisan migrate --force
-  php artisan db:seed    # optional demo data only
+  php artisan db:seed --force    # optional demo data only
+
+Prune live DB to 3 users only (Super Admin + 1 Business Admin + 1 Staff):
+  php artisan db:prune-core-users --force
+
+  Keeps by default:
+    admin@totalcashpro.com
+    ava@harbourkitchen.test
+    staff.harbour-kitchen-group@totalcashpro.test
+
+Super Admin (after seed): admin@totalcashpro.com / admin123
 
 Live .env essentials:
   APP_ENV=production
@@ -47,4 +57,5 @@ Live .env essentials:
   APP_URL=https://totalcashpro.com
   ASSET_URL=
 
-Super Admin (after seed): admin@totalcashpro.com / admin123
+Business Admin (after seed + prune): ava@harbourkitchen.test / password
+Staff (after seed + prune): staff.harbour-kitchen-group@totalcashpro.test / password
