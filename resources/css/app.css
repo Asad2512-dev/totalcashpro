@@ -338,6 +338,129 @@
         align-items: center;
         gap: 0.75rem;
     }
+
+    .admin-scroll-lock {
+        overflow: hidden;
+        touch-action: none;
+    }
+
+    .admin-touch-target {
+        @apply inline-flex min-h-[44px] min-w-[44px] items-center justify-center;
+    }
+
+    .admin-table-wrap {
+        @apply overflow-x-auto overscroll-x-contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .admin-table thead {
+        @apply border-b border-gray-200 bg-gray-50/90 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-400;
+    }
+
+    .admin-table tbody {
+        @apply divide-y divide-gray-100 dark:divide-gray-700;
+    }
+
+    .admin-table tbody tr {
+        @apply transition hover:bg-primary-50/40 dark:hover:bg-gray-800/70;
+    }
+
+    .admin-stat-grid {
+        @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-4;
+    }
+
+    .admin-form-grid {
+        @apply grid gap-4 sm:grid-cols-2;
+    }
+
+    .admin-modal-panel {
+        @apply rounded-t-3xl sm:rounded-2xl;
+    }
+
+    .staff-mobile-actions {
+        @apply sticky bottom-0 z-20 -mx-4 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none;
+    }
+
+    @media (max-width: 640px) {
+        .cashup-row {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.5rem;
+        }
+
+        .cashup-row > :last-child {
+            @apply text-left;
+        }
+
+        .cashup-actions {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .cashup-input {
+            @apply max-w-none;
+        }
+    }
+
+    @media (min-width: 641px) and (max-width: 1023px) {
+        .cashup-actions {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    .admin-matrix-wrap table {
+        @apply min-w-full text-left text-sm;
+    }
+
+    .admin-matrix-wrap thead {
+        @apply border-b border-gray-200 bg-gray-50/90 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-400;
+    }
+
+    .admin-matrix-wrap tbody {
+        @apply divide-y divide-gray-100 dark:divide-gray-800;
+    }
+
+    .admin-matrix-sticky {
+        @apply sticky left-0 z-10 bg-white dark:bg-gray-900;
+        box-shadow: 4px 0 8px -4px rgb(17 24 39 / 0.08);
+    }
+
+    .dark .admin-matrix-sticky {
+        box-shadow: 4px 0 8px -4px rgb(0 0 0 / 0.35);
+    }
+
+    .admin-mobile-cards {
+        @apply space-y-3 md:hidden;
+    }
+
+    .admin-mobile-card {
+        @apply rounded-2xl border border-gray-200 bg-white p-4 shadow-[0_1px_0_rgb(17_24_39_/_0.03)] dark:border-gray-700 dark:bg-gray-800;
+    }
+
+    .admin-form-actions .admin-touch-target,
+    .admin-form-actions .inline-flex {
+        @apply w-full sm:w-auto;
+    }
+
+    .admin-pagination {
+        @apply overflow-x-auto overscroll-x-contain pb-1;
+    }
+
+    .admin-pagination nav {
+        @apply flex min-w-max justify-end;
+    }
+
+    .admin-toolbar-title {
+        @apply font-display text-xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-2xl;
+    }
+
+    .admin-drawer-panel {
+        @apply w-full max-w-md sm:max-w-lg;
+    }
+
+    .cashup-page .cashup-actions .inline-flex,
+    .cashup-page .cashup-actions button {
+        @apply min-h-[44px] w-full justify-center sm:w-auto;
+    }
 }
 
 @keyframes admin-fade-in {

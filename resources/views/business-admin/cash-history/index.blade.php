@@ -1,14 +1,10 @@
 <x-layouts.business-admin title="Cash History" active="cash-history">
     <x-admin.toolbar title="Cash history" description="Live totals from saved cash ups for the selected branch filter.">
         @foreach (['daily', 'weekly', 'monthly'] as $p)
-            <a
-                href="{{ route('business-admin.cash-history', ['period' => $p, 'date' => $date]) }}"
-                @class([
-                    'rounded-xl px-3 py-2 text-sm font-semibold',
-                    'bg-primary-600 text-white' => $period === $p,
-                    'border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200' => $period !== $p,
-                ])
-            >{{ ucfirst($p) }}</a>
+            <x-admin.nav-pill
+                :href="route('business-admin.cash-history', ['period' => $p, 'date' => $date])"
+                :active="$period === $p"
+            >{{ ucfirst($p) }}</x-admin.nav-pill>
         @endforeach
         <form method="GET" class="inline-flex items-center gap-2">
             <input type="hidden" name="period" value="{{ $period }}">

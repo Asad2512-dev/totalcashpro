@@ -77,8 +77,34 @@
         @if ($items->isEmpty())
             <x-admin.empty-state title="No products" description="Add products for a branch to start counting stock." />
         @else
-            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-                <table class="min-w-full text-sm">
+            <div class="admin-mobile-cards">
+                @foreach ($items as $item)
+                    <article class="admin-mobile-card">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">{{ $item->name }}</h3>
+                                <p class="mt-1 text-xs text-gray-500">{{ $item->category?->name ?? 'Uncategorised' }} · {{ $item->branch?->name }}</p>
+                            </div>
+                            <div class="text-right text-sm font-medium">
+                                {{ $item->stock_total_pcs }} pcs
+                                @if ($item->isLowStock())
+                                    <x-admin.badge tone="warning" class="mt-1">Low</x-admin.badge>
+                                @endif
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ route('business-admin.inventory.counts.store') }}" class="mt-4 flex flex-wrap items-center gap-2">
+                            @csrf
+                            <input type="hidden" name="item_id" value="{{ $item->id }}">
+                            <input type="number" name="new_pcs" class="admin-input min-h-[44px] w-full min-w-0 flex-1 sm:w-24" value="{{ $item->stock_total_pcs }}" min="0" required>
+                            <x-admin.button type="submit" size="sm" class="min-h-[44px] w-full sm:w-auto">Save</x-admin.button>
+                        </form>
+                    </article>
+                @endforeach
+            </div>
+
+            <div class="admin-card hidden overflow-hidden md:block">
+                <div class="admin-table-wrap -mx-4 sm:mx-0">
+                <table class="admin-table min-w-full text-sm">
                     <thead class="bg-gray-50 text-xs uppercase text-gray-500 dark:bg-gray-800">
                         <tr>
                             <th class="px-4 py-3 text-left">Product</th>
@@ -111,6 +137,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             </div>
             <div class="mt-4">{{ $items->links() }}</div>
         @endif

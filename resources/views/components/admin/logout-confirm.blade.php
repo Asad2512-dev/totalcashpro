@@ -41,10 +41,10 @@
             </p>
         </div>
 
-        <div class="mt-6 grid grid-cols-2 gap-3 border-t border-gray-100 bg-gray-50/80 px-6 py-4 dark:border-gray-800 dark:bg-gray-950/40">
+        <div class="mt-6 grid grid-cols-1 gap-3 border-t border-gray-100 bg-gray-50/80 px-4 py-4 sm:grid-cols-2 sm:px-6 dark:border-gray-800 dark:bg-gray-950/40">
             <button
                 type="button"
-                class="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+                class="admin-touch-target inline-flex w-full items-center justify-center rounded-xl border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
                 @click="cancelLogout()"
             >
                 Stay signed in
@@ -53,7 +53,7 @@
                 @csrf
                 <button
                     type="submit"
-                    class="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/30"
+                    class="admin-touch-target inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-semibold text-white transition hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/30"
                 >
                     Yes, log out
                 </button>

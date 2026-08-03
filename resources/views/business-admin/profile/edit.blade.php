@@ -52,7 +52,7 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-end gap-3 border-t border-gray-200 pt-6 dark:border-gray-700">
+                    <div class="flex flex-col-reverse gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:items-center sm:justify-end dark:border-gray-700">
                         <x-admin.button type="submit">Update Profile</x-admin.button>
                     </div>
                 </form>

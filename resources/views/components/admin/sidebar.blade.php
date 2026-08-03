@@ -14,10 +14,11 @@
 @endphp
 
 <aside
-    class="fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-gray-200 bg-white transition-[width] duration-300 dark:border-gray-800 dark:bg-gray-900 max-lg:translate-x-0"
+    id="admin-sidebar"
+    class="fixed inset-y-0 left-0 z-40 flex w-[min(100vw-3rem,18rem)] flex-col border-r border-gray-200 bg-white transition-transform duration-300 ease-out dark:border-gray-800 dark:bg-gray-900 sm:w-72"
     :class="{
         'w-[5.25rem]': collapsed,
-        'w-72': !collapsed,
+        'w-[min(100vw-3rem,18rem)] sm:w-72': !collapsed,
         'translate-x-0': sidebarOpen,
         '-translate-x-full lg:translate-x-0': !sidebarOpen
     }"
@@ -38,7 +39,7 @@
     </div>
 
     <div class="shrink-0 border-b border-gray-200 px-3 py-3 dark:border-gray-800" x-bind:class="collapsed ? 'hidden' : ''">
-        <button type="button" @click="commandOpen = true" class="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-left text-sm text-gray-500 transition hover:border-primary-300 dark:border-gray-700 dark:bg-gray-800">
+        <button type="button" @click="commandOpen = true; closeSidebar()" class="admin-touch-target flex w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-left text-sm text-gray-500 transition hover:border-primary-300 dark:border-gray-700 dark:bg-gray-800">
             <span class="inline-flex items-center gap-2"><x-admin.icon name="search" /> Search…</span>
             <kbd class="rounded-md border border-gray-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold dark:border-gray-600 dark:bg-gray-900">⌘K</kbd>
         </button>
@@ -74,8 +75,9 @@
                                 <a
                                     href="{{ route($item['route']) }}"
                                     title="{{ $item['label'] }}"
+                                    @click="closeSidebar()"
                                     @class([
-                                        'group flex min-w-0 flex-1 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
+                                        'group admin-touch-target flex min-w-0 flex-1 items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40',
                                         'bg-primary-50 text-primary-700 dark:bg-primary-900/25 dark:text-primary-300' => $isActive && ! $isBusinesses,
                                         'bg-primary-50 text-primary-700 dark:bg-primary-900/25 dark:text-primary-300' => $isBusinesses && ($active === 'businesses' || $active === 'organizations'),
                                         'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800' => ! ($isActive && ! $isBusinesses) && ! ($isBusinesses && ($active === 'businesses' || $active === 'organizations')),
@@ -114,8 +116,9 @@
                                             <div class="flex items-center gap-1">
                                                 <a
                                                     href="{{ $business['url'] }}"
+                                                    @click="closeSidebar()"
                                                     @class([
-                                                        'block min-w-0 flex-1 truncate rounded-lg px-2.5 py-1.5 text-[13px] font-medium',
+                                                        'admin-touch-target block min-w-0 flex-1 truncate rounded-lg px-2.5 py-2 text-[13px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40',
                                                         'bg-primary-50 text-primary-700' => $currentOrganizationId === (int) $business['id'],
                                                         'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800' => $currentOrganizationId !== (int) $business['id'],
                                                     ])
@@ -138,8 +141,9 @@
                                                         <li>
                                                             <a
                                                                 href="{{ $branch['url'] }}"
+                                                                @click="closeSidebar()"
                                                                 @class([
-                                                                    'block truncate rounded-lg px-2 py-1 text-xs',
+                                                                    'admin-touch-target block truncate rounded-lg px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40',
                                                                     'bg-primary-50 text-primary-700 font-medium' => $currentBranchId === (int) $branch['id'],
                                                                     'text-gray-500 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-primary-900/20' => $currentBranchId !== (int) $branch['id'],
                                                                 ])
@@ -163,7 +167,7 @@
     <div class="shrink-0 space-y-2 border-t border-gray-200 p-3 dark:border-gray-800">
         <button
             type="button"
-            class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+            class="admin-touch-target flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 dark:text-gray-300 dark:hover:bg-gray-800"
             :class="collapsed ? 'justify-center px-2' : ''"
             @click="requestLogout()"
         >

@@ -51,9 +51,9 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end border-t border-gray-200 pt-6 dark:border-gray-700">
+                <x-admin.form-actions class="justify-end border-t border-gray-200 pt-6 dark:border-gray-700">
                     <x-admin.button type="submit">Update Profile</x-admin.button>
-                </div>
+                </x-admin.form-actions>
             </form>
         </x-admin.card>
     </div>

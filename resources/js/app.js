@@ -216,6 +216,16 @@ document.addEventListener('alpine:init', () => {
                     this.commandQuery = '';
                     this.searchResults = [];
                 }
+
+                this.syncBodyScrollLock();
+            });
+
+            this.$watch('sidebarOpen', () => {
+                this.syncBodyScrollLock();
+            });
+
+            this.$watch('logoutConfirm', () => {
+                this.syncBodyScrollLock();
             });
 
             this.$el.addEventListener('confirm-logout', () => {
@@ -223,11 +233,53 @@ document.addEventListener('alpine:init', () => {
             });
 
             window.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    if (this.logoutConfirm) {
+                        this.cancelLogout();
+                        return;
+                    }
+
+                    if (this.commandOpen) {
+                        this.commandOpen = false;
+                        return;
+                    }
+
+                    if (this.sidebarOpen) {
+                        this.closeSidebar();
+                    }
+
+                    return;
+                }
+
                 if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
                     event.preventDefault();
                     this.commandOpen = true;
                 }
             });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    this.sidebarOpen = false;
+                    this.syncBodyScrollLock();
+                }
+            });
+        },
+
+        syncBodyScrollLock() {
+            const locked = this.sidebarOpen || this.commandOpen || this.logoutConfirm;
+            document.documentElement.classList.toggle('admin-scroll-lock', locked);
+        },
+
+        openSidebar() {
+            this.sidebarOpen = true;
+        },
+
+        closeSidebar() {
+            this.sidebarOpen = false;
+        },
+
+        toggleSidebar() {
+            this.sidebarOpen = ! this.sidebarOpen;
         },
 
         requestLogout() {

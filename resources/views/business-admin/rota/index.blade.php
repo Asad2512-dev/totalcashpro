@@ -44,16 +44,16 @@
         }"
     >
         <x-admin.toolbar title="Rota Management" description="Assign morning and evening shifts with section colours — same layout as Cash Up Pro.">
-            <a href="{{ $tabUrl('weekly') }}" @class(['rounded-xl px-3 py-2 text-sm font-semibold', 'bg-primary-600 text-white' => $tab === 'weekly', 'border border-gray-200 dark:border-gray-700' => $tab !== 'weekly'])>Weekly Rota</a>
-            <a href="{{ $tabUrl('sections') }}" @class(['rounded-xl px-3 py-2 text-sm font-semibold', 'bg-primary-600 text-white' => $tab === 'sections', 'border border-gray-200 dark:border-gray-700' => $tab !== 'sections'])>Sections</a>
-            <a href="{{ $tabUrl('groups') }}" @class(['rounded-xl px-3 py-2 text-sm font-semibold', 'bg-primary-600 text-white' => $tab === 'groups', 'border border-gray-200 dark:border-gray-700' => $tab !== 'groups'])>Groups</a>
+            <x-admin.nav-pill :href="$tabUrl('weekly')" :active="$tab === 'weekly'">Weekly Rota</x-admin.nav-pill>
+            <x-admin.nav-pill :href="$tabUrl('sections')" :active="$tab === 'sections'">Sections</x-admin.nav-pill>
+            <x-admin.nav-pill :href="$tabUrl('groups')" :active="$tab === 'groups'">Groups</x-admin.nav-pill>
         </x-admin.toolbar>
 
         @if ($tab === 'weekly')
-            <div class="mb-4 flex items-center justify-between gap-3">
-                <a href="{{ route('business-admin.rota', ['week' => $prevWeek, 'tab' => 'weekly']) }}" class="rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold dark:border-gray-700">← Prev Week</a>
-                <h3 class="font-display text-lg font-bold">{{ $weekLabel }}</h3>
-                <a href="{{ route('business-admin.rota', ['week' => $nextWeek, 'tab' => 'weekly']) }}" class="rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold dark:border-gray-700">Next Week →</a>
+            <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <x-admin.nav-pill :href="route('business-admin.rota', ['week' => $prevWeek, 'tab' => 'weekly'])">← Prev Week</x-admin.nav-pill>
+                <h3 class="text-center font-display text-base font-bold sm:text-lg">{{ $weekLabel }}</h3>
+                <x-admin.nav-pill :href="route('business-admin.rota', ['week' => $nextWeek, 'tab' => 'weekly'])">Next Week →</x-admin.nav-pill>
             </div>
 
             @if ($sections->isEmpty())
@@ -67,11 +67,11 @@
                     <div class="{{ $block['header'] }} px-4 py-3 text-white">
                         <h4 class="font-semibold">{{ $block['title'] }}</h4>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-sm">
-                            <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500 dark:bg-gray-800">
+                    <x-admin.matrix-wrap>
+                        <table>
+                            <thead>
                                 <tr>
-                                    <th class="px-3 py-2 text-left">Staff Name</th>
+                                    <th class="admin-matrix-sticky px-3 py-2 text-left">Staff Name</th>
                                     @foreach ($days as $day)
                                         <th class="px-2 py-2 text-center whitespace-nowrap">{{ $day['label'] }}</th>
                                     @endforeach
@@ -82,13 +82,13 @@
                             <tbody>
                                 @forelse ($block['grid'] as $row)
                                     <tr class="border-t border-gray-100 dark:border-gray-800">
-                                        <td class="px-3 py-2 font-semibold whitespace-nowrap">{{ $row['name'] }}</td>
+                                        <td class="admin-matrix-sticky px-3 py-2 font-semibold whitespace-nowrap">{{ $row['name'] }}</td>
                                         @foreach ($row['cells'] as $idx => $cell)
                                             @php $day = $days[$idx]; @endphp
                                             <td class="px-1 py-2 text-center">
                                                 <button
                                                     type="button"
-                                                    class="inline-block min-w-[4.5rem] rounded-lg border border-dashed border-gray-200 px-1 py-1 text-[11px] font-semibold dark:border-gray-700"
+                                                    class="admin-touch-target inline-flex min-h-[44px] min-w-[3.5rem] items-center justify-center rounded-lg border border-dashed border-gray-200 px-1.5 py-2 text-[11px] font-semibold dark:border-gray-700 sm:min-w-[4.5rem]"
                                                     @if ($cell)
                                                         style="background: {{ $cell['color'] }}22; border-color: {{ $cell['color'] }}; color: {{ $cell['color'] }};"
                                                     @endif
@@ -110,7 +110,7 @@
                                 @endforelse
                             </tbody>
                         </table>
-                    </div>
+                    </x-admin.matrix-wrap>
                 </x-admin.card>
             @endforeach
         @endif

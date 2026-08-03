@@ -22,6 +22,6 @@
                 </x-admin.card>
             @endforeach
         </div>
-        <div class="mt-4">{{ $notifications->links() }}</div>
+        <x-admin.pagination :paginator="$notifications" />
     @endif
 </x-layouts.staff>

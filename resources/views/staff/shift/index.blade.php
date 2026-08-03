@@ -5,9 +5,9 @@
 
 <x-layouts.staff title="My Shift" active="shift">
     <x-admin.toolbar title="My Shift" description="Shifts assigned to you this week.">
-        <a href="{{ route('staff.shift', ['week' => $prev]) }}" class="rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold dark:border-gray-700">← Prev</a>
-        <span class="px-2 text-sm font-semibold">{{ $weekLabel }}</span>
-        <a href="{{ route('staff.shift', ['week' => $next]) }}" class="rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold dark:border-gray-700">Next →</a>
+        <x-admin.nav-pill :href="route('staff.shift', ['week' => $prev])">← Prev</x-admin.nav-pill>
+        <span class="inline-flex min-h-[44px] items-center px-2 text-sm font-semibold">{{ $weekLabel }}</span>
+        <x-admin.nav-pill :href="route('staff.shift', ['week' => $next])">Next →</x-admin.nav-pill>
     </x-admin.toolbar>
 
     @if ($todayShift)
@@ -26,36 +26,36 @@
     @if ($shifts->isEmpty())
         <x-admin.empty-state title="No shifts this week" description="Ask your manager to assign you on the Staff Rota." />
     @else
-        <div class="admin-card overflow-hidden">
-            <table class="min-w-full text-left text-sm">
-                <thead class="border-b border-gray-200 bg-gray-50/90 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:border-gray-700 dark:bg-gray-800/80">
-                    <tr>
-                        <th class="px-4 py-3">Date</th>
-                        <th class="px-4 py-3">Type</th>
-                        <th class="px-4 py-3">Time</th>
-                        <th class="px-4 py-3">Section</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                    @foreach ($shifts as $shift)
-                        <tr>
-                            <td class="px-4 py-3.5">{{ $shift->shift_date?->format('D d M') }}</td>
-                            <td class="px-4 py-3.5">{{ $shift->shift_type }}</td>
-                            <td class="px-4 py-3.5">{{ $shift->start_time?->format('H:i') }}–{{ $shift->end_time?->format('H:i') }}</td>
-                            <td class="px-4 py-3.5">
-                                @if ($shift->rotaSection)
-                                    <span class="inline-flex items-center gap-2">
-                                        <span class="inline-block h-3 w-3 rounded" style="background: {{ $shift->rotaSection->color }}"></span>
-                                        {{ $shift->rotaSection->name }}
-                                    </span>
-                                @else
-                                    —
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <div class="admin-mobile-cards sm:hidden">
+            @foreach ($shifts as $shift)
+                <article class="admin-mobile-card">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <p class="font-semibold text-gray-900 dark:text-white">{{ $shift->shift_date?->format('D d M') }}</p>
+                            <p class="mt-1 text-sm text-gray-500">{{ $shift->shift_type }}</p>
+                        </div>
+                        <p class="text-sm font-semibold text-primary-700">{{ $shift->start_time?->format('H:i') }}–{{ $shift->end_time?->format('H:i') }}</p>
+                    </div>
+                    @if ($shift->rotaSection)
+                        <p class="mt-3 inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                            <span class="inline-block h-3 w-3 rounded" style="background: {{ $shift->rotaSection->color }}"></span>
+                            {{ $shift->rotaSection->name }}
+                        </p>
+                    @endif
+                </article>
+            @endforeach
         </div>
+
+        <x-admin.card :padding="false" class="hidden sm:block">
+            <x-admin.table
+                :columns="['Date', 'Type', 'Time', 'Section']"
+                :rows="$shifts->map(fn ($shift) => [
+                    $shift->shift_date?->format('D d M'),
+                    $shift->shift_type,
+                    $shift->start_time?->format('H:i').'–'.$shift->end_time?->format('H:i'),
+                    $shift->rotaSection?->name ?? '—',
+                ])->all()"
+            />
+        </x-admin.card>
     @endif
 </x-layouts.staff>

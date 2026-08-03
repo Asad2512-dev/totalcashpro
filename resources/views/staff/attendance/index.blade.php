@@ -1,47 +1,50 @@
 @php
     $prev = $from->copy()->subWeek()->toDateString();
     $next = $from->copy()->addWeek()->toDateString();
+    $weekTotal = collect($days)->sum('hours');
 @endphp
 
 <x-layouts.staff title="Attendance" active="attendance">
     <x-admin.toolbar title="My Attendance" description="Your clock-in and clock-out history for the week.">
-        <a href="{{ route('staff.attendance', ['week' => $prev]) }}" class="rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold dark:border-gray-700">← Prev</a>
-        <span class="px-2 text-sm font-semibold">{{ $from->format('d M') }} – {{ $to->format('d M Y') }}</span>
-        <a href="{{ route('staff.attendance', ['week' => $next]) }}" class="rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold dark:border-gray-700">Next →</a>
+        <x-admin.nav-pill :href="route('staff.attendance', ['week' => $prev])">← Prev</x-admin.nav-pill>
+        <span class="inline-flex min-h-[44px] items-center px-2 text-sm font-semibold">{{ $from->format('d M') }} – {{ $to->format('d M Y') }}</span>
+        <x-admin.nav-pill :href="route('staff.attendance', ['week' => $next])">Next →</x-admin.nav-pill>
     </x-admin.toolbar>
 
-    <div class="admin-card overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-left text-sm">
-                <thead class="border-b border-gray-200 bg-gray-50/90 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:border-gray-700 dark:bg-gray-800/80">
-                    <tr>
-                        <th class="px-4 py-3">Day</th>
-                        <th class="px-4 py-3">Slots</th>
-                        <th class="px-4 py-3">Hours</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                    @foreach ($days as $date => $day)
-                        <tr>
-                            <td class="px-4 py-3.5 font-medium text-gray-900 dark:text-white">{{ \Illuminate\Support\Carbon::parse($date)->format('D d M') }}</td>
-                            <td class="px-4 py-3.5 text-gray-600 dark:text-gray-300">
-                                @forelse ($day['slots'] as $slot)
-                                    <span class="mr-2 inline-block rounded-lg bg-gray-100 px-2 py-1 text-xs dark:bg-gray-800">{{ $slot['in'] }}–{{ $slot['out'] ?? '…' }}</span>
-                                @empty
-                                    —
-                                @endforelse
-                            </td>
-                            <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ number_format((float) $day['hours'], 2) }}h</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-                <tfoot>
-                    <tr class="bg-gray-50 dark:bg-gray-800/60">
-                        <td class="px-4 py-3 font-bold" colspan="2">Week total</td>
-                        <td class="px-4 py-3 font-bold">{{ number_format(collect($days)->sum('hours'), 2) }}h</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
+    <div class="admin-mobile-cards">
+        @foreach ($days as $date => $day)
+            <article class="admin-mobile-card">
+                <div class="flex items-center justify-between gap-3">
+                    <h3 class="font-semibold text-gray-900 dark:text-white">{{ \Illuminate\Support\Carbon::parse($date)->format('D d M') }}</h3>
+                    <span class="text-sm font-semibold text-primary-700">{{ number_format((float) $day['hours'], 2) }}h</span>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    @forelse ($day['slots'] as $slot)
+                        <span class="inline-flex rounded-lg bg-gray-100 px-2.5 py-1.5 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-200">{{ $slot['in'] }}–{{ $slot['out'] ?? '…' }}</span>
+                    @empty
+                        <span class="text-sm text-gray-400">No slots</span>
+                    @endforelse
+                </div>
+            </article>
+        @endforeach
+        <article class="admin-mobile-card border-primary-200 bg-primary-50/40 dark:border-primary-900/40 dark:bg-primary-900/15">
+            <div class="flex items-center justify-between">
+                <span class="font-bold text-gray-900 dark:text-white">Week total</span>
+                <span class="font-bold text-primary-700">{{ number_format($weekTotal, 2) }}h</span>
+            </div>
+        </article>
     </div>
+
+    <x-admin.card :padding="false" class="hidden sm:block">
+        <x-admin.table
+            :columns="['Day', 'Slots', 'Hours']"
+            :rows="collect($days)->map(fn ($day, $date) => [
+                \Illuminate\Support\Carbon::parse($date)->format('D d M'),
+                collect($day['slots'])->isEmpty()
+                    ? '—'
+                    : collect($day['slots'])->map(fn ($slot) => $slot['in'].'–'.($slot['out'] ?? '…'))->join(', '),
+                number_format((float) $day['hours'], 2).'h',
+            ])->values()->push(['Week total', '', number_format($weekTotal, 2).'h'])->all()"
+        />
+    </x-admin.card>
 </x-layouts.staff>

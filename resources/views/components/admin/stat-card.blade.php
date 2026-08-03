@@ -5,10 +5,10 @@
     'tone' => 'success',
 ])
 
-<article class="admin-card p-5">
-    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ $label }}</p>
-    <div class="mt-3 flex items-end justify-between gap-3">
-        <p class="font-display text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">{{ $value }}</p>
+<article class="admin-card p-4 sm:p-5">
+    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 sm:text-sm">{{ $label }}</p>
+    <div class="mt-2 flex items-end justify-between gap-3 sm:mt-3">
+        <p class="font-display text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-3xl">{{ $value }}</p>
         @if ($change)
             <span @class([
                 'rounded-full px-2.5 py-1 text-xs font-semibold',

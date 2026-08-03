@@ -12,7 +12,7 @@
             @else
                 <div class="divide-y divide-gray-100 dark:divide-gray-800">
                     @foreach ($notifications as $notification)
-                        <div class="flex items-start gap-4 px-4 py-4 transition hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <div class="flex flex-col gap-3 px-4 py-4 transition hover:bg-gray-50 sm:flex-row sm:items-start dark:hover:bg-gray-800">
                             <div class="flex-shrink-0">
                                 <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/20">
                                     <x-admin.icon name="bell" class="h-5 w-5 text-primary-600" />
@@ -23,11 +23,11 @@
                                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ $notification->message }}</p>
                                 <p class="mt-1 text-xs text-gray-500">{{ $notification->created_at->diffForHumans() }}</p>
                             </div>
-                            <div class="flex-shrink-0">
+                            <div class="flex-shrink-0 sm:ml-auto">
                                 @if (!$notification->read_at)
                                     <form method="POST" action="{{ route('business-admin.notifications.mark-read', $notification) }}">
                                         @csrf
-                                        <button type="submit" class="text-sm text-primary-600 hover:text-primary-700">
+                                        <button type="submit" class="admin-touch-target text-sm font-semibold text-primary-600 hover:text-primary-700">
                                             Mark Read
                                         </button>
                                     </form>

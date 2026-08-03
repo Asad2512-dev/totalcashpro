@@ -8,7 +8,7 @@
             of
             <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $paginator->total() }}</span>
         </p>
-        <div>
+        <div class="admin-pagination">
             {{ $paginator->onEachSide(1)->links() }}
         </div>
     </div>

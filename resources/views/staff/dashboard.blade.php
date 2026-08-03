@@ -1,7 +1,7 @@
 <x-layouts.staff title="Dashboard" active="dashboard">
     <x-admin.toolbar title="Staff Dashboard" description="Your shift, clock status and today’s work at a glance." />
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="admin-stat-grid">
         <x-admin.card>
             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Assigned branch</p>
             <p class="mt-2 font-display text-xl font-bold text-gray-900 dark:text-white">{{ $branchName }}</p>
@@ -31,9 +31,9 @@
         <x-admin.card>
             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Quick actions</p>
             <div class="mt-3 flex flex-wrap gap-2">
-                <a href="{{ route('staff.clock') }}" class="rounded-xl bg-primary-600 px-3 py-2 text-sm font-semibold text-white">Clock</a>
-                <a href="{{ route('staff.cash-up') }}" class="rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold dark:border-gray-700">Cash Up</a>
-                <a href="{{ route('staff.attendance') }}" class="rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold dark:border-gray-700">Attendance</a>
+                <a href="{{ route('staff.clock') }}" class="admin-touch-target rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white">Clock</a>
+                <a href="{{ route('staff.cash-up') }}" class="admin-touch-target rounded-xl border border-gray-200 px-4 text-sm font-semibold dark:border-gray-700">Cash Up</a>
+                <a href="{{ route('staff.attendance') }}" class="admin-touch-target rounded-xl border border-gray-200 px-4 text-sm font-semibold dark:border-gray-700">Attendance</a>
             </div>
         </x-admin.card>
     </div>

@@ -9,7 +9,7 @@
         <x-admin.button variant="secondary" size="sm" :href="route('business-admin.clock-in')">Clock In</x-admin.button>
     </x-admin.toolbar>
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="admin-stat-grid">
         @foreach ($stats as $stat)
             <x-admin.stat
                 :label="$stat['label']"
@@ -32,7 +32,7 @@
             <h3 class="font-display text-base font-bold text-gray-900 dark:text-white">Quick actions</h3>
             <div class="mt-4 grid gap-2">
                 @foreach ($quickActions as $action)
-                    <a href="{{ route($action['route']) }}" class="flex items-center gap-3 rounded-xl border border-gray-200 px-3 py-3 text-sm font-medium text-gray-700 transition hover:border-primary-300 hover:bg-primary-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-primary-900/20">
+                    <a href="{{ route($action['route']) }}" class="admin-touch-target flex items-center gap-3 rounded-xl border border-gray-200 px-3 py-3 text-sm font-medium text-gray-700 transition hover:border-primary-300 hover:bg-primary-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-primary-900/20">
                         <x-admin.icon :name="$action['icon']" class="h-4 w-4 text-primary-600" />
                         {{ $action['label'] }}
                     </a>

@@ -39,25 +39,25 @@
                 settings-route="business-admin.settings"
             >
                 <x-slot:actions>
-                    <form method="POST" action="{{ route('business-admin.branch.select') }}" class="hidden items-center gap-2 sm:flex">
-                        @csrf
-                        <label for="branch-selector" class="sr-only">Branch</label>
-                        <select
-                            id="branch-selector"
-                            name="branch_id"
-                            onchange="this.form.submit()"
-                            class="rounded-xl border border-gray-200 bg-white py-2 pl-3 pr-8 text-sm font-medium text-gray-700 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
-                        >
-                            <option value="all" @selected($selectedBranchId === null)>All branches</option>
-                            @foreach ($branches as $branch)
-                                <option value="{{ $branch->id }}" @selected($selectedBranchId === (int) $branch->id)>
-                                    {{ $branch->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </form>
+                    <x-admin.branch-selector
+                        :branches="$branches"
+                        :selected-branch-id="$selectedBranchId"
+                        :action="route('business-admin.branch.select')"
+                        class="hidden min-w-0 sm:flex"
+                    />
                 </x-slot:actions>
             </x-admin.topbar>
+
+            @if ($branches->isNotEmpty())
+                <div class="border-b border-gray-200 bg-white px-3 py-2.5 dark:border-gray-800 dark:bg-gray-900 sm:hidden">
+                    <x-admin.branch-selector
+                        :branches="$branches"
+                        :selected-branch-id="$selectedBranchId"
+                        :action="route('business-admin.branch.select')"
+                        compact
+                    />
+                </div>
+            @endif
 
             <main class="admin-fade-in flex-1 px-4 py-6 sm:px-6 lg:px-8">
                 @if ($user && ! $user->hasVerifiedEmail())
@@ -86,7 +86,7 @@
         x-cloak
         x-show="commandOpen"
         x-transition.opacity
-        class="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 px-4 pt-24"
+        class="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 px-3 pt-16 sm:px-4 sm:pt-24"
         @keydown.escape.window="commandOpen = false"
         @click.self="commandOpen = false"
     >
@@ -114,7 +114,7 @@
         </div>
     </div>
 
-    <div x-cloak x-show="sidebarOpen" class="fixed inset-0 z-30 bg-gray-900/40 lg:hidden" @click="sidebarOpen = false"></div>
+    <x-admin.mobile-backdrop />
 
     <x-admin.logout-confirm :user-name="$user?->name" />
 </body>

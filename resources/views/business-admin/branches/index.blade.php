@@ -7,8 +7,8 @@
         <x-admin.empty-state title="No branches yet" description="Add your first branch to get started." />
     @else
         <div class="admin-card overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-left text-sm">
+            <div class="admin-table-wrap -mx-4 sm:mx-0">
+                <table class="admin-table min-w-full text-left text-sm">
                     <thead class="border-b border-gray-200 bg-gray-50/90 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-400">
                         <tr>
                             <th class="px-4 py-3">Name</th>

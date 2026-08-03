@@ -11,7 +11,7 @@
         </x-admin.button>
     </x-admin.toolbar>
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="admin-stat-grid">
         @foreach ($stats as $stat)
             <x-admin.stat
                 :label="$stat['label']"

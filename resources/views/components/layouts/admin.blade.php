@@ -47,7 +47,7 @@
         x-cloak
         x-show="commandOpen"
         x-transition.opacity
-        class="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 px-4 pt-24"
+        class="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 px-3 pt-16 sm:px-4 sm:pt-24"
         @keydown.escape.window="commandOpen = false"
         @click.self="commandOpen = false"
     >
@@ -92,7 +92,7 @@
         </div>
     </div>
 
-    <div x-cloak x-show="sidebarOpen" class="fixed inset-0 z-30 bg-gray-900/40 lg:hidden" @click="sidebarOpen = false"></div>
+    <x-admin.mobile-backdrop />
 
     <x-admin.logout-confirm :user-name="$user?->name" />
 </body>

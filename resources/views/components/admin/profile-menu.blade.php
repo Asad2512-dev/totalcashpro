@@ -6,7 +6,7 @@
 
 <x-admin.dropdown align="right" width="w-56">
     <x-slot:trigger>
-        <button type="button" class="flex items-center gap-2 rounded-xl border border-gray-200 px-2 py-1.5 transition hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">
+        <button type="button" class="admin-touch-target flex items-center gap-2 rounded-xl border border-gray-200 px-2 py-1.5 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 dark:border-gray-700 dark:hover:bg-gray-800">
             <x-admin.avatar :name="$user?->name ?? 'Admin'" />
             <div class="hidden text-left sm:block">
                 <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $user?->name ?? 'Admin' }}</p>
