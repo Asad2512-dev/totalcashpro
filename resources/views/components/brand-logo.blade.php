@@ -13,7 +13,7 @@
 @endphp
 
 <img
-    src="{{ asset('logo.png') }}"
+    src="{{ brand_logo_url() }}"
     alt="{{ brand_name() }}"
     decoding="async"
     {{ $attributes->class([

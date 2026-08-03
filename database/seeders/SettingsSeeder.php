@@ -18,7 +18,7 @@ final class SettingsSeeder extends Seeder
             ['group' => 'general', 'key' => 'timezone', 'value' => 'Europe/London', 'type' => 'string'],
             ['group' => 'brand', 'key' => 'primary_color', 'value' => '#16A34A', 'type' => 'string'],
             ['group' => 'brand', 'key' => 'logo_path', 'value' => '/logo.png', 'type' => 'string'],
-            ['group' => 'brand', 'key' => 'favicon_path', 'value' => '/logo.png', 'type' => 'string'],
+            ['group' => 'brand', 'key' => 'favicon_path', 'value' => '/favicon.png', 'type' => 'string'],
             ['group' => 'seo', 'key' => 'default_title', 'value' => 'TotalCashPro', 'type' => 'string'],
             ['group' => 'seo', 'key' => 'meta_description', 'value' => 'Cash, staff and reporting for multi-branch businesses.', 'type' => 'string'],
             ['group' => 'email', 'key' => 'from_name', 'value' => 'TotalCashPro', 'type' => 'string'],

@@ -12,7 +12,7 @@
     <title>{{ $seo['title'] ?? ($title.' — '.brand_name()) }}</title>
     <meta name="description" content="{{ $seo['description'] ?? 'Sign in to TotalCashPro.' }}">
     <link rel="icon" href="{{ brand_favicon_url() }}" type="image/png" sizes="any">
-    <link rel="apple-touch-icon" href="{{ brand_favicon_url() }}">
+    <link rel="apple-touch-icon" href="{{ brand_apple_touch_icon_url() }}">
     <link rel="shortcut icon" href="{{ brand_favicon_url() }}">
     <style>[x-cloak]{display:none!important}</style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])

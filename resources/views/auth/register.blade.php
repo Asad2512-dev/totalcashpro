@@ -2,7 +2,7 @@
     <div class="grid min-h-screen lg:grid-cols-2">
         <section class="relative hidden overflow-hidden auth-shell text-white lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
             <div class="relative z-10">
-                <a href="{{ route('home') }}" class="inline-flex shrink-0 items-center rounded-2xl bg-white px-3 py-2" aria-label="{{ brand_name() }} home">
+                <a href="{{ route('home') }}" class="inline-flex shrink-0 items-center drop-shadow-md" aria-label="{{ brand_name() }} home">
                     <x-brand-logo height="h-9" class="max-w-none" />
                 </a>
                 <h1 class="mt-14 max-w-md font-display text-4xl font-extrabold tracking-tight xl:text-5xl">

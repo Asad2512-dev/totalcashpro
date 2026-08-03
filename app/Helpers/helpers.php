@@ -26,6 +26,13 @@ if (! function_exists('brand_logo_url')) {
 if (! function_exists('brand_favicon_url')) {
     function brand_favicon_url(): string
     {
-        return asset('logo.png');
+        return asset('favicon.png');
+    }
+}
+
+if (! function_exists('brand_apple_touch_icon_url')) {
+    function brand_apple_touch_icon_url(): string
+    {
+        return asset('apple-touch-icon.png');
     }
 }

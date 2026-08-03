@@ -2,7 +2,7 @@
     <x-container class="relative py-16 lg:py-20">
         <div class="grid gap-12 lg:grid-cols-[1.35fr_repeat(4,1fr)]">
             <div class="max-w-sm">
-                <a href="{{ route('home') }}" class="inline-flex shrink-0 items-center rounded-xl bg-white px-3 py-2" aria-label="{{ brand_name() }} home">
+                <a href="{{ route('home') }}" class="inline-flex shrink-0 items-center drop-shadow-md" aria-label="{{ brand_name() }} home">
                     <x-brand-logo height="h-8" class="max-w-none" />
                 </a>
                 <p class="mt-5 text-sm leading-relaxed text-white/70">
