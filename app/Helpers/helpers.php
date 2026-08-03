@@ -30,6 +30,13 @@ if (! function_exists('brand_favicon_url')) {
     }
 }
 
+if (! function_exists('brand_favicon_ico_url')) {
+    function brand_favicon_ico_url(): string
+    {
+        return asset('favicon.ico');
+    }
+}
+
 if (! function_exists('brand_apple_touch_icon_url')) {
     function brand_apple_touch_icon_url(): string
     {
