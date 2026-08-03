@@ -17,7 +17,7 @@
     alt="{{ brand_name() }}"
     decoding="async"
     {{ $attributes->class([
-        'block w-auto shrink-0 object-contain object-left',
+        'block w-auto shrink-0 bg-transparent object-contain object-left',
         $heightClass,
     ]) }}
 >

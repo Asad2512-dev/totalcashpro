@@ -26,7 +26,7 @@
         class="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200 px-3 dark:border-gray-800"
         :class="collapsed ? 'justify-center px-2' : 'justify-between px-4'"
     >
-        <a href="{{ route($homeRoute) }}" class="inline-flex min-w-0 items-center overflow-hidden rounded-lg dark:bg-white dark:px-2 dark:py-1">
+        <a href="{{ route($homeRoute) }}" class="inline-flex min-w-0 items-center overflow-hidden rounded-lg">
             <span class="inline-flex" x-bind:class="collapsed ? 'hidden' : ''">
                 <x-brand-logo height="h-8" class="max-w-none" />
             </span>

@@ -16,30 +16,43 @@ if (! function_exists('brand_tagline')) {
     }
 }
 
+if (! function_exists('brand_asset_url')) {
+    function brand_asset_url(string $filename): string
+    {
+        $path = public_path($filename);
+
+        if (! is_file($path)) {
+            return asset($filename);
+        }
+
+        return asset($filename).'?v='.filemtime($path);
+    }
+}
+
 if (! function_exists('brand_logo_url')) {
     function brand_logo_url(): string
     {
-        return asset('logo.png');
+        return brand_asset_url('logo.png');
     }
 }
 
 if (! function_exists('brand_favicon_url')) {
     function brand_favicon_url(): string
     {
-        return asset('favicon.png');
+        return brand_asset_url('favicon.png');
     }
 }
 
 if (! function_exists('brand_favicon_ico_url')) {
     function brand_favicon_ico_url(): string
     {
-        return asset('favicon.ico');
+        return brand_asset_url('favicon.ico');
     }
 }
 
 if (! function_exists('brand_apple_touch_icon_url')) {
     function brand_apple_touch_icon_url(): string
     {
-        return asset('apple-touch-icon.png');
+        return brand_asset_url('apple-touch-icon.png');
     }
 }
