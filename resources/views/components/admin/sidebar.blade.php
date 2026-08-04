@@ -24,8 +24,8 @@
     }"
 >
     <div
-        class="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200 px-3 dark:border-gray-800"
-        :class="collapsed ? 'justify-center px-2' : 'justify-between px-4'"
+        class="flex h-16 shrink-0 items-center border-b border-gray-200 px-3 dark:border-gray-800"
+        :class="collapsed ? 'justify-center px-2' : 'justify-start px-3'"
     >
         <a href="{{ route($homeRoute) }}" class="inline-flex min-w-0 items-center overflow-hidden rounded-lg">
             <span class="inline-flex" x-bind:class="collapsed ? 'hidden' : ''">
@@ -38,25 +38,24 @@
         </a>
     </div>
 
-    <div class="shrink-0 border-b border-gray-200 px-3 py-3 dark:border-gray-800" x-bind:class="collapsed ? 'hidden' : ''">
-        <button type="button" @click="commandOpen = true; closeSidebar()" class="admin-touch-target flex w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-left text-sm text-gray-500 transition hover:border-primary-300 dark:border-gray-700 dark:bg-gray-800">
-            <span class="inline-flex items-center gap-2"><x-admin.icon name="search" /> Search…</span>
-            <kbd class="rounded-md border border-gray-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold dark:border-gray-600 dark:bg-gray-900">⌘K</kbd>
+    <div class="shrink-0 border-b border-gray-200 px-2 py-3 dark:border-gray-800" x-bind:class="collapsed ? 'hidden' : ''">
+        <button type="button" @click="commandOpen = true; closeSidebar()" class="admin-touch-target flex w-full min-h-[44px] items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-left text-sm text-gray-500 transition hover:border-primary-300 dark:border-gray-700 dark:bg-gray-800">
+            <span class="inline-flex min-w-0 items-center gap-2 truncate"><x-admin.icon name="search" class="h-4 w-4 shrink-0" /> Search…</span>
+            <kbd class="shrink-0 rounded-md border border-gray-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold dark:border-gray-600 dark:bg-gray-900">⌘K</kbd>
         </button>
     </div>
 
-    <nav class="min-h-0 flex-1 space-y-5 overflow-y-auto overflow-x-hidden px-3 py-4">
+    <nav class="min-h-0 flex-1 space-y-4 overflow-y-auto overflow-x-hidden px-2 py-4">
         @foreach ($nav as $group)
             <div>
                 <p
-                    class="px-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400"
+                    class="admin-sidebar-group-label"
                     x-bind:class="collapsed ? 'hidden' : ''"
                 >{{ $group['label'] }}</p>
-                <ul class="mt-2 space-y-0.5">
+                <ul class="mt-1.5 space-y-0.5">
                     @foreach ($group['items'] as $item)
                         @php
                             $routeKey = \Illuminate\Support\Str::afterLast($item['route'], '.');
-                            // Prefer full suffix after panel prefix (e.g. cash-history)
                             if (str_starts_with($item['route'], 'super-admin.')) {
                                 $routeKey = str_replace('super-admin.', '', $item['route']);
                             } elseif (str_starts_with($item['route'], 'business-admin.')) {
@@ -69,18 +68,18 @@
                                 || ($active === 'dashboard' && $routeKey === 'dashboard')
                                 || ($routeKey === 'businesses' && $businessesSectionOpen);
                             $isBusinesses = $routeKey === 'businesses';
+                            $businessesActive = $isBusinesses && ($active === 'businesses' || $active === 'organizations');
                         @endphp
                         <li @if ($isBusinesses) x-data="{ businessesOpen: {{ $businessesSectionOpen ? 'true' : 'false' }} }" @endif>
-                            <div class="flex items-center gap-1">
+                            <div class="flex items-stretch gap-0.5">
                                 <a
                                     href="{{ route($item['route']) }}"
                                     title="{{ $item['label'] }}"
                                     @click="closeSidebar()"
                                     @class([
-                                        'group admin-touch-target flex min-w-0 flex-1 items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40',
-                                        'bg-primary-50 text-primary-700 dark:bg-primary-900/25 dark:text-primary-300' => $isActive && ! $isBusinesses,
-                                        'bg-primary-50 text-primary-700 dark:bg-primary-900/25 dark:text-primary-300' => $isBusinesses && ($active === 'businesses' || $active === 'organizations'),
-                                        'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800' => ! ($isActive && ! $isBusinesses) && ! ($isBusinesses && ($active === 'businesses' || $active === 'organizations')),
+                                        'admin-sidebar-link group min-w-0',
+                                        'bg-primary-50 text-primary-700 dark:bg-primary-900/25 dark:text-primary-300' => ($isActive && ! $isBusinesses) || $businessesActive,
+                                        'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800' => ! (($isActive && ! $isBusinesses) || $businessesActive),
                                     ])
                                     :class="collapsed ? 'justify-center px-2' : ''"
                                 >
@@ -90,7 +89,7 @@
                                 @if ($isBusinesses && count($businessTree) > 0)
                                     <button
                                         type="button"
-                                        class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-50 hover:text-gray-700 dark:hover:bg-gray-800"
+                                        class="admin-touch-target inline-flex shrink-0 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-50 hover:text-gray-700 dark:hover:bg-gray-800"
                                         x-bind:class="collapsed ? 'hidden' : ''"
                                         @click="businessesOpen = !businessesOpen"
                                         aria-label="Toggle businesses"
@@ -102,7 +101,7 @@
 
                             @if ($isBusinesses && count($businessTree) > 0)
                                 <ul
-                                    class="mt-1 space-y-1 border-l border-gray-200 pl-3 ml-4 dark:border-gray-700"
+                                    class="mt-1 space-y-0.5 border-l border-gray-200 pl-2 ml-3 dark:border-gray-700"
                                     x-show="businessesOpen && !collapsed"
                                     x-cloak
                                 >
@@ -113,13 +112,13 @@
                                                 || in_array($currentBranchId, $branchIds, true);
                                         @endphp
                                         <li x-data="{ open: {{ $businessOpen ? 'true' : 'false' }} }">
-                                            <div class="flex items-center gap-1">
+                                            <div class="flex items-stretch gap-0.5">
                                                 <a
                                                     href="{{ $business['url'] }}"
                                                     @click="closeSidebar()"
                                                     @class([
-                                                        'admin-touch-target block min-w-0 flex-1 truncate rounded-lg px-2.5 py-2 text-[13px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40',
-                                                        'bg-primary-50 text-primary-700' => $currentOrganizationId === (int) $business['id'],
+                                                        'admin-sidebar-sublink min-w-0 truncate',
+                                                        'bg-primary-50 text-primary-700 dark:bg-primary-900/25 dark:text-primary-300' => $currentOrganizationId === (int) $business['id'],
                                                         'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800' => $currentOrganizationId !== (int) $business['id'],
                                                     ])
                                                     title="{{ $business['name'] }}"
@@ -127,7 +126,7 @@
                                                 @if (count($business['branches']) > 0)
                                                     <button
                                                         type="button"
-                                                        class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-gray-400 hover:bg-gray-50"
+                                                        class="admin-touch-target inline-flex shrink-0 items-center justify-center rounded-md text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                         @click="open = !open"
                                                         aria-label="Toggle branches"
                                                     >
@@ -136,16 +135,16 @@
                                                 @endif
                                             </div>
                                             @if (count($business['branches']) > 0)
-                                                <ul class="mt-0.5 space-y-0.5 pl-3" x-show="open" x-cloak>
+                                                <ul class="mt-0.5 space-y-0.5 border-l border-gray-200 pl-2 ml-2 dark:border-gray-700" x-show="open" x-cloak>
                                                     @foreach ($business['branches'] as $branch)
                                                         <li>
                                                             <a
                                                                 href="{{ $branch['url'] }}"
                                                                 @click="closeSidebar()"
                                                                 @class([
-                                                                    'admin-touch-target block truncate rounded-lg px-2 py-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40',
-                                                                    'bg-primary-50 text-primary-700 font-medium' => $currentBranchId === (int) $branch['id'],
-                                                                    'text-gray-500 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-primary-900/20' => $currentBranchId !== (int) $branch['id'],
+                                                                    'admin-sidebar-nested-link truncate',
+                                                                    'bg-primary-50 font-medium text-primary-700 dark:bg-primary-900/25 dark:text-primary-300' => $currentBranchId === (int) $branch['id'],
+                                                                    'text-gray-500 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-primary-900/20 dark:hover:text-primary-300' => $currentBranchId !== (int) $branch['id'],
                                                                 ])
                                                                 title="{{ $branch['name'] }}"
                                                             >{{ $branch['name'] }}</a>
@@ -164,10 +163,10 @@
         @endforeach
     </nav>
 
-    <div class="shrink-0 space-y-2 border-t border-gray-200 p-3 dark:border-gray-800">
+    <div class="shrink-0 border-t border-gray-200 p-2 dark:border-gray-800">
         <button
             type="button"
-            class="admin-touch-target flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 dark:text-gray-300 dark:hover:bg-gray-800"
+            class="admin-sidebar-link w-full text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
             :class="collapsed ? 'justify-center px-2' : ''"
             @click="requestLogout()"
         >

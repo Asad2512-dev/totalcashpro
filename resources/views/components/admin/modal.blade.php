@@ -31,7 +31,7 @@
         @if ($title)
             <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-4 py-4 sm:px-5 dark:border-gray-700">
                 <h3 class="font-display text-lg font-bold text-gray-900 dark:text-white">{{ $title }}</h3>
-                <button type="button" class="admin-touch-target rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800" @click="open = false" aria-label="Close">
+                <button type="button" class="admin-touch-target inline-flex items-center justify-center rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800" @click="open = false" aria-label="Close">
                     <x-admin.icon name="x" class="h-4 w-4" />
                 </button>
             </div>

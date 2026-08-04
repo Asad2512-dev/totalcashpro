@@ -31,9 +31,9 @@
         <x-admin.card>
             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Quick actions</p>
             <div class="mt-3 flex flex-wrap gap-2">
-                <a href="{{ route('staff.clock') }}" class="admin-touch-target rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white">Clock</a>
-                <a href="{{ route('staff.cash-up') }}" class="admin-touch-target rounded-xl border border-gray-200 px-4 text-sm font-semibold dark:border-gray-700">Cash Up</a>
-                <a href="{{ route('staff.attendance') }}" class="admin-touch-target rounded-xl border border-gray-200 px-4 text-sm font-semibold dark:border-gray-700">Attendance</a>
+                <a href="{{ route('staff.clock') }}" class="admin-touch-target inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white">Clock</a>
+                <a href="{{ route('staff.cash-up') }}" class="admin-touch-target inline-flex items-center justify-center rounded-xl border border-gray-200 px-4 text-sm font-semibold dark:border-gray-700">Cash Up</a>
+                <a href="{{ route('staff.attendance') }}" class="admin-touch-target inline-flex items-center justify-center rounded-xl border border-gray-200 px-4 text-sm font-semibold dark:border-gray-700">Attendance</a>
             </div>
         </x-admin.card>
     </div>
