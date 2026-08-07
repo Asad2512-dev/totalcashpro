@@ -155,7 +155,7 @@ final class DemoDataSeeder extends Seeder
                 ],
             );
 
-            $organization = Organization::query()->updateOrCreate(
+            $organization = Organization::withTrashed()->updateOrCreate(
                 ['slug' => $item['slug']],
                 [
                     'name' => $item['name'],
@@ -170,6 +170,7 @@ final class DemoDataSeeder extends Seeder
                     'trial_ends_at' => $item['sub'] === SubscriptionStatus::Trialing ? now()->addDays(11) : null,
                     'created_at' => now()->subDays(40 - ($index * 4)),
                     'updated_at' => now()->subDays($index),
+                    'deleted_at' => null,
                 ],
             );
 
@@ -190,7 +191,7 @@ final class DemoDataSeeder extends Seeder
             }
 
             foreach ($item['branches'] as $bIndex => $branchData) {
-                $branch = Branch::query()->updateOrCreate(
+                $branch = Branch::withTrashed()->updateOrCreate(
                     [
                         'organization_id' => $organization->id,
                         'slug' => Str::slug($branchData['name']),
@@ -201,6 +202,7 @@ final class DemoDataSeeder extends Seeder
                         'address' => $branchData['city'].' High Street',
                         'status' => $organization->status === OrganizationStatus::Suspended ? 'closed' : 'open',
                         'staff_count' => 3 + $bIndex,
+                        'deleted_at' => null,
                     ],
                 );
 
