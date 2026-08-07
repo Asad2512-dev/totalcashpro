@@ -68,7 +68,7 @@ final class HarbourKitchenDemoSeeder extends Seeder
         $central = $branches->firstWhere('name', 'Harbour Central') ?? $branches->first();
         $staff = User::query()
             ->where('organization_id', $org->id)
-            ->whereNotNull('pin_code')
+            ->whereNotNull('pin_hash')
             ->orderBy('id')
             ->get();
 

@@ -99,7 +99,7 @@ final class FinanceModuleTest extends TestCase
             'role_id' => Role::query()->where('slug', RoleSlug::Staff->value)->value('id'),
             'organization_id' => $admin->organization_id,
             'branch_id' => $branch->id,
-            'pin_code' => '2000',
+            'pin_hash' => \App\Support\Security\StaffPinHasher::hash('2000'),
             'hourly_rate' => 15,
             'status' => 'active',
             'email_verified_at' => now(),

@@ -57,7 +57,7 @@ final class Milestone41IntegrationTest extends TestCase
         app(\App\Services\BusinessAdmin\StaffService::class)->create($admin, [
             'name' => 'New Staff',
             'email' => 'newstaff@test.com',
-            'pin_code' => '1234',
+            'pin_hash' => \App\Support\Security\StaffPinHasher::hash('1234'),
         ]);
 
         Event::assertDispatched(StaffInvited::class);

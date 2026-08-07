@@ -11,7 +11,19 @@
             </div>
             <x-admin.input label="Email" type="email" name="email" :value="old('email', $staffMember?->email)" required />
             <x-admin.input label="Phone" name="phone" :value="old('phone', $staffMember?->phone)" />
-            <x-admin.input label="PIN (4 digits)" name="pin_code" maxlength="4" :value="old('pin_code', $staffMember?->pin_code)" />
+            <x-admin.input label="New kiosk PIN (4 digits)" name="pin_code" maxlength="4" placeholder="{{ $staffMember?->hasPinConfigured() ? 'Leave blank to keep current PIN' : 'e.g. 1234' }}" :value="old('pin_code')" />
+            @if ($staffMember?->hasPinConfigured())
+                <div class="sm:col-span-2">
+                    <x-admin.button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        @click="if (confirm('Generate a new kiosk PIN? The old PIN will stop working immediately.')) { document.getElementById('reset-pin-form').submit(); }"
+                    >
+                        Generate new kiosk PIN
+                    </x-admin.button>
+                </div>
+            @endif
             <x-admin.input label="Hourly rate" type="number" step="0.01" name="hourly_rate" :value="old('hourly_rate', $staffMember?->hourly_rate)" />
             <div class="sm:col-span-2">
                 <label class="block space-y-1.5">
@@ -50,4 +62,10 @@
             <x-admin.button type="submit">Save</x-admin.button>
         </x-admin.form-actions>
     </form>
+
+    @if ($staffMember?->hasPinConfigured())
+        <form id="reset-pin-form" method="POST" action="{{ route('business-admin.staff.reset-pin', $staffMember) }}" class="hidden">
+            @csrf
+        </form>
+    @endif
 </x-layouts.business-admin>

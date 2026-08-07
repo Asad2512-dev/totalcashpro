@@ -73,6 +73,10 @@ Route::post('/logout', [LoginController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
+Route::post('/impersonation/stop', [\App\Http\Controllers\SuperAdmin\ImpersonationController::class, 'stop'])
+    ->middleware('auth')
+    ->name('impersonation.stop');
+
 Route::redirect('/get-started', '/register');
 Route::redirect('/buy', '/#pricing')->name('buy');
 

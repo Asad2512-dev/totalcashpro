@@ -4,26 +4,23 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\BusinessAdmin;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Support\Tenancy\TenantRules;
 
-final class PurchaseOrderStoreRequest extends FormRequest
+final class PurchaseOrderStoreRequest extends BusinessAdminFormRequest
 {
-    public function authorize(): bool
-    {
-        return $this->user()?->isAdmin() ?? false;
-    }
-
     /**
      * @return array<string, mixed>
      */
     public function rules(): array
     {
+        $organizationId = $this->organizationId();
+
         return [
-            'supplier_id' => ['required', 'integer', 'exists:suppliers,id'],
+            'supplier_id' => TenantRules::supplierId($organizationId),
             'expected_at' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],
             'lines' => ['required', 'array', 'min:1'],
-            'lines.*.inventory_item_id' => ['nullable', 'integer', 'exists:inventory_items,id'],
+            'lines.*.inventory_item_id' => TenantRules::inventoryItemId($organizationId),
             'lines.*.description' => ['required', 'string', 'max:255'],
             'lines.*.quantity' => ['required', 'numeric', 'min:0.001'],
             'lines.*.unit_cost' => ['required', 'numeric', 'min:0'],

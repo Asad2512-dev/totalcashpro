@@ -71,8 +71,7 @@ final class StaffRepository extends BaseRepository implements StaffRepositoryInt
                 $q->where(function ($inner) use ($search): void {
                     $inner->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%")
-                        ->orWhere('pin_code', 'like', "%{$search}%");
+                        ->orWhere('phone', 'like', "%{$search}%");
                 });
             })
             ->when(! empty($filters['status']), fn ($q) => $q->where('status', $filters['status']))
@@ -88,10 +87,6 @@ final class StaffRepository extends BaseRepository implements StaffRepositoryInt
 
     public function findByPinCode(int $organizationId, string $pinCode): ?User
     {
-        return $this->model->newQuery()
-            ->where('organization_id', $organizationId)
-            ->where('pin_code', $pinCode)
-            ->where('status', 'active')
-            ->first();
+        return \App\Support\Security\StaffPinHasher::findStaffByPin($organizationId, $pinCode);
     }
 }

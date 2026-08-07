@@ -89,7 +89,7 @@ final class V1StaffRoutesTest extends TestCase
             'role_id' => $role->id,
             'organization_id' => $organization->id,
             'branch_id' => $branch->id,
-            'pin_code' => '1234',
+            'pin_hash' => \App\Support\Security\StaffPinHasher::hash('1234'),
             'status' => 'active',
             'email_verified_at' => now(),
         ]);

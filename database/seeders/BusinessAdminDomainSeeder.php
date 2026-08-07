@@ -29,6 +29,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Support\Security\StaffPinHasher;
 
 final class BusinessAdminDomainSeeder extends Seeder
 {
@@ -64,7 +65,7 @@ final class BusinessAdminDomainSeeder extends Seeder
                 'role_id' => $staffRole->id,
                 'organization_id' => $org->id,
                 'branch_id' => $dockside->id,
-                'pin_code' => '1000',
+                'pin_hash' => StaffPinHasher::hash('1000'),
                 'hourly_rate' => 12.50,
                 'status' => 'active',
                 'email_verified_at' => now(),
@@ -88,7 +89,7 @@ final class BusinessAdminDomainSeeder extends Seeder
                     'role_id' => $staffRole->id,
                     'organization_id' => $org->id,
                     'branch_id' => $member['branch']->id,
-                    'pin_code' => $member['pin'],
+                    'pin_hash' => StaffPinHasher::hash($member['pin']),
                     'hourly_rate' => $member['rate'],
                     'status' => 'active',
                     'email_verified_at' => now(),

@@ -36,7 +36,7 @@ final class User extends Authenticatable implements MustVerifyEmail
         'status',
         'last_login_at',
         'onboarding_completed_at',
-        'pin_code',
+        'pin_hash',
         'hourly_rate',
         'notes',
         'address',
@@ -48,6 +48,7 @@ final class User extends Authenticatable implements MustVerifyEmail
 
     protected $hidden = [
         'password',
+        'pin_hash',
         'remember_token',
     ];
 
@@ -142,5 +143,10 @@ final class User extends Authenticatable implements MustVerifyEmail
     public function hasCompletedOnboarding(): bool
     {
         return $this->onboarding_completed_at !== null;
+    }
+
+    public function hasPinConfigured(): bool
+    {
+        return $this->pin_hash !== null && $this->pin_hash !== '';
     }
 }

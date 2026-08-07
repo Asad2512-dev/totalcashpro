@@ -55,6 +55,7 @@ Route::put('/staff/{staff}', [StaffController::class, 'update'])->name('staff.up
 Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->name('staff.destroy');
 Route::post('/staff/{staff}/suspend', [StaffController::class, 'suspend'])->name('staff.suspend');
 Route::post('/staff/{staff}/reset-password', [StaffController::class, 'resetPassword'])->name('staff.reset-password');
+Route::post('/staff/{staff}/reset-pin', [StaffController::class, 'resetPin'])->name('staff.reset-pin');
 
 Route::middleware('plan_feature:attendance')->group(function (): void {
     Route::redirect('/clock-in', '/business-admin/kiosks')->name('clock-in');

@@ -243,7 +243,7 @@ final class SmartKioskTest extends TestCase
             'role_id' => $staffRole->id,
             'organization_id' => $org->id,
             'branch_id' => $branch->id,
-            'pin_code' => '1000',
+            'pin_hash' => \App\Support\Security\StaffPinHasher::hash('1000'),
             'status' => 'active',
             'email_verified_at' => now(),
         ]);

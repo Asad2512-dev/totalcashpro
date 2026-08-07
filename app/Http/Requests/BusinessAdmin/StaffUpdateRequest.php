@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\BusinessAdmin;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\User;
+use App\Support\Tenancy\TenantRules;
 
-final class StaffUpdateRequest extends FormRequest
+final class StaffUpdateRequest extends BusinessAdminFormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $staff = $this->route('staff');
+
+        return parent::authorize()
+            && $staff instanceof User
+            && (int) $staff->organization_id === $this->organizationId();
     }
 
     /**
@@ -24,12 +29,12 @@ final class StaffUpdateRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$staffId,
             'phone' => 'nullable|string|max:50',
-            'pin_code' => 'nullable|string|size:4',
+            'pin_code' => 'nullable|string|size:4|regex:/^\d{4}$/',
             'hourly_rate' => 'nullable|numeric|min:0',
             'address' => 'nullable|string',
             'notes' => 'nullable|string',
             'password' => 'nullable|string|min:8',
-            'branch_id' => 'nullable|integer|exists:branches,id',
+            'branch_id' => TenantRules::branchId($this->organizationId()),
             'status' => 'nullable|string|in:active,suspended',
         ];
     }

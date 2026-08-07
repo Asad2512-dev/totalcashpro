@@ -80,4 +80,13 @@ final class StaffController extends Controller
 
         return back()->with('status', 'A new password has been emailed to the staff member.');
     }
+
+    public function resetPin(Request $request, User $staff): RedirectResponse
+    {
+        $pin = $this->staffService->resetPin($request->user(), $staff);
+
+        return back()
+            ->with('status', 'A new kiosk PIN was generated for '.$staff->name.'. Copy it now — it will not be shown again.')
+            ->with('generated_pin', $pin);
+    }
 }

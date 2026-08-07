@@ -12,8 +12,17 @@
     @csrf
     <x-admin.button size="sm" variant="secondary" type="submit">Suspend</x-admin.button>
 </form>
-<form method="POST" action="{{ route('super-admin.organizations.login-as', $organization) }}" class="inline">
+<form method="POST" action="{{ route('super-admin.organizations.login-as', $organization) }}" class="inline-flex flex-wrap items-center gap-2">
     @csrf
+    <input
+        type="text"
+        name="reason"
+        required
+        minlength="3"
+        maxlength="500"
+        placeholder="Reason for login"
+        class="min-h-[36px] rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs dark:border-gray-700 dark:bg-gray-900"
+    >
     <x-admin.button size="sm" variant="ghost" type="submit">Login As Business</x-admin.button>
 </form>
 <form method="POST" action="{{ route('super-admin.organizations.destroy', $organization) }}" class="inline" onsubmit="return confirm('Delete this business?')">

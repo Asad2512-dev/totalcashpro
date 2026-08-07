@@ -4,8 +4,14 @@
     </x-admin.toolbar>
 
     <form method="GET" class="mb-4 max-w-full sm:max-w-sm">
-        <x-admin.input name="q" label="Search" :value="request('q')" placeholder="Name, email, PIN" />
+        <x-admin.input name="q" label="Search" :value="request('q')" placeholder="Name or email" />
     </form>
+
+    @if (session('generated_pin'))
+        <x-admin.alert type="warning" class="mb-4">
+            New kiosk PIN: <span class="font-mono font-bold">{{ session('generated_pin') }}</span> — copy now. It will not be shown again.
+        </x-admin.alert>
+    @endif
 
     @if ($staff->isEmpty())
         <x-admin.empty-state title="No staff yet" description="Add your first team member to start clock-in and payroll.">
@@ -28,8 +34,8 @@
                             <dd class="mt-1 text-gray-700 dark:text-gray-200">{{ $member->branch?->name ?? '—' }}</dd>
                         </div>
                         <div>
-                            <dt class="text-xs font-medium uppercase tracking-wide text-gray-400">PIN</dt>
-                            <dd class="mt-1 font-mono text-gray-700 dark:text-gray-200">{{ $member->pin_code ?? '—' }}</dd>
+                            <dt class="text-xs font-medium uppercase tracking-wide text-gray-400">Kiosk PIN</dt>
+                            <dd class="mt-1 text-gray-700 dark:text-gray-200">{{ $member->hasPinConfigured() ? 'Configured' : 'Not set' }}</dd>
                         </div>
                         <div>
                             <dt class="text-xs font-medium uppercase tracking-wide text-gray-400">Rate</dt>
@@ -54,7 +60,7 @@
                         <tr>
                             <th class="px-4 py-3">Name</th>
                             <th class="hidden px-4 py-3 lg:table-cell">Branch</th>
-                            <th class="px-4 py-3">PIN</th>
+                            <th class="px-4 py-3">Kiosk PIN</th>
                             <th class="hidden px-4 py-3 sm:table-cell">Rate</th>
                             <th class="hidden px-4 py-3 md:table-cell">Status</th>
                             <th class="px-4 py-3"></th>
@@ -73,7 +79,7 @@
                                     </div>
                                 </td>
                                 <td class="hidden px-4 py-3.5 text-gray-700 dark:text-gray-200 lg:table-cell">{{ $member->branch?->name ?? '—' }}</td>
-                                <td class="px-4 py-3.5 font-mono text-gray-700 dark:text-gray-200">{{ $member->pin_code ?? '—' }}</td>
+                                <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $member->hasPinConfigured() ? 'Configured' : 'Not set' }}</td>
                                 <td class="hidden px-4 py-3.5 text-gray-700 dark:text-gray-200 sm:table-cell">£{{ number_format((float) ($member->hourly_rate ?? 0), 2) }}</td>
                                 <td class="hidden px-4 py-3.5 text-gray-700 dark:text-gray-200 md:table-cell">{{ $member->status }}</td>
                                 <td class="px-4 py-3.5">

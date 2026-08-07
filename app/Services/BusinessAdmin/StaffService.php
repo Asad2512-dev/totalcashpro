@@ -8,9 +8,11 @@ use App\Contracts\ServiceInterface;
 use App\Enums\RoleSlug;
 use App\Events\StaffInvited;
 use App\Events\StaffPasswordReset;
+use App\Models\Branch;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\Contracts\StaffRepositoryInterface;
+use App\Support\Security\StaffPinHasher;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -38,6 +40,7 @@ final class StaffService implements ServiceInterface
      */
     public function create(User $admin, array $data): array
     {
+        $this->assertBranchInOrganization($admin, $data['branch_id'] ?? null);
         $this->assertUniquePin($admin, $data['pin_code'] ?? null);
 
         $roleId = Role::query()->where('slug', RoleSlug::Staff->value)->value('id');
@@ -47,7 +50,7 @@ final class StaffService implements ServiceInterface
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
-            'pin_code' => $data['pin_code'] ?? null,
+            'pin_hash' => $this->hashPin($data['pin_code'] ?? null),
             'hourly_rate' => $data['hourly_rate'] ?? null,
             'address' => $data['address'] ?? null,
             'notes' => $data['notes'] ?? null,
@@ -70,11 +73,16 @@ final class StaffService implements ServiceInterface
     public function update(User $admin, User $staff, array $data): User
     {
         $this->assertSameOrg($admin, $staff);
+        $this->assertBranchInOrganization($admin, $data['branch_id'] ?? null);
         $this->assertUniquePin($admin, $data['pin_code'] ?? null, $staff->id);
 
         $payload = collect($data)->only([
-            'name', 'email', 'phone', 'pin_code', 'hourly_rate', 'address', 'notes', 'branch_id', 'status',
+            'name', 'email', 'phone', 'hourly_rate', 'address', 'notes', 'branch_id', 'status',
         ])->all();
+
+        if (array_key_exists('pin_code', $data) && $data['pin_code'] !== null && $data['pin_code'] !== '') {
+            $payload['pin_hash'] = $this->hashPin($data['pin_code']);
+        }
 
         if (! empty($data['password'])) {
             $payload['password'] = Hash::make($data['password']);
@@ -107,10 +115,39 @@ final class StaffService implements ServiceInterface
         return $password;
     }
 
+    public function resetPin(User $admin, User $staff): string
+    {
+        $this->assertSameOrg($admin, $staff);
+
+        do {
+            $pin = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        } while (StaffPinHasher::pinInUse((int) $admin->organization_id, $pin, $staff->id));
+
+        $this->staff->update($staff->id, ['pin_hash' => StaffPinHasher::hash($pin)]);
+
+        return $pin;
+    }
+
     private function assertSameOrg(User $admin, User $staff): void
     {
         if ((int) $staff->organization_id !== (int) $admin->organization_id) {
             abort(403);
+        }
+    }
+
+    private function assertBranchInOrganization(User $admin, mixed $branchId): void
+    {
+        if ($branchId === null || $branchId === '') {
+            return;
+        }
+
+        $exists = Branch::query()
+            ->where('organization_id', $admin->organization_id)
+            ->whereKey($branchId)
+            ->exists();
+
+        if (! $exists) {
+            throw ValidationException::withMessages(['branch_id' => 'The selected branch is not valid for your organisation.']);
         }
     }
 
@@ -120,14 +157,17 @@ final class StaffService implements ServiceInterface
             return;
         }
 
-        $exists = User::query()
-            ->where('organization_id', $admin->organization_id)
-            ->where('pin_code', $pin)
-            ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
-            ->exists();
-
-        if ($exists) {
+        if (StaffPinHasher::pinInUse((int) $admin->organization_id, $pin, $ignoreId)) {
             throw ValidationException::withMessages(['pin_code' => 'This PIN is already assigned.']);
         }
+    }
+
+    private function hashPin(?string $pin): ?string
+    {
+        if ($pin === null || $pin === '') {
+            return null;
+        }
+
+        return StaffPinHasher::hash($pin);
     }
 }

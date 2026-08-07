@@ -14,6 +14,7 @@
     $unreadNotifications = $user
         ? \App\Models\AppNotification::query()->where('user_id', $user->id)->whereNull('read_at')->count()
         : 0;
+    $impersonation = app(\App\Services\SuperAdmin\ImpersonationService::class)->context(request());
 @endphp
 
 <!DOCTYPE html>
@@ -31,6 +32,12 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="admin-shell admin-shell--viewport bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <x-admin.impersonation-banner
+        :impersonator="$impersonation['impersonator']"
+        :organization-name="$impersonation['organization_name']"
+        :started-at="$impersonation['started_at']"
+        :reason="$impersonation['reason']"
+    />
     <div class="admin-shell-layout flex min-h-0">
         <x-admin.sidebar :nav="$nav" :active="$active" :business-tree="[]" home-route="business-admin.dashboard" />
 

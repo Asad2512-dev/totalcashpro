@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SuperAdmin\StoreOrganizationRequest;
 use App\Models\Organization;
 use App\Models\User;
+use App\Services\SuperAdmin\ImpersonationService;
 use App\Services\SuperAdmin\OrganizationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +17,10 @@ use Illuminate\Contracts\View\View;
 
 final class OrganizationController extends Controller
 {
-    public function __construct(private readonly OrganizationService $service) {}
+    public function __construct(
+        private readonly OrganizationService $service,
+        private readonly ImpersonationService $impersonation,
+    ) {}
 
     public function create(): View
     {
@@ -160,25 +164,15 @@ final class OrganizationController extends Controller
         return back()->with('status', 'Business activated.');
     }
 
-    public function loginAs(Organization $organization): RedirectResponse
+    public function loginAs(Request $request, Organization $organization): RedirectResponse
     {
         $this->authorize('view', $organization);
 
-        $owner = $organization->owner
-            ?? User::query()
-                ->where('organization_id', $organization->id)
-                ->whereHas('role', fn ($q) => $q->where('slug', 'admin'))
-                ->orderBy('id')
-                ->first();
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'min:3', 'max:500'],
+        ]);
 
-        if ($owner === null) {
-            return back()->withErrors(['organization' => 'This business has no admin owner to sign in as.']);
-        }
-
-        $superAdminId = auth()->id();
-        auth()->login($owner);
-        session()->put('impersonator_id', $superAdminId);
-        session()->regenerate();
+        $owner = $this->impersonation->start(auth()->user(), $organization, $data['reason'], $request);
 
         return redirect()
             ->route('business-admin.dashboard')
