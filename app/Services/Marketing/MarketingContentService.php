@@ -18,9 +18,9 @@ final class MarketingContentService implements ServiceInterface
     {
         return [
             ['value' => '14 days', 'label' => 'Free trial'],
-            ['value' => '£19.99', 'label' => 'Basic / month'],
-            ['value' => '£29.99', 'label' => 'Pro / month'],
-            ['value' => 'Instant', 'label' => 'Signup'],
+            ['value' => 'PIN Kiosk', 'label' => 'Attendance'],
+            ['value' => 'Multi-branch', 'label' => 'Professional'],
+            ['value' => 'Cloud', 'label' => 'Always online'],
         ];
     }
 
@@ -70,7 +70,14 @@ final class MarketingContentService implements ServiceInterface
             ],
             [
                 'title' => 'Staff Clock In & Out',
-                'description' => 'Let staff start and end shifts quickly with a simple clock-in and clock-out flow.',
+                'description' => 'Staff panel and dedicated attendance kiosk with PIN entry — no admin access required on the floor.',
+                'icon' => 'clock-in',
+                'plan' => 'basic',
+                'planLabel' => 'Included in Basic',
+            ],
+            [
+                'title' => 'Attendance Kiosk',
+                'description' => 'Full-screen tablet terminal at your entrance. Large buttons, live clock, branch-scoped PIN clock-in.',
                 'icon' => 'clock-in',
                 'plan' => 'basic',
                 'planLabel' => 'Included in Basic',
@@ -145,6 +152,126 @@ final class MarketingContentService implements ServiceInterface
                 'plan' => 'professional',
                 'planLabel' => 'Professional Only',
             ],
+            [
+                'title' => 'Finance & Accounting',
+                'description' => 'Income, expenses, bills, bank accounts, cash flow and VAT summaries in one finance hub.',
+                'icon' => 'cash',
+                'plan' => 'professional',
+                'planLabel' => 'Professional Only',
+            ],
+            [
+                'title' => 'CRM & Customers',
+                'description' => 'Track customer visits, notes and timelines for hospitality and retail relationships.',
+                'icon' => 'users',
+                'plan' => 'professional',
+                'planLabel' => 'Professional Only',
+            ],
+            [
+                'title' => 'HR & Leave',
+                'description' => 'Leave requests, shift swaps and people workflows alongside staff management.',
+                'icon' => 'roles',
+                'plan' => 'professional',
+                'planLabel' => 'Professional Only',
+            ],
+            [
+                'title' => 'Purchase Orders',
+                'description' => 'Create, approve and receive purchase orders linked to suppliers and inventory.',
+                'icon' => 'suppliers',
+                'plan' => 'professional',
+                'planLabel' => 'Professional Only',
+            ],
+            [
+                'title' => 'Security — 2FA & OTP',
+                'description' => 'Two-factor authentication, OTP verification, login history and device management.',
+                'icon' => 'security',
+                'plan' => 'basic',
+                'planLabel' => 'All Plans',
+            ],
+            [
+                'title' => 'Notifications & Email',
+                'description' => 'In-app notifications and automated transactional email for staff and owners.',
+                'icon' => 'bell',
+                'plan' => 'basic',
+                'planLabel' => 'Included in Basic',
+            ],
+        ];
+    }
+
+    /**
+     * Grouped feature sections for the dedicated features page.
+     *
+     * @return list<array{title: string, description: string, items: list<array{title: string, description: string}>}>
+     */
+    public function featureCategories(): array
+    {
+        return [
+            [
+                'title' => 'Attendance Kiosk',
+                'description' => 'A dedicated time-clock terminal — not another admin page.',
+                'items' => [
+                    ['title' => 'PIN Clock In', 'description' => '4-digit PIN keypad with automatic verification and branch scoping.'],
+                    ['title' => 'Touch Terminal UI', 'description' => 'Large buttons, live clock, success animations — built for iPad and Android tablets.'],
+                    ['title' => 'Break Tracking', 'description' => 'Clock in, clock out, start break and end break from one screen.'],
+                    ['title' => 'Kiosk Audit Log', 'description' => 'Every clock event and failed PIN attempt is logged for managers.'],
+                ],
+            ],
+            [
+                'title' => 'Operations & Cash',
+                'description' => 'Daily cash up, history and operational dashboards.',
+                'items' => [
+                    ['title' => 'Business Dashboard', 'description' => 'Cash, staff clocked in, inventory alerts and charts at a glance.'],
+                    ['title' => 'Daily Cash Up', 'description' => 'Guided shift close with coins, notes, cards and deductions.'],
+                    ['title' => 'Cash History', 'description' => 'Searchable history of every cash-up record.'],
+                    ['title' => 'Staff Dashboard', 'description' => 'Separate staff panel for shifts, clock and personal attendance.'],
+                ],
+            ],
+            [
+                'title' => 'Finance & Reports',
+                'description' => 'Accounting tools and export-ready reports.',
+                'items' => [
+                    ['title' => 'Finance Dashboard', 'description' => 'Income, expenses, bills and bank accounts in one hub.'],
+                    ['title' => 'Cash Flow & P&L', 'description' => 'Cash flow statements and profit & loss reporting.'],
+                    ['title' => 'Reports Center', 'description' => 'Attendance, cash, inventory and payroll reports with CSV export.'],
+                    ['title' => 'Petty Cash & Drawers', 'description' => 'Petty cash accounts and cash drawer tracking.'],
+                ],
+            ],
+            [
+                'title' => 'People & Inventory',
+                'description' => 'Staff, HR, rota, payroll and stock.',
+                'items' => [
+                    ['title' => 'Payroll & Wages', 'description' => 'Generate wages from attendance and approve payroll runs.'],
+                    ['title' => 'Staff Rota', 'description' => 'Sections, groups and weekly shift planning.'],
+                    ['title' => 'Inventory', 'description' => 'Categories, stock counts, adjustments and low-stock alerts.'],
+                    ['title' => 'Supplier Management', 'description' => 'Suppliers, invoices and purchase order workflows.'],
+                ],
+            ],
+            [
+                'title' => 'Platform & Security',
+                'description' => 'Multi-branch, CRM, notifications and enterprise-grade auth.',
+                'items' => [
+                    ['title' => 'Multi-Branch', 'description' => 'Filter dashboards and kiosk by branch as you grow.'],
+                    ['title' => 'CRM', 'description' => 'Customer profiles, visits, notes and timeline.'],
+                    ['title' => '2FA & OTP', 'description' => 'Email OTP and two-factor authentication for sensitive actions.'],
+                    ['title' => 'Email Automation', 'description' => 'Password resets, invites and notification emails via SMTP.'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Employee day workflow for marketing visual.
+     *
+     * @return list<array{step: string, title: string, description: string}>
+     */
+    public function employeeWorkflow(): array
+    {
+        return [
+            ['step' => '01', 'title' => 'Employee Arrives', 'description' => 'Staff walk to the attendance kiosk at your entrance — no login required.'],
+            ['step' => '02', 'title' => 'PIN Clock In', 'description' => 'Enter a 4-digit PIN. Name, photo and today\'s status appear instantly.'],
+            ['step' => '03', 'title' => 'Attendance', 'description' => 'Hours, breaks and rota rules feed accurate attendance records.'],
+            ['step' => '04', 'title' => 'Payroll', 'description' => 'Managers approve wages generated from verified clock data.'],
+            ['step' => '05', 'title' => 'Finance', 'description' => 'Labour and cash data flow into finance, cash flow and P&L.'],
+            ['step' => '06', 'title' => 'Reports', 'description' => 'Export attendance, cash and profit reports for your accountant.'],
         ];
     }
 
@@ -206,44 +333,39 @@ final class MarketingContentService implements ServiceInterface
     {
         return [
             [
-                'title' => 'Cloud SaaS Access',
-                'description' => 'Use TotalCashPro securely online from desktop, tablet or phone — no local install required.',
-                'icon' => 'cloud',
+                'title' => 'Attendance Kiosk',
+                'description' => 'Dedicated PIN terminal for tablets at your entrance — a key selling point for busy restaurants.',
+                'icon' => 'clock-in',
             ],
             [
-                'title' => 'Better Than Spreadsheets',
-                'description' => 'Replace scattered notes and sheets with one secure dashboard your team can use.',
-                'icon' => 'easy',
-            ],
-            [
-                'title' => 'Two Clear Plans',
-                'description' => 'Start with Basic for cash and staff, or choose Professional for inventory, payroll and branches.',
-                'icon' => 'reports',
-            ],
-            [
-                'title' => 'Instant Signup',
-                'description' => 'Create your account in minutes with a 14-day Professional trial — no manual approval.',
-                'icon' => 'security',
-            ],
-            [
-                'title' => 'Built for Real Businesses',
-                'description' => 'Designed for restaurants, cafés, takeaways and retail — not generic office software.',
+                'title' => 'Fast & Cloud-Based',
+                'description' => 'Instant signup, no local install, works on desktop, tablet and phone from anywhere.',
                 'icon' => 'fast',
             ],
             [
-                'title' => 'Clear Daily Reports',
-                'description' => 'Understand cash and staff activity with reports that are easy to read.',
+                'title' => 'Secure by Design',
+                'description' => '2FA, OTP, login history, device management and role-based access across all panels.',
+                'icon' => 'security',
+            ],
+            [
+                'title' => 'Multi-Branch Ready',
+                'description' => 'Harbour Central, Dockside or every branch — filter operations and kiosk by location.',
+                'icon' => 'branches',
+            ],
+            [
+                'title' => 'Professional Reports',
+                'description' => 'Cash flow, profit & loss, attendance and inventory exports your accountant will appreciate.',
                 'icon' => 'analytics',
             ],
             [
-                'title' => 'Cancel Anytime',
-                'description' => 'Monthly subscriptions stay flexible. Keep access while you need it.',
-                'icon' => 'affordable',
+                'title' => 'Staff Management',
+                'description' => 'Staff profiles, PIN codes, rota, HR leave and payroll in one people hub.',
+                'icon' => 'roles',
             ],
             [
-                'title' => 'Priority Paths Available',
-                'description' => 'Professional includes priority support when your team needs faster help.',
-                'icon' => 'reliable',
+                'title' => 'Finance Built In',
+                'description' => 'Income, expenses, bills, suppliers and petty cash — not a bolt-on spreadsheet.',
+                'icon' => 'cash',
             ],
         ];
     }
@@ -288,6 +410,7 @@ final class MarketingContentService implements ServiceInterface
                     'Reports',
                     'Up to 5 Staff Members',
                     'Staff Clock In',
+                    'Attendance Kiosk',
                     'Staff Clock Out',
                     'Attendance',
                     'Staff Management',
@@ -339,6 +462,54 @@ final class MarketingContentService implements ServiceInterface
                     'Priority Support',
                 ],
             ],
+            [
+                'name' => 'Enterprise',
+                'price' => 'Custom',
+                'period' => '',
+                'badge' => 'Coming Soon',
+                'popularBadge' => null,
+                'description' => 'Multi-site groups, custom integrations, dedicated support and advanced compliance.',
+                'cta' => 'Contact Sales',
+                'featured' => false,
+                'ctaHref' => route('contact'),
+                'assurances' => [
+                    'Volume Pricing',
+                    'Dedicated Onboarding',
+                    'SLA Options',
+                ],
+                'features' => [
+                    'Everything in Professional',
+                    'Multi-Organisation Groups',
+                    'Custom Integrations',
+                    'Advanced API Access',
+                    'Dedicated Account Manager',
+                    'Priority SLA Support',
+                    'Custom Reporting',
+                    'SSO (planned)',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return list<array{feature: string, basic: bool|string, professional: bool|string, enterprise: bool|string}>
+     */
+    public function pricingComparison(): array
+    {
+        return [
+            ['feature' => 'Daily Cash Up', 'basic' => true, 'professional' => true, 'enterprise' => true],
+            ['feature' => 'Attendance Kiosk (PIN)', 'basic' => true, 'professional' => true, 'enterprise' => true],
+            ['feature' => 'Staff Panel', 'basic' => true, 'professional' => true, 'enterprise' => true],
+            ['feature' => 'Up to 5 Staff', 'basic' => true, 'professional' => 'Unlimited', 'enterprise' => 'Unlimited'],
+            ['feature' => 'Suppliers & Invoices', 'basic' => true, 'professional' => true, 'enterprise' => true],
+            ['feature' => 'Inventory Management', 'basic' => false, 'professional' => true, 'enterprise' => true],
+            ['feature' => 'Payroll & Wages', 'basic' => false, 'professional' => true, 'enterprise' => true],
+            ['feature' => 'Finance & Accounting', 'basic' => false, 'professional' => true, 'enterprise' => true],
+            ['feature' => 'CRM', 'basic' => false, 'professional' => true, 'enterprise' => true],
+            ['feature' => 'Multiple Branches', 'basic' => false, 'professional' => true, 'enterprise' => true],
+            ['feature' => 'Reports Export', 'basic' => 'Daily', 'professional' => 'Unlimited', 'enterprise' => 'Custom'],
+            ['feature' => '2FA & OTP Security', 'basic' => true, 'professional' => true, 'enterprise' => true],
+            ['feature' => 'Priority Support', 'basic' => false, 'professional' => true, 'enterprise' => 'Dedicated'],
         ];
     }
 
@@ -406,6 +577,30 @@ final class MarketingContentService implements ServiceInterface
             [
                 'question' => 'Can I cancel anytime?',
                 'answer' => 'Yes. Subscriptions are monthly and can be cancelled anytime. You keep access while your subscription is active.',
+            ],
+            [
+                'question' => 'What is the Attendance Kiosk?',
+                'answer' => 'A dedicated full-screen clock terminal for tablets at your restaurant entrance. Staff enter a PIN to clock in or out — they never see the business admin panel. Owners launch kiosk mode once and exit with their admin password.',
+            ],
+            [
+                'question' => 'Does TotalCashPro include finance and accounting?',
+                'answer' => 'Professional includes a finance hub with income, expenses, bills, bank accounts, cash flow, profit & loss, VAT summaries, petty cash and recurring bills.',
+            ],
+            [
+                'question' => 'Can I manage inventory and purchase orders?',
+                'answer' => 'Yes on Professional. Track categories, stock counts, adjustments, history and create purchase orders linked to suppliers.',
+            ],
+            [
+                'question' => 'How does payroll work?',
+                'answer' => 'Attendance from the kiosk and staff panel feeds wage calculations. Managers generate, approve and mark payroll runs as paid.',
+            ],
+            [
+                'question' => 'Is my data secure?',
+                'answer' => 'TotalCashPro includes 2FA, OTP verification, login history, device management, security logs and role-based access for Super Admin, Business Admin and Staff panels.',
+            ],
+            [
+                'question' => 'Can I run multiple branches?',
+                'answer' => 'Professional supports unlimited branches with branch filters across dashboard, reports and attendance kiosk.',
             ],
             [
                 'question' => 'How do I get started?',

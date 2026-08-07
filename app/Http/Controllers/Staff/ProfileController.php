@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Staff;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 final class ProfileController extends Controller
@@ -24,19 +23,11 @@ final class ProfileController extends Controller
         $user = $request->user();
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string',
-            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        $updateData = collect($validated)->except(['password', 'password_confirmation'])->all();
-
-        if (! empty($validated['password'])) {
-            $updateData['password'] = Hash::make($validated['password']);
-        }
-
-        $user->update($updateData);
+        $user->update($validated);
 
         return redirect()
             ->route('staff.profile')

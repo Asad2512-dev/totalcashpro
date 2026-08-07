@@ -1,0 +1,25 @@
+{
+    "name": "TotalCashPro Attendance Kiosk",
+    "short_name": "TCP Kiosk",
+    "description": "Dedicated attendance clock terminal for restaurants and retail.",
+    "start_url": "/business-admin/kiosk",
+    "scope": "/business-admin/kiosk",
+    "display": "standalone",
+    "background_color": "#ECFDF5",
+    "theme_color": "#16A34A",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "/favicon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}

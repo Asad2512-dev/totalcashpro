@@ -7,15 +7,15 @@
                 <x-badge tone="emerald">Cloud software for restaurants & retail</x-badge>
 
                 <h1 id="hero-heading" class="mt-5 font-display text-[2.45rem] font-extrabold leading-[1.08] tracking-[-0.04em] text-navy-900 sm:text-5xl lg:text-[3.35rem]">
-                    Manage cash, staff and reports from one secure dashboard
+                    Restaurant management — cash, attendance, finance &amp; reports in one cloud platform
                 </h1>
 
                 <p class="mt-5 text-lg font-semibold tracking-tight text-navy-800">
-                    Built for restaurants, cafés, takeaways and retail businesses.
+                    Cash up · Attendance kiosk · Payroll · Inventory · CRM · Multi-branch · HR
                 </p>
 
                 <p class="mt-4 max-w-lg text-base leading-relaxed text-mute sm:text-lg">
-                    Choose Basic (£19.99/month) or Professional (£29.99/month), then start your free 14-day trial instantly.
+                    Built for UK restaurants, cafés and retail. PIN clock-in terminal, finance dashboard, professional reports and secure 2FA — from £19.99/month with a 14-day trial.
                 </p>
 
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">

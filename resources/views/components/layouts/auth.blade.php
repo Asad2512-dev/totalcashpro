@@ -15,7 +15,12 @@
     <style>[x-cloak]{display:none!important}</style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-900 antialiased">
+<body
+    x-data
+    class="min-h-screen bg-gray-50 text-gray-900 antialiased"
+    @submit.window="if ($event.target.matches('form:not([data-no-auth-spinner])')) $store.authUi.start()"
+>
     {{ $slot }}
+    <x-auth.spinner />
 </body>
 </html>

@@ -12,18 +12,86 @@
             <x-admin.button :href="route('business-admin.staff.create')">Add staff</x-admin.button>
         </x-admin.empty-state>
     @else
-        <x-admin.table
-            :columns="['Name', 'Branch', 'PIN', 'Rate', 'Status', '']"
-            :raw-html="true"
-            :rows="$staff->map(fn ($member) => [
-                '<div><p class=\"font-medium\">'.e($member->name).'</p><p class=\"text-xs text-gray-500\">'.e($member->email).'</p></div>',
-                $member->branch?->name ?? '—',
-                e($member->pin_code ?? '—'),
-                '£'.number_format((float) ($member->hourly_rate ?? 0), 2),
-                $member->status,
-                '<div class=\"flex flex-wrap gap-2\"><a href=\"'.e(route('business-admin.staff.edit', $member)).'\" class=\"font-semibold text-primary-600\">Edit</a><form method=\"POST\" action=\"'.e(route('business-admin.staff.suspend', $member)).'\" class=\"inline\">'.csrf_field().'<button class=\"font-semibold text-amber-600\">Suspend</button></form></div>',
-            ])->all()"
-        />
+        <div class="admin-mobile-cards">
+            @foreach ($staff as $member)
+                <article class="admin-mobile-card">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <h3 class="font-semibold text-gray-900 dark:text-white">{{ $member->name }}</h3>
+                            <p class="mt-1 truncate text-xs text-gray-500">{{ $member->email }}</p>
+                        </div>
+                        <x-admin.badge tone="neutral">{{ $member->status }}</x-admin.badge>
+                    </div>
+                    <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                            <dt class="text-xs font-medium uppercase tracking-wide text-gray-400">Branch</dt>
+                            <dd class="mt-1 text-gray-700 dark:text-gray-200">{{ $member->branch?->name ?? '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium uppercase tracking-wide text-gray-400">PIN</dt>
+                            <dd class="mt-1 font-mono text-gray-700 dark:text-gray-200">{{ $member->pin_code ?? '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium uppercase tracking-wide text-gray-400">Rate</dt>
+                            <dd class="mt-1 text-gray-700 dark:text-gray-200">£{{ number_format((float) ($member->hourly_rate ?? 0), 2) }}</dd>
+                        </div>
+                    </dl>
+                    <div class="mt-4 flex flex-wrap gap-3">
+                        <a href="{{ route('business-admin.staff.edit', $member) }}" class="text-sm font-semibold text-primary-700">Edit</a>
+                        <form method="POST" action="{{ route('business-admin.staff.suspend', $member) }}" class="inline">
+                            @csrf
+                            <button type="submit" class="text-sm font-semibold text-amber-600">Suspend</button>
+                        </form>
+                    </div>
+                </article>
+            @endforeach
+        </div>
+
+        <div class="admin-card hidden overflow-hidden md:block">
+            <div class="admin-table-wrap -mx-4 sm:mx-0">
+                <table class="admin-table min-w-full text-left text-sm">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3">Name</th>
+                            <th class="hidden px-4 py-3 lg:table-cell">Branch</th>
+                            <th class="px-4 py-3">PIN</th>
+                            <th class="hidden px-4 py-3 sm:table-cell">Rate</th>
+                            <th class="hidden px-4 py-3 md:table-cell">Status</th>
+                            <th class="px-4 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($staff as $member)
+                            <tr class="transition hover:bg-primary-50/40 dark:hover:bg-gray-800/70">
+                                <td class="px-4 py-3.5">
+                                    <p class="font-medium text-gray-900 dark:text-white">{{ $member->name }}</p>
+                                    <p class="text-xs text-gray-500">{{ $member->email }}</p>
+                                    <div class="mt-2 space-y-1 text-xs text-gray-500 lg:hidden">
+                                        <p><span class="font-medium text-gray-400">Branch:</span> {{ $member->branch?->name ?? '—' }}</p>
+                                        <p class="sm:hidden"><span class="font-medium text-gray-400">Rate:</span> £{{ number_format((float) ($member->hourly_rate ?? 0), 2) }}</p>
+                                        <p class="md:hidden"><span class="font-medium text-gray-400">Status:</span> {{ $member->status }}</p>
+                                    </div>
+                                </td>
+                                <td class="hidden px-4 py-3.5 text-gray-700 dark:text-gray-200 lg:table-cell">{{ $member->branch?->name ?? '—' }}</td>
+                                <td class="px-4 py-3.5 font-mono text-gray-700 dark:text-gray-200">{{ $member->pin_code ?? '—' }}</td>
+                                <td class="hidden px-4 py-3.5 text-gray-700 dark:text-gray-200 sm:table-cell">£{{ number_format((float) ($member->hourly_rate ?? 0), 2) }}</td>
+                                <td class="hidden px-4 py-3.5 text-gray-700 dark:text-gray-200 md:table-cell">{{ $member->status }}</td>
+                                <td class="px-4 py-3.5">
+                                    <div class="flex flex-wrap gap-3">
+                                        <a href="{{ route('business-admin.staff.edit', $member) }}" class="font-semibold text-primary-700">Edit</a>
+                                        <form method="POST" action="{{ route('business-admin.staff.suspend', $member) }}" class="inline">
+                                            @csrf
+                                            <button type="submit" class="font-semibold text-amber-600">Suspend</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <x-admin.pagination :paginator="$staff" />
     @endif
 </x-layouts.business-admin>

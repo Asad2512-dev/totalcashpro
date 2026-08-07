@@ -25,7 +25,9 @@ final class HomeController extends Controller
             'whyChoose' => $this->marketingContent->whyChoose(),
             'testimonials' => $this->marketingContent->testimonials(),
             'pricingPlans' => $this->marketingContent->pricingPlans(),
+            'pricingComparison' => $this->marketingContent->pricingComparison(),
             'faqs' => $this->marketingContent->faqs(),
+            'employeeWorkflow' => $this->marketingContent->employeeWorkflow(),
         ]);
     }
 }

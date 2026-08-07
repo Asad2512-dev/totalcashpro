@@ -10,6 +10,7 @@ use App\Enums\RoleSlug;
 use App\Enums\SupplierInvoiceStatus;
 use App\Enums\WageStatus;
 use App\Models\AttendanceLog;
+use App\Models\BranchKiosk;
 use App\Models\Branch;
 use App\Models\CashUp;
 use App\Models\InventoryCategory;
@@ -19,6 +20,7 @@ use App\Models\Role;
 use App\Models\RotaGroup;
 use App\Models\RotaSection;
 use App\Models\RotaShift;
+use App\Models\Spending;
 use App\Models\Supplier;
 use App\Models\SupplierInvoice;
 use App\Models\User;
@@ -273,6 +275,97 @@ final class BusinessAdminDomainSeeder extends Seeder
                     'amount' => round(28 * (float) $member->hourly_rate, 2),
                     'status' => WageStatus::Pending->value,
                     'created_by' => $org->owner_user_id,
+                ],
+            );
+        }
+
+        Bill::query()->updateOrCreate(
+            [
+                'organization_id' => $org->id,
+                'branch_id' => $dockside->id,
+                'title' => 'Monthly rent',
+            ],
+            [
+                'vendor' => 'Harbour Properties',
+                'category' => 'rent',
+                'amount' => 2400.00,
+                'net_amount' => 2400.00,
+                'vat_amount' => 0,
+                'gross_amount' => 2400.00,
+                'due_date' => now()->addDays(10)->toDateString(),
+                'status' => 'approved',
+                'created_by' => $org->owner_user_id,
+            ],
+        );
+
+        Bill::query()->updateOrCreate(
+            [
+                'organization_id' => $org->id,
+                'branch_id' => $central->id,
+                'title' => 'Business insurance',
+            ],
+            [
+                'vendor' => 'CoverSure',
+                'category' => 'insurance',
+                'amount' => 185.00,
+                'net_amount' => 154.17,
+                'vat_amount' => 30.83,
+                'gross_amount' => 185.00,
+                'due_date' => now()->addDays(5)->toDateString(),
+                'status' => 'approved',
+                'created_by' => $org->owner_user_id,
+            ],
+        );
+
+        Spending::query()->updateOrCreate(
+            [
+                'organization_id' => $org->id,
+                'branch_id' => $dockside->id,
+                'title' => 'Cleaning supplies',
+                'spent_date' => now()->subDays(2)->toDateString(),
+            ],
+            [
+                'category' => 'supplies',
+                'amount' => 46.50,
+                'net_amount' => 38.75,
+                'vat_amount' => 7.75,
+                'gross_amount' => 46.50,
+                'status' => 'paid',
+                'payment_method' => 'card',
+                'notes' => 'Floor cleaner and cloths',
+                'created_by' => $org->owner_user_id,
+            ],
+        );
+
+        Spending::query()->updateOrCreate(
+            [
+                'organization_id' => $org->id,
+                'branch_id' => $dockside->id,
+                'title' => 'Social media ads',
+                'spent_date' => now()->subDays(6)->toDateString(),
+            ],
+            [
+                'category' => 'marketing',
+                'amount' => 120.00,
+                'net_amount' => 100.00,
+                'vat_amount' => 20.00,
+                'gross_amount' => 120.00,
+                'status' => 'paid',
+                'payment_method' => 'bank',
+                'created_by' => $org->owner_user_id,
+            ],
+        );
+
+        foreach ($branches as $branch) {
+            BranchKiosk::query()->firstOrCreate(
+                ['branch_id' => $branch->id],
+                [
+                    'organization_id' => $org->id,
+                    'name' => $branch->name.' Kiosk',
+                    'token' => \Illuminate\Support\Str::random(64),
+                    'welcome_message' => 'Welcome — enter your PIN to clock in or out.',
+                    'show_photos' => true,
+                    'is_enabled' => true,
                 ],
             );
         }

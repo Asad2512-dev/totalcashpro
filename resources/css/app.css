@@ -80,6 +80,10 @@
         scroll-behavior: smooth;
     }
 
+    html.admin-panel {
+        scroll-behavior: auto;
+    }
+
     body {
         @apply bg-paper font-sans text-ink antialiased;
     }
@@ -189,15 +193,12 @@
     }
 
     .auth-loader-overlay {
-        @apply fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/45 backdrop-blur-sm;
-    }
-
-    .auth-loader-panel {
-        @apply flex flex-col items-center gap-4 rounded-3xl border border-white/20 bg-white px-8 py-7 shadow-soft;
+        @apply fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/35 backdrop-blur-[2px];
     }
 
     .auth-loader-spinner {
-        @apply h-10 w-10 animate-spin rounded-full border-[3px] border-primary-100 border-t-primary-600;
+        @apply h-12 w-12 animate-spin rounded-full border-[3px] border-white/20 border-t-white shadow-lg;
+        animation-duration: 0.7s;
     }
 
     .glass-panel {
@@ -211,6 +212,19 @@
     .admin-shell {
         @apply min-h-screen bg-gray-50 text-gray-900;
         font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .admin-shell.admin-shell--viewport {
+        @apply h-dvh min-h-0 overflow-hidden;
+    }
+
+    .admin-shell.admin-shell--viewport > .admin-shell-layout {
+        @apply h-full min-h-0;
+    }
+
+    .admin-shell.admin-shell--viewport .admin-shell-main {
+        @apply min-h-0 flex-1 overflow-y-auto overscroll-y-contain;
+        -webkit-overflow-scrolling: touch;
     }
 
     .admin-shell {
@@ -233,8 +247,115 @@
         @apply border-gray-700 bg-gray-800;
     }
 
+    .finance-subnav {
+        @apply overflow-hidden p-0;
+    }
+
+    .finance-subnav-group {
+        @apply inline-flex min-h-[36px] items-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white;
+    }
+
+    .finance-subnav-group-active {
+        @apply bg-primary-50 text-primary-800 dark:bg-primary-900/30 dark:text-primary-200;
+    }
+
+    .finance-subnav-link {
+        @apply inline-flex min-h-[34px] items-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white;
+    }
+
+    .finance-subnav-link-block {
+        @apply flex w-full min-h-[36px];
+    }
+
+    .finance-subnav-link-active {
+        @apply bg-primary-600 font-semibold text-white shadow-sm hover:bg-primary-700 hover:text-white dark:bg-primary-600 dark:hover:bg-primary-500;
+    }
+
+    .report-filters {
+        @apply sticky top-16 z-20 bg-white/95 backdrop-blur dark:bg-gray-900/95;
+    }
+
+    .report-stat-grid {
+        @apply grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+    }
+
+    .report-stat-grid .admin-card {
+        @apply h-full;
+    }
+
+    @media print {
+        .report-center .admin-card,
+        .report-center table {
+            break-inside: avoid;
+        }
+
+        .report-filters,
+        .print\:hidden {
+            display: none !important;
+        }
+    }
+
     .admin-input {
         @apply w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20;
+    }
+
+    .admin-branch-select-form {
+        @apply flex min-w-0 items-center;
+    }
+
+    .admin-branch-select-form-compact {
+        @apply w-full min-w-0 flex-1;
+    }
+
+    .admin-branch-select-wrap {
+        @apply relative inline-flex w-full min-w-0 max-w-[14rem] items-center;
+    }
+
+    .admin-branch-select-form-compact .admin-branch-select-wrap {
+        @apply max-w-none;
+    }
+
+    .admin-branch-select {
+        @apply h-10 w-full min-w-0 cursor-pointer appearance-none truncate rounded-full border border-gray-200 bg-white pl-4 pr-10 text-sm font-semibold text-gray-700 shadow-sm outline-none transition hover:border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-600;
+        line-height: 2.5rem;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .admin-branch-select-icon {
+        @apply pointer-events-none absolute inset-y-0 right-3 flex items-center justify-center text-gray-400 dark:text-gray-500;
+    }
+
+    .admin-branch-filter {
+        @apply rounded-2xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-800 dark:bg-gray-900;
+    }
+
+    .admin-branch-filter-compact {
+        @apply rounded-none border-0 bg-transparent p-0 shadow-none;
+    }
+
+    .admin-branch-tabs {
+        @apply flex flex-wrap gap-1 overflow-x-auto rounded-xl bg-gray-100/90 p-1 dark:bg-gray-800/80;
+    }
+
+    .admin-branch-filter-compact .admin-branch-tabs {
+        @apply max-w-[min(100vw-8rem,20rem)] flex-nowrap sm:max-w-none;
+    }
+
+    .admin-branch-tab-form {
+        @apply shrink-0;
+    }
+
+    .admin-branch-tab {
+        @apply inline-flex min-h-11 min-w-11 items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40;
+    }
+
+    .admin-branch-tab-active {
+        @apply bg-white text-primary-700 shadow-sm dark:bg-gray-900 dark:text-primary-300;
+    }
+
+    .admin-branch-tab-inactive {
+        @apply text-gray-600 hover:bg-white/70 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-900/60 dark:hover:text-white;
     }
 
     .dark .admin-input {
@@ -339,6 +460,177 @@
         gap: 0.75rem;
     }
 
+    .cashup-steps-nav {
+        @apply mb-6;
+    }
+
+    .cashup-steps-shell {
+        @apply overflow-hidden rounded-2xl border border-gray-200/90 bg-gradient-to-b from-gray-50 to-white shadow-sm dark:border-gray-700 dark:from-gray-900 dark:to-gray-900/80;
+    }
+
+    .cashup-steps-header {
+        @apply flex flex-wrap items-start justify-between gap-4 border-b border-gray-200/80 px-4 py-3.5 sm:px-5 dark:border-gray-700/80;
+    }
+
+    .cashup-steps-eyebrow {
+        @apply text-[11px] font-bold uppercase tracking-[0.16em] text-primary-700 dark:text-primary-300;
+    }
+
+    .cashup-steps-heading {
+        @apply mt-0.5 font-display text-sm font-semibold text-gray-900 dark:text-white;
+    }
+
+    .cashup-steps-shift-total {
+        @apply rounded-xl border border-primary-100 bg-primary-50/80 px-3.5 py-2 text-right dark:border-primary-900/50 dark:bg-primary-900/20;
+    }
+
+    .cashup-steps-shift-label {
+        @apply block text-[10px] font-bold uppercase tracking-[0.14em] text-primary-700/80 dark:text-primary-300/80;
+    }
+
+    .cashup-steps-shift-value {
+        @apply block font-display text-lg font-bold tabular-nums text-primary-800 dark:text-primary-100;
+    }
+
+    .cashup-steps-scroll {
+        @apply overflow-x-auto overscroll-x-contain px-3 py-3 sm:px-4;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .cashup-steps-list {
+        @apply flex min-w-max items-stretch gap-2;
+    }
+
+    .cashup-steps-item {
+        @apply flex items-stretch;
+    }
+
+    .cashup-step-tab {
+        @apply relative flex min-w-[8.75rem] flex-col items-center gap-2.5 rounded-2xl border border-transparent bg-transparent px-3 py-3.5 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40;
+    }
+
+    .cashup-step-tab:hover {
+        @apply border-gray-200/80 bg-white/70 dark:border-gray-700 dark:bg-gray-800/50;
+    }
+
+    .cashup-step-tab-active {
+        @apply border-primary-200 bg-white shadow-md ring-1 ring-primary-500/15 dark:border-primary-800 dark:bg-gray-900 dark:ring-primary-500/25;
+        background-image: linear-gradient(180deg, rgb(240 253 244 / 0.95) 0%, rgb(255 255 255 / 1) 100%);
+    }
+
+    .dark .cashup-step-tab-active {
+        background-image: linear-gradient(180deg, rgb(20 83 45 / 0.35) 0%, rgb(17 24 39 / 1) 100%);
+    }
+
+    .cashup-step-tab-complete:not(.cashup-step-tab-active) {
+        @apply border-primary-100/80 bg-primary-50/50 dark:border-primary-900/40 dark:bg-primary-900/15;
+    }
+
+    .cashup-step-icon-wrap {
+        @apply relative inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-100 text-gray-500 transition dark:bg-gray-800 dark:text-gray-400;
+    }
+
+    .cashup-step-icon {
+        @apply flex h-5 w-5 items-center justify-center transition;
+    }
+
+    .cashup-step-icon svg {
+        @apply h-full w-full;
+    }
+
+    .cashup-step-check {
+        @apply absolute inset-0 hidden items-center justify-center rounded-2xl bg-primary-600 text-white;
+    }
+
+    .cashup-step-check svg {
+        @apply h-5 w-5;
+    }
+
+    .cashup-step-tab-active .cashup-step-icon-wrap {
+        @apply bg-primary-600 text-white shadow-sm shadow-primary-600/30;
+    }
+
+    .cashup-step-tab-complete:not(.cashup-step-tab-active) .cashup-step-icon-wrap {
+        @apply bg-primary-100 text-primary-700 dark:bg-primary-900/60 dark:text-primary-200;
+    }
+
+    .cashup-step-tab-complete:not(.cashup-step-tab-active) .cashup-step-icon {
+        @apply opacity-0;
+    }
+
+    .cashup-step-tab-complete:not(.cashup-step-tab-active) .cashup-step-check {
+        @apply flex;
+    }
+
+    .cashup-step-copy {
+        @apply flex min-w-0 flex-col items-center gap-0.5;
+    }
+
+    .cashup-step-label {
+        @apply text-sm font-semibold text-gray-800 dark:text-gray-100;
+    }
+
+    .cashup-step-tab-active .cashup-step-label {
+        @apply text-primary-900 dark:text-primary-100;
+    }
+
+    .cashup-step-total {
+        @apply text-xs font-bold tabular-nums text-gray-500 dark:text-gray-400;
+    }
+
+    .cashup-step-tab-active .cashup-step-total {
+        @apply text-primary-700 dark:text-primary-200;
+    }
+
+    .cashup-step-tab-complete:not(.cashup-step-tab-active) .cashup-step-total {
+        @apply text-primary-700 dark:text-primary-300;
+    }
+
+    .cashup-steps-progress {
+        @apply h-1.5 bg-gray-100 dark:bg-gray-800;
+    }
+
+    .cashup-steps-progress-bar {
+        @apply h-full bg-gradient-to-r from-primary-500 to-primary-600 transition-all duration-500 ease-out;
+    }
+
+    .cashup-step-intro {
+        @apply mt-4 flex items-start gap-3 rounded-2xl border border-primary-100 bg-primary-50/50 px-4 py-3.5 dark:border-primary-900/40 dark:bg-primary-900/15;
+    }
+
+    .cashup-step-intro-badge {
+        @apply inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white shadow-sm;
+    }
+
+    .cashup-step-intro-text {
+        @apply pt-0.5 text-sm leading-relaxed text-gray-600 dark:text-gray-300;
+    }
+
+    @media (min-width: 768px) {
+        .cashup-steps-list {
+            @apply grid min-w-0 grid-cols-5 gap-2;
+        }
+
+        .cashup-steps-item {
+            @apply min-w-0;
+        }
+
+        .cashup-step-tab {
+            @apply min-w-0 w-full;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .cashup-steps-header {
+            @apply flex-col;
+        }
+
+        .cashup-steps-shift-total {
+            @apply w-full text-left;
+        }
+    }
+
     .admin-scroll-lock {
         overflow: hidden;
         touch-action: none;
@@ -370,12 +662,32 @@
         scrollbar-width: thin;
     }
 
+    .admin-chart-panel {
+        overflow: visible;
+    }
+
+    .admin-chart-scroll {
+        overflow-x: auto;
+        overflow-y: visible;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
     .admin-table thead {
         @apply border-b border-gray-200 bg-gray-50/90 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-400;
     }
 
     .admin-table tbody {
         @apply divide-y divide-gray-100 dark:divide-gray-700;
+    }
+
+    .admin-btn-secondary {
+        @apply inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 disabled:pointer-events-none disabled:opacity-60 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700;
+    }
+
+    .admin-btn-primary {
+        @apply inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg bg-primary-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 disabled:pointer-events-none disabled:opacity-60;
     }
 
     .admin-table tbody tr {
@@ -541,10 +853,54 @@
     .reveal,
     .float-a,
     .float-b,
-    .marquee-track {
+    .marquee-track,
+    .animate-kiosk-shake {
         animation: none !important;
         opacity: 1;
         transform: none;
         transition: none;
     }
+}
+
+/* Attendance Kiosk terminal */
+.kiosk-shell {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.kiosk-keypad-btn {
+    @apply flex h-16 items-center justify-center rounded-2xl border-2 border-gray-200 bg-white text-2xl font-bold text-gray-900 shadow-sm transition-all duration-150 active:scale-95 hover:border-emerald-300 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:border-emerald-700 dark:hover:bg-emerald-950/40 sm:h-[4.5rem] sm:text-3xl;
+}
+
+.kiosk-keypad-btn-muted {
+    @apply text-base font-semibold text-gray-600 dark:text-gray-300;
+}
+
+.kiosk-keypad-btn-danger {
+    @apply border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950/30;
+}
+
+.kiosk-action-btn {
+    @apply w-full rounded-2xl border-2 border-gray-200 bg-white px-6 py-4 text-base font-bold text-gray-900 shadow-sm transition-all duration-150 active:scale-[0.98] hover:border-emerald-400 hover:bg-emerald-50 disabled:opacity-60 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:border-emerald-600 dark:hover:bg-emerald-950/30;
+}
+
+.kiosk-action-btn-primary {
+    @apply border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600;
+}
+
+.kiosk-action-btn-muted {
+    @apply text-sm font-semibold text-gray-600 dark:text-gray-300;
+}
+
+@keyframes kiosk-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+}
+
+.animate-kiosk-shake {
+    animation: kiosk-shake 0.45s ease-in-out;
 }

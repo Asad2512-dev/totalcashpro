@@ -15,7 +15,12 @@
         {{-- Revenue Chart + Quick Actions --}}
         <div class="grid gap-6 lg:grid-cols-3">
             <div class="lg:col-span-2">
-                <x-admin.chart-card title="Revenue (Last 14 Days)" :bars="$revenueBars" />
+                <x-admin.chart-card
+                    :title="'Daily cash up · '.($cashChartPeriod ?? now()->format('F Y'))"
+                    description="Net cash up for each day this month."
+                    :points="$cashChart"
+                    :total="$cashChartTotal"
+                />
             </div>
 
             <x-admin.card title="Quick Actions">

@@ -29,6 +29,11 @@
             @endif
         </x-admin.card>
         <x-admin.card>
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">This week</p>
+            <p class="mt-2 font-display text-xl font-bold text-gray-900 dark:text-white">{{ number_format($weeklyHours ?? 0, 2) }}h</p>
+            <a href="{{ route('staff.hours') }}" class="mt-1 inline-block text-sm font-semibold text-primary-700">View hours →</a>
+        </x-admin.card>
+        <x-admin.card>
             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Quick actions</p>
             <div class="mt-3 flex flex-wrap gap-2">
                 <a href="{{ route('staff.clock') }}" class="admin-touch-target inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white">Clock</a>

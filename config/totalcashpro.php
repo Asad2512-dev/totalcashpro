@@ -44,9 +44,9 @@ return [
     ],
 
     'seo' => [
-        'title' => 'TotalCashPro — Cloud Restaurant & Retail Software',
-        'description' => 'TotalCashPro is cloud SaaS for restaurants and retail. Basic £19.99/month or Professional £29.99/month. Request access — accounts are reviewed and created by our team.',
-        'keywords' => 'restaurant software, retail management, cash up, payroll, inventory, attendance, SaaS, monthly subscription, TotalCashPro',
+        'title' => 'TotalCashPro — Restaurant Management, Attendance Kiosk & Finance Software UK',
+        'description' => 'Cloud restaurant management software for UK businesses. Attendance kiosk with PIN clock-in, daily cash up, payroll, inventory, finance, CRM, multi-branch reports, 2FA security. Basic £19.99/mo · Professional £29.99/mo · 14-day trial.',
+        'keywords' => 'restaurant management software, POS back office, attendance system, attendance kiosk, cash up software, payroll software, inventory software, UK restaurant management, hospitality software, retail management SaaS, TotalCashPro',
         'og_image' => '/logo.png',
         'twitter_handle' => '@totalcashpro',
     ],

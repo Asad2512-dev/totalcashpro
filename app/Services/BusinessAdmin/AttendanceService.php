@@ -29,15 +29,18 @@ final class AttendanceService implements ServiceInterface
     public function verifyPin(User $admin, string $pin): array
     {
         $staff = $this->requireStaffByPin($admin, $pin);
-        $state = $this->resolveState($staff);
 
-        if ($state['state'] === 'not_checked_in' && $this->canClockIn($admin, $staff)) {
-            $this->clockAction($admin, $staff, 'clock-in');
-            $state = $this->resolveState($staff);
-            $state['state'] = 'auto_checked_in';
-        }
+        return $this->verifyPinForStaff($admin, $staff);
+    }
 
-        return $state;
+    /**
+     * @return array{user: User, state: string, break: ?AttendanceBreak, hours: ?float}
+     */
+    public function verifyPinForBranch(User $admin, string $pin, int $branchId): array
+    {
+        $staff = $this->requireStaffByPinForBranch($admin, $pin, $branchId);
+
+        return $this->verifyPinForStaff($admin, $staff);
     }
 
     /**
@@ -46,6 +49,17 @@ final class AttendanceService implements ServiceInterface
     public function action(User $admin, string $pin, string $action): array
     {
         $staff = $this->requireStaffByPin($admin, $pin);
+        $this->clockAction($admin, $staff, $action);
+
+        return $this->resolveState($staff);
+    }
+
+    /**
+     * @return array{user: User, state: string, break: ?AttendanceBreak, hours: ?float}
+     */
+    public function actionForBranch(User $admin, string $pin, string $action, int $branchId): array
+    {
+        $staff = $this->requireStaffByPinForBranch($admin, $pin, $branchId);
         $this->clockAction($admin, $staff, $action);
 
         return $this->resolveState($staff);
@@ -61,6 +75,44 @@ final class AttendanceService implements ServiceInterface
         $this->assertStaffActor($staff);
 
         return $this->resolveState($staff);
+    }
+
+    /**
+     * Smart kiosk: auto-select clock action from current attendance state.
+     *
+     * @return array{user: User, state: string, break: ?AttendanceBreak, hours: ?float, action_performed: string, action_label: string}
+     */
+    public function smartKioskPin(User $admin, string $pin, int $branchId): array
+    {
+        $staff = $this->requireStaffByPinForBranch($admin, $pin, $branchId);
+        $state = $this->resolveState($staff);
+        $action = $this->resolveSmartKioskAction($state['state']);
+        $this->clockAction($admin, $staff, $action);
+        $result = $this->resolveState($staff);
+        $result['action_performed'] = $action;
+        $result['action_label'] = $this->smartActionLabel($action);
+
+        return $result;
+    }
+
+    private function resolveSmartKioskAction(string $state): string
+    {
+        return match ($state) {
+            'on_break' => 'end-break',
+            'checked_in', 'auto_checked_in' => 'clock-out',
+            default => 'clock-in',
+        };
+    }
+
+    private function smartActionLabel(string $action): string
+    {
+        return match ($action) {
+            'clock-in' => 'Clocked In',
+            'clock-out' => 'Clocked Out',
+            'start-break' => 'Break Started',
+            'end-break' => 'Break Ended',
+            default => 'Updated',
+        };
     }
 
     /**
@@ -183,6 +235,33 @@ final class AttendanceService implements ServiceInterface
         }
 
         return $staff;
+    }
+
+    private function requireStaffByPinForBranch(User $admin, string $pin, int $branchId): User
+    {
+        $staff = $this->requireStaffByPin($admin, $pin);
+
+        if ((int) $staff->branch_id !== $branchId) {
+            throw ValidationException::withMessages(['pin' => 'This PIN is not valid for this branch.']);
+        }
+
+        return $staff;
+    }
+
+    /**
+     * @return array{user: User, state: string, break: ?AttendanceBreak, hours: ?float}
+     */
+    private function verifyPinForStaff(User $admin, User $staff): array
+    {
+        $state = $this->resolveState($staff);
+
+        if ($state['state'] === 'not_checked_in' && $this->canClockIn($admin, $staff)) {
+            $this->clockAction($admin, $staff, 'clock-in');
+            $state = $this->resolveState($staff);
+            $state['state'] = 'auto_checked_in';
+        }
+
+        return $state;
     }
 
     private function clockAction(User $admin, User $staff, string $action): void

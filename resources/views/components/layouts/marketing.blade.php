@@ -39,6 +39,25 @@
     <script type="application/ld+json">
         {!! json_encode([
             '@context' => 'https://schema.org',
+            '@type' => 'SoftwareApplication',
+            'name' => brand_name(),
+            'applicationCategory' => 'BusinessApplication',
+            'operatingSystem' => 'Web',
+            'url' => config('totalcashpro.domain'),
+            'description' => config('totalcashpro.seo.description'),
+            'offers' => [
+                '@type' => 'Offer',
+                'price' => '19.99',
+                'priceCurrency' => 'GBP',
+                'description' => 'Basic plan from £19.99/month with 14-day Professional trial',
+            ],
+            'featureList' => 'Attendance Kiosk, PIN Clock In, Cash Up, Payroll, Inventory, Finance, CRM, HR, Reports, Multi-Branch, 2FA',
+        ], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT) !!}
+    </script>
+
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
             '@type' => 'Organization',
             'name' => brand_name(),
             'url' => config('totalcashpro.domain'),

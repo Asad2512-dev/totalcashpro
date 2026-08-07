@@ -13,7 +13,7 @@
 <x-layouts.admin :title="$title" :active="$active">
     <x-admin.breadcrumb :items="[$title]" />
 
-    <x-admin.toolbar :title="$title" :description="$description">
+    <x-admin.toolbar :description="$description">
         @if ($actionLabel && ! empty($createRoute))
             <x-admin.button size="sm" :href="route($createRoute)">
                 <x-admin.icon name="plus" class="h-4 w-4" />

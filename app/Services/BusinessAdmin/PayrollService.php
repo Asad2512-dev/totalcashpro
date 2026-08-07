@@ -41,9 +41,23 @@ final class PayrollService implements ServiceInterface
     public function formMeta(User $user): array
     {
         $branchId = $this->branchContext->currentBranchId($user);
+        $orgId = (int) $user->organization_id;
+
+        $baseQuery = Wage::query()
+            ->where('organization_id', $orgId)
+            ->when($branchId, fn ($q) => $q->where('branch_id', $branchId));
 
         return [
-            'staff' => $this->staff->activeStaff((int) $user->organization_id, $branchId),
+            'staff' => $this->staff->activeStaff($orgId, $branchId),
+            'summary' => [
+                'unpaid_total' => (float) (clone $baseQuery)->where('status', WageStatus::Pending->value)->sum('amount'),
+                'unpaid_count' => (int) (clone $baseQuery)->where('status', WageStatus::Pending->value)->count(),
+                'paid_month_total' => (float) (clone $baseQuery)
+                    ->where('status', WageStatus::Paid->value)
+                    ->whereMonth('paid_date', now()->month)
+                    ->whereYear('paid_date', now()->year)
+                    ->sum('amount'),
+            ],
         ];
     }
 

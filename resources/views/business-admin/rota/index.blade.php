@@ -4,7 +4,7 @@
     $tabUrl = fn (string $t) => route('business-admin.rota', ['week' => $weekStart, 'tab' => $t]);
 @endphp
 
-<x-layouts.business-admin title="Staff Rota" active="rota">
+<x-layouts.business-admin title="Rota Management" active="rota">
     <div
         x-data="{
             shiftForm: {
@@ -43,7 +43,7 @@
             },
         }"
     >
-        <x-admin.toolbar title="Rota Management" description="Assign morning and evening shifts with section colours — same layout as Cash Up Pro.">
+        <x-admin.toolbar description="Assign morning and evening shifts with section colours — same layout as Cash Up Pro.">
             <x-admin.nav-pill :href="$tabUrl('weekly')" :active="$tab === 'weekly'">Weekly Rota</x-admin.nav-pill>
             <x-admin.nav-pill :href="$tabUrl('sections')" :active="$tab === 'sections'">Sections</x-admin.nav-pill>
             <x-admin.nav-pill :href="$tabUrl('groups')" :active="$tab === 'groups'">Groups</x-admin.nav-pill>
@@ -88,7 +88,7 @@
                                             <td class="px-1 py-2 text-center">
                                                 <button
                                                     type="button"
-                                                    class="admin-touch-target inline-flex min-h-[44px] min-w-[3.5rem] items-center justify-center rounded-lg border border-dashed border-gray-200 px-1.5 py-2 text-[11px] font-semibold dark:border-gray-700 sm:min-w-[4.5rem]"
+                                                    class="admin-touch-target inline-flex min-h-[44px] min-w-[4.5rem] flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-gray-200 px-1.5 py-1.5 text-[10px] font-semibold leading-tight dark:border-gray-700 sm:min-w-[5.5rem]"
                                                     @if ($cell)
                                                         style="background: {{ $cell['color'] }}22; border-color: {{ $cell['color'] }}; color: {{ $cell['color'] }};"
                                                     @endif
@@ -96,7 +96,12 @@
                                                         @click="openShift({{ $row['user_id'] }}, @js($row['name']), @js($day['date']), @js($block['type']), @js($cell))"
                                                     @endif
                                                 >
-                                                    {{ $cell ? ($cell['start_time'].'-'.$cell['end_time']) : '+' }}
+                                                    @if ($cell)
+                                                        <span class="max-w-[5rem] truncate">{{ $cell['section'] ?? 'Section' }}</span>
+                                                        <span class="text-[9px] font-medium opacity-90">{{ $cell['start_time'].'-'.$cell['end_time'] }}</span>
+                                                    @else
+                                                        +
+                                                    @endif
                                                 </button>
                                             </td>
                                         @endforeach

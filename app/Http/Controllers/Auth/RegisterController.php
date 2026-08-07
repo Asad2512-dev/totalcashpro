@@ -46,8 +46,8 @@ final class RegisterController extends Controller
         $request->session()->regenerate();
 
         return redirect()
-            ->route('business-admin.onboarding')
-            ->with('status', 'Welcome! Your 14-day Professional trial has started.');
+            ->route('verification.notice')
+            ->with('status', 'Welcome! Your 14-day Professional trial has started. Please verify your email to continue.');
     }
 
     /**

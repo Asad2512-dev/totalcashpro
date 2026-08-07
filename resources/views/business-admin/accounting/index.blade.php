@@ -1,0 +1,242 @@
+<x-layouts.business-admin title="Accounting" active="accounting">
+    <x-admin.toolbar title="Accounting" description="Bills, spendings and a live financial overview for your business.">
+        @if ($tab === 'bills')
+            <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-bill')">Add bill</x-admin.button>
+        @elseif ($tab === 'spendings')
+            <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-spending')">Add spending</x-admin.button>
+        @endif
+    </x-admin.toolbar>
+
+    <div class="mb-6 flex flex-wrap gap-2 border-b border-gray-200 dark:border-gray-700">
+        @foreach (['overview' => 'Overview', 'bills' => 'Bills', 'spendings' => 'Spendings'] as $key => $label)
+            <a
+                href="{{ route('business-admin.accounting', ['tab' => $key]) }}"
+                @class([
+                    'admin-touch-target -mb-px border-b-2 px-1 py-3 text-sm font-semibold transition',
+                    'border-primary-600 text-primary-700' => $tab === $key,
+                    'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200' => $tab !== $key,
+                ])
+            >{{ $label }}</a>
+        @endforeach
+    </div>
+
+    @if ($tab === 'overview')
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <x-admin.stat-card label="Cash up revenue" :value="'£'.number_format($overview['revenue'], 2)" change="This month" tone="success" />
+            <x-admin.stat-card label="Payroll paid" :value="'£'.number_format($overview['payroll_out'], 2)" change="This month" tone="info" />
+            <x-admin.stat-card label="Supplier invoices paid" :value="'£'.number_format($overview['supplier_bills'], 2)" change="This month" tone="info" />
+            <x-admin.stat-card label="Operational spendings" :value="'£'.number_format($overview['spendings'], 2)" change="This month" tone="warning" />
+            <x-admin.stat-card label="Bills due" :value="'£'.number_format($overview['bills_due'], 2)" change="Outstanding" tone="danger" />
+            <x-admin.stat-card label="Net position" :value="'£'.number_format($overview['net_position'], 2)" change="Revenue − outflows" :tone="$overview['net_position'] >= 0 ? 'success' : 'danger'" />
+        </div>
+
+        <div class="mt-6 grid gap-4 lg:grid-cols-2">
+            <x-admin.card>
+                <h3 class="font-display font-bold text-gray-900 dark:text-white">Quick links</h3>
+                <div class="mt-4 flex flex-wrap gap-3">
+                    <x-admin.button size="sm" variant="secondary" :href="route('business-admin.accounting', ['tab' => 'bills'])">Manage bills</x-admin.button>
+                    <x-admin.button size="sm" variant="secondary" :href="route('business-admin.accounting', ['tab' => 'spendings'])">Record spending</x-admin.button>
+                    <x-admin.button size="sm" variant="secondary" :href="route('business-admin.payroll')">Payroll</x-admin.button>
+                    <x-admin.button size="sm" variant="secondary" :href="route('business-admin.suppliers', ['tab' => 'invoices'])">Supplier invoices</x-admin.button>
+                    <x-admin.button size="sm" variant="secondary" :href="route('business-admin.cash-history')">Cash history</x-admin.button>
+                </div>
+            </x-admin.card>
+            <x-admin.card>
+                <h3 class="font-display font-bold text-gray-900 dark:text-white">What we track</h3>
+                <ul class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                    <li>✓ Recurring & one-off bills with due dates</li>
+                    <li>✓ Day-to-day operational spendings</li>
+                    <li>✓ Payroll and supplier invoice outflows</li>
+                    <li>✓ Cash up revenue from your branches</li>
+                </ul>
+            </x-admin.card>
+        </div>
+    @elseif ($tab === 'bills')
+        @if ($bills->isEmpty())
+            <x-admin.empty-state title="No bills yet" description="Track rent, utilities, insurance and other recurring costs.">
+                <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-bill')">Add bill</x-admin.button>
+            </x-admin.empty-state>
+        @else
+            <div class="admin-mobile-cards md:hidden">
+                @foreach ($bills as $bill)
+                    @php
+                        $status = $bill->status instanceof \BackedEnum ? $bill->status->value : (string) $bill->status;
+                        $pending = strcasecmp($status, 'Paid') !== 0;
+                    @endphp
+                    <article class="admin-mobile-card">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">{{ $bill->title }}</h3>
+                                <p class="mt-1 text-sm text-gray-500">{{ $bill->vendor ?: 'No vendor' }} · Due {{ $bill->due_date?->format('d M Y') }}</p>
+                            </div>
+                            <span class="text-sm font-semibold">£{{ number_format((float) $bill->amount, 2) }}</span>
+                        </div>
+                        @if ($pending)
+                            <form method="POST" action="{{ route('business-admin.accounting.bills.paid', $bill) }}" class="mt-4">
+                                @csrf
+                                <x-admin.button type="submit" size="sm">Mark paid</x-admin.button>
+                            </form>
+                        @endif
+                    </article>
+                @endforeach
+            </div>
+
+            <div class="admin-card hidden overflow-hidden md:block">
+                <div class="admin-table-wrap -mx-4 sm:mx-0">
+                    <table class="admin-table min-w-full text-left text-sm">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3">Bill</th>
+                                <th class="px-4 py-3">Category</th>
+                                <th class="px-4 py-3">Due</th>
+                                <th class="px-4 py-3">Amount</th>
+                                <th class="px-4 py-3">Status</th>
+                                <th class="px-4 py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($bills as $bill)
+                                @php
+                                    $status = $bill->status instanceof \BackedEnum ? $bill->status->value : (string) $bill->status;
+                                    $pending = strcasecmp($status, 'Paid') !== 0;
+                                @endphp
+                                <tr class="transition hover:bg-primary-50/40 dark:hover:bg-gray-800/70">
+                                    <td class="px-4 py-3.5">
+                                        <p class="font-medium text-gray-900 dark:text-white">{{ $bill->title }}</p>
+                                        <p class="text-xs text-gray-500">{{ $bill->vendor ?: '—' }}</p>
+                                    </td>
+                                    <td class="px-4 py-3.5 capitalize text-gray-700 dark:text-gray-200">{{ $billCategories[$bill->category] ?? $bill->category }}</td>
+                                    <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $bill->due_date?->format('d M Y') }}</td>
+                                    <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">£{{ number_format((float) $bill->amount, 2) }}</td>
+                                    <td class="px-4 py-3.5 capitalize text-gray-700 dark:text-gray-200">{{ $status }}</td>
+                                    <td class="px-4 py-3.5">
+                                        @if ($pending)
+                                            <form method="POST" action="{{ route('business-admin.accounting.bills.paid', $bill) }}" class="inline">
+                                                @csrf
+                                                <button type="submit" class="font-semibold text-primary-700">Mark paid</button>
+                                            </form>
+                                        @else
+                                            {{ $bill->paid_date?->format('d M Y') ?? '—' }}
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <x-admin.pagination :paginator="$bills" />
+        @endif
+    @else
+        @if ($spendings->isEmpty())
+            <x-admin.empty-state title="No spendings yet" description="Record supplies, maintenance, marketing and other day-to-day costs.">
+                <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-spending')">Add spending</x-admin.button>
+            </x-admin.empty-state>
+        @else
+            <div class="admin-mobile-cards md:hidden">
+                @foreach ($spendings as $spending)
+                    <article class="admin-mobile-card">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">{{ $spending->title }}</h3>
+                                <p class="mt-1 text-sm text-gray-500">{{ $spendingCategories[$spending->category] ?? $spending->category }} · {{ $spending->spent_date?->format('d M Y') }}</p>
+                            </div>
+                            <span class="text-sm font-semibold">£{{ number_format((float) $spending->amount, 2) }}</span>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+
+            <div class="admin-card hidden overflow-hidden md:block">
+                <div class="admin-table-wrap -mx-4 sm:mx-0">
+                    <table class="admin-table min-w-full text-left text-sm">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3">Description</th>
+                                <th class="px-4 py-3">Category</th>
+                                <th class="px-4 py-3">Date</th>
+                                <th class="px-4 py-3">Payment</th>
+                                <th class="px-4 py-3">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($spendings as $spending)
+                                <tr class="transition hover:bg-primary-50/40 dark:hover:bg-gray-800/70">
+                                    <td class="px-4 py-3.5">
+                                        <p class="font-medium text-gray-900 dark:text-white">{{ $spending->title }}</p>
+                                        @if ($spending->notes)
+                                            <p class="text-xs text-gray-500">{{ $spending->notes }}</p>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $spendingCategories[$spending->category] ?? $spending->category }}</td>
+                                    <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $spending->spent_date?->format('d M Y') }}</td>
+                                    <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $paymentMethods[$spending->payment_method] ?? ($spending->payment_method ?: '—') }}</td>
+                                    <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">£{{ number_format((float) $spending->amount, 2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <x-admin.pagination :paginator="$spendings" />
+        @endif
+    @endif
+
+    <x-admin.modal name="add-bill" title="Add bill" max-width="max-w-md">
+        <form method="POST" action="{{ route('business-admin.accounting.bills.store') }}" class="space-y-4">
+            @csrf
+            <x-admin.input name="title" label="Bill title" required class="w-full" placeholder="e.g. Monthly rent" />
+            <x-admin.input name="vendor" label="Vendor" class="w-full" placeholder="e.g. Landlord Ltd" />
+            <div>
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                <select name="category" required class="admin-input min-h-[44px] w-full">
+                    @foreach ($billCategories as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="admin-form-grid">
+                <x-admin.input type="number" name="amount" label="Amount (£)" step="0.01" min="0" required class="w-full" />
+                <x-admin.input type="date" name="due_date" label="Due date" required class="w-full" value="{{ now()->addWeek()->toDateString() }}" />
+            </div>
+            <x-admin.textarea name="notes" label="Notes" rows="2" class="w-full" />
+            <x-admin.form-actions class="justify-end pt-2">
+                <x-admin.button type="button" variant="secondary" @click="$dispatch('close-modal')">Cancel</x-admin.button>
+                <x-admin.button type="submit">Save bill</x-admin.button>
+            </x-admin.form-actions>
+        </form>
+    </x-admin.modal>
+
+    <x-admin.modal name="add-spending" title="Add spending" max-width="max-w-md">
+        <form method="POST" action="{{ route('business-admin.accounting.spendings.store') }}" class="space-y-4">
+            @csrf
+            <x-admin.input name="title" label="Description" required class="w-full" placeholder="e.g. Cleaning supplies" />
+            <div>
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                <select name="category" required class="admin-input min-h-[44px] w-full">
+                    @foreach ($spendingCategories as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="admin-form-grid">
+                <x-admin.input type="number" name="amount" label="Amount (£)" step="0.01" min="0" required class="w-full" />
+                <x-admin.input type="date" name="spent_date" label="Date" required class="w-full" value="{{ now()->toDateString() }}" />
+            </div>
+            <div>
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Payment method</label>
+                <select name="payment_method" class="admin-input min-h-[44px] w-full">
+                    <option value="">Select…</option>
+                    @foreach ($paymentMethods as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <x-admin.textarea name="notes" label="Notes" rows="2" class="w-full" />
+            <x-admin.form-actions class="justify-end pt-2">
+                <x-admin.button type="button" variant="secondary" @click="$dispatch('close-modal')">Cancel</x-admin.button>
+                <x-admin.button type="submit">Save spending</x-admin.button>
+            </x-admin.form-actions>
+        </form>
+    </x-admin.modal>
+</x-layouts.business-admin>

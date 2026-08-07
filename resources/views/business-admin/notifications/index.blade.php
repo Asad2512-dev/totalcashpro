@@ -1,5 +1,10 @@
 <x-layouts.business-admin title="Notifications" active="notifications">
-    <x-admin.toolbar title="Notifications" />
+    <div class="mb-4 flex flex-wrap gap-2">
+        <a href="{{ route('business-admin.notifications') }}" class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {{ empty($activeCategory) ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-gray-800' }}">All</a>
+        @foreach ($categories as $category)
+            <a href="{{ route('business-admin.notifications', ['category' => $category->value]) }}" class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {{ $activeCategory === $category->value ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-gray-800' }}">{{ $category->label() }}</a>
+        @endforeach
+    </div>
 
     <div class="mt-6">
         <x-admin.card>
@@ -20,12 +25,12 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $notification->title }}</p>
-                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ $notification->message }}</p>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ $notification->body ?? $notification->message ?? '' }}</p>
                                 <p class="mt-1 text-xs text-gray-500">{{ $notification->created_at->diffForHumans() }}</p>
                             </div>
                             <div class="flex-shrink-0 sm:ml-auto">
                                 @if (!$notification->read_at)
-                                    <form method="POST" action="{{ route('business-admin.notifications.mark-read', $notification) }}">
+                                    <form method="POST" action="{{ route('business-admin.notifications.read', $notification) }}">
                                         @csrf
                                         <button type="submit" class="admin-touch-target text-sm font-semibold text-primary-600 hover:text-primary-700">
                                             Mark Read

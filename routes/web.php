@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Marketing\ContactController;
 use App\Http\Controllers\Marketing\HomeController;
@@ -13,7 +14,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 
-Route::redirect('/features', '/#features')->name('features');
+require __DIR__.'/kiosk.php';
+
+Route::get('/features', [\App\Http\Controllers\Marketing\PageController::class, 'features'])->name('features');
 Route::redirect('/solutions', '/#solutions')->name('solutions');
 Route::redirect('/pricing', '/#pricing')->name('pricing');
 
@@ -36,7 +39,7 @@ Route::controller(AccessRequestController::class)->group(function (): void {
 
 Route::middleware('guest')->controller(RegisterController::class)->group(function (): void {
     Route::get('/register', 'create')->name('register');
-    Route::post('/register', 'store')->name('register.store');
+    Route::post('/register', 'store')->middleware('throttle:10,1')->name('register.store');
 });
 
 Route::middleware('auth')->controller(VerifyEmailController::class)->group(function (): void {
@@ -47,15 +50,24 @@ Route::middleware('auth')->controller(VerifyEmailController::class)->group(funct
 
 Route::middleware('guest')->controller(LoginController::class)->group(function (): void {
     Route::get('/login', 'create')->name('login');
-    Route::post('/login', 'store')->name('login.attempt');
+    Route::post('/login', 'store')->middleware('throttle:10,1')->name('login.attempt');
 });
 
 Route::middleware('guest')->controller(PasswordResetController::class)->group(function (): void {
     Route::get('/forgot-password', 'requestForm')->name('password.request');
-    Route::post('/forgot-password', 'sendResetLink')->name('password.email');
+    Route::post('/forgot-password', 'sendResetLink')->middleware('throttle:password-reset')->name('password.email');
     Route::get('/reset-password/{token}', 'resetForm')->name('password.reset');
-    Route::post('/reset-password', 'reset')->name('password.update');
+    Route::post('/reset-password', 'reset')->middleware('throttle:password-reset')->name('password.update');
 });
+
+Route::middleware('guest')->controller(TwoFactorController::class)->group(function (): void {
+    Route::get('/two-factor-challenge', 'create')->name('two-factor.challenge');
+    Route::post('/two-factor-challenge', 'store')->middleware('throttle:otp')->name('two-factor.verify');
+    Route::post('/two-factor-challenge/resend', 'resend')->middleware('throttle:otp')->name('two-factor.resend');
+});
+
+Route::post('/webhooks/stripe', \App\Http\Controllers\Billing\StripeWebhookController::class)
+    ->name('webhooks.stripe');
 
 Route::post('/logout', [LoginController::class, 'destroy'])
     ->middleware('auth')
@@ -71,7 +83,7 @@ Route::prefix('super-admin')
 
 Route::prefix('business-admin')
     ->name('business-admin.')
-    ->middleware(['auth', 'business_admin', 'org_active'])
+    ->middleware(['auth', 'business_admin', 'org_active', 'verified'])
     ->group(function (): void {
         Route::get('/onboarding', [\App\Http\Controllers\BusinessAdmin\OnboardingController::class, 'show'])->name('onboarding');
         Route::post('/onboarding', [\App\Http\Controllers\BusinessAdmin\OnboardingController::class, 'store'])->name('onboarding.store');
@@ -83,10 +95,10 @@ Route::prefix('business-admin')
 
 Route::prefix('business-admin')
     ->name('business-admin.')
-    ->middleware(['auth', 'business_admin', 'org_active', 'plan_selected', 'onboarding_complete'])
+    ->middleware(['auth', 'business_admin', 'org_active', 'verified', 'plan_selected', 'onboarding_complete'])
     ->group(base_path('routes/business-admin.php'));
 
 Route::prefix('staff')
     ->name('staff.')
-    ->middleware(['auth', 'staff', 'org_active'])
+    ->middleware(['auth', 'staff', 'org_active', 'verified'])
     ->group(base_path('routes/staff.php'));

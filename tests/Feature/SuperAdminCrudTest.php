@@ -38,7 +38,7 @@ final class SuperAdminCrudTest extends TestCase
 
     public function test_super_admin_can_create_organization(): void
     {
-        Mail::fake();
+        \Illuminate\Support\Facades\Notification::fake();
 
         $admin = User::query()->where('email', 'admin@totalcashpro.com')->firstOrFail();
 
@@ -64,7 +64,10 @@ final class SuperAdminCrudTest extends TestCase
         $organization = Organization::query()->where('name', 'Harbour Retail Group')->firstOrFail();
         $this->assertNotNull($organization->owner_user_id);
         $this->assertDatabaseHas('activity_logs', ['event' => 'organization.created']);
-        Mail::assertSent(\App\Mail\AccessCredentialsMail::class);
+        \Illuminate\Support\Facades\Notification::assertSentTo(
+            User::query()->where('email', 'ava@harbour.test')->firstOrFail(),
+            \App\Notifications\AccessCredentialsNotification::class,
+        );
     }
 
     public function test_super_admin_can_approve_access_request(): void

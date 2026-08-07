@@ -21,6 +21,8 @@ final class BranchController extends Controller
             $request->user(),
         );
 
-        return back()->with('status', 'Branch filter updated.');
+        return $request->boolean('silent')
+            ? back()
+            : back()->with('status', 'Branch filter updated.');
     }
 }

@@ -8,10 +8,12 @@ use App\Enums\AccessRequestStatus;
 use App\Enums\SubscriptionPlan;
 use App\Mail\AccessRequestSubmittedMail;
 use App\Models\AccessRequest;
-use Illuminate\Support\Facades\Mail;
+use App\Services\Mail\MailSender;
 
 final class StoreAccessRequestAction
 {
+    public function __construct(private readonly MailSender $mail) {}
+
     /**
      * @param  array{
      *     business_name: string,
@@ -37,7 +39,7 @@ final class StoreAccessRequestAction
         $supportEmail = (string) config('totalcashpro.support_email');
 
         if ($supportEmail !== '') {
-            Mail::to($supportEmail)->send(new AccessRequestSubmittedMail($request));
+            $this->mail->sendMailable(new AccessRequestSubmittedMail($request), $supportEmail);
         }
 
         return $request;

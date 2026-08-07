@@ -9,6 +9,23 @@ use Illuminate\Contracts\View\View;
 
 final class PageController extends Controller
 {
+    public function __construct(
+        private readonly \App\Services\Marketing\MarketingContentService $marketingContent,
+    ) {}
+
+    public function features(): View
+    {
+        return view('marketing.pages.features', [
+            'seo' => [
+                'title' => 'Features — Attendance Kiosk, Finance, Payroll & Reports | TotalCashPro',
+                'description' => 'Explore TotalCashPro features: attendance kiosk, PIN clock-in, business dashboard, staff panel, finance, inventory, payroll, CRM, HR, reports, 2FA and multi-branch management.',
+                'canonical' => route('features'),
+            ],
+            'features' => $this->marketingContent->features(),
+            'featureCategories' => $this->marketingContent->featureCategories(),
+        ]);
+    }
+
     public function about(): View
     {
         return view('marketing.about', [

@@ -29,17 +29,17 @@ final class BusinessAdminPanelTest extends TestCase
             'password' => 'password',
         ])->assertRedirect(route('business-admin.dashboard'));
 
-        $this->actingAs($admin)
+        $this->actingAsVerified($admin)
             ->get(route('business-admin.dashboard'))
             ->assertOk()
-            ->assertSee("Today's Cash");
+            ->assertSee("Today's cash up");
     }
 
     public function test_cash_up_page_loads_with_auto_branch(): void
     {
         $admin = $this->makeBusinessAdmin();
 
-        $this->actingAs($admin)
+        $this->actingAsVerified($admin)
             ->get(route('business-admin.cash-up'))
             ->assertOk()
             ->assertSee('Daily Cash Up')
@@ -47,17 +47,16 @@ final class BusinessAdminPanelTest extends TestCase
             ->assertSee('Coins Grand Total');
     }
 
-    public function test_clock_in_and_rota_match_legacy_layout(): void
+    public function test_kiosks_and_rota_pages_load(): void
     {
         $admin = $this->makeBusinessAdmin();
 
-        $this->actingAs($admin)
-            ->get(route('business-admin.clock-in'))
+        $this->actingAsVerified($admin)
+            ->get(route('business-admin.kiosks.index'))
             ->assertOk()
-            ->assertSee('Staff Clock-In')
-            ->assertSee('security PIN');
+            ->assertSee('Smart Kiosks');
 
-        $this->actingAs($admin)
+        $this->actingAsVerified($admin)
             ->get(route('business-admin.rota'))
             ->assertOk()
             ->assertSee('Rota Management')
@@ -66,11 +65,44 @@ final class BusinessAdminPanelTest extends TestCase
             ->assertSee('Evening Shifts');
     }
 
+    public function test_business_admin_branch_filter_updates_dashboard_scope(): void
+    {
+        $admin = $this->makeBusinessAdmin();
+
+        Branch::query()->create([
+            'organization_id' => $admin->organization_id,
+            'name' => 'Second Branch',
+            'slug' => 'second-branch',
+            'status' => 'open',
+        ]);
+
+        $secondBranch = Branch::query()->where('slug', 'second-branch')->firstOrFail();
+
+        $this->actingAsVerified($admin)
+            ->get(route('business-admin.dashboard'))
+            ->assertOk()
+            ->assertSee('All branches')
+            ->assertSee('Main')
+            ->assertSee('Second Branch');
+
+        $this->actingAsVerified($admin)
+            ->post(route('business-admin.branch.select'), [
+                'branch_id' => $secondBranch->id,
+                'silent' => 1,
+            ])
+            ->assertRedirect(route('business-admin.dashboard'));
+
+        $this->actingAsVerified($admin)
+            ->get(route('business-admin.dashboard'))
+            ->assertOk()
+            ->assertSee('Second Branch');
+    }
+
     public function test_staff_index_is_organization_scoped(): void
     {
         $admin = $this->makeBusinessAdmin();
 
-        $this->actingAs($admin)
+        $this->actingAsVerified($admin)
             ->get(route('business-admin.staff'))
             ->assertOk();
     }
@@ -84,10 +116,15 @@ final class BusinessAdminPanelTest extends TestCase
             'business-admin.reports',
             'business-admin.inventory',
             'business-admin.inventory-history',
-            'business-admin.clock-in',
+            'business-admin.kiosks.index',
             'business-admin.attendance',
             'business-admin.suppliers',
-            'business-admin.payroll',
+            'business-admin.finance.dashboard',
+            'business-admin.finance.income',
+            'business-admin.finance.expenses',
+            'business-admin.finance.bills',
+            'business-admin.finance.payroll',
+            'business-admin.finance.cash-flow',
             'business-admin.rota',
             'business-admin.subscription',
             'business-admin.branches',
@@ -97,34 +134,19 @@ final class BusinessAdminPanelTest extends TestCase
         ];
 
         foreach ($routes as $route) {
-            $this->actingAs($admin)
+            $this->actingAsVerified($admin)
                 ->get(route($route))
                 ->assertOk();
         }
     }
 
-    public function test_clock_in_pin_verify_works(): void
+    public function test_legacy_clock_in_redirects_to_kiosks(): void
     {
         $admin = $this->makeBusinessAdmin();
-        $branch = $admin->organization->branches()->first();
 
-        User::query()->create([
-            'name' => 'Staff Member',
-            'email' => 'staff@example.com',
-            'password' => Hash::make('password'),
-            'role_id' => Role::query()->where('slug', RoleSlug::Staff->value)->value('id'),
-            'organization_id' => $admin->organization_id,
-            'branch_id' => $branch->id,
-            'pin_code' => '1000',
-            'hourly_rate' => 12.5,
-            'status' => 'active',
-            'email_verified_at' => now(),
-        ]);
-
-        $this->actingAs($admin)
-            ->postJson(route('business-admin.clock-in.verify'), ['pin' => '1000'])
-            ->assertOk()
-            ->assertJsonStructure(['state', 'user']);
+        $this->actingAsVerified($admin)
+            ->get(route('business-admin.clock-in'))
+            ->assertRedirect('/business-admin/kiosks');
     }
 
     private function makeBusinessAdmin(): User

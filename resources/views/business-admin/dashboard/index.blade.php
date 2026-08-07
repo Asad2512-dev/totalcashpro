@@ -1,12 +1,11 @@
 <x-layouts.business-admin title="Dashboard" active="dashboard">
     <x-admin.toolbar
-        title="Business overview"
         description="Live totals for your organisation{{ auth()->user()->organization?->name ? ' · '.auth()->user()->organization->name : '' }}."
     >
         <x-admin.button size="sm" :href="route('business-admin.cash-up')">
             <x-admin.icon name="cash" class="h-4 w-4" /> Cash Up
         </x-admin.button>
-        <x-admin.button variant="secondary" size="sm" :href="route('business-admin.clock-in')">Clock In</x-admin.button>
+        <x-admin.button variant="secondary" size="sm" :href="route('business-admin.kiosks.index')">Smart Kiosks</x-admin.button>
     </x-admin.toolbar>
 
     <div class="admin-stat-grid">
@@ -22,10 +21,11 @@
 
     <div class="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <x-admin.chart-card
-            title="Cash last 14 days"
-            description="Net cash up totals by day."
-            :bars="$revenueBars"
-            empty="Cash ups will appear here once recorded."
+            :title="'Daily cash up · '.$cashChartPeriod"
+            description="Net cash up for each day this month — matches the This month total above."
+            :points="$cashChart"
+            :total="$cashChartTotal"
+            empty="Cash ups will appear here once recorded this month."
         />
 
         <x-admin.card>
@@ -43,7 +43,7 @@
 
     <div class="mt-6 grid gap-6 xl:grid-cols-2">
         <div>
-            <x-admin.toolbar title="Recent cash ups" description="Latest saved shifts." />
+            <x-admin.toolbar section title="Recent cash ups" description="Latest saved shifts." />
             @if ($recentCashUps->isEmpty())
                 <x-admin.empty-state title="No cash ups yet" description="Record your first Morning or Evening cash up." />
             @else

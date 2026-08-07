@@ -9,13 +9,12 @@ use App\Contracts\ServiceInterface;
 use App\DTOs\OrganizationData;
 use App\Enums\OrganizationStatus;
 use App\Enums\RoleSlug;
-use App\Mail\AccessCredentialsMail;
+use App\Events\OwnerCredentialsSent;
 use App\Models\Organization;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
@@ -89,7 +88,7 @@ final class OrganizationService implements ServiceInterface
                 ],
             );
 
-            Mail::to($owner->email)->send(new AccessCredentialsMail($owner, $password, $organization));
+            OwnerCredentialsSent::dispatch($owner, $organization, $password);
 
             return [
                 'organization' => $organization->refresh(),
@@ -123,7 +122,7 @@ final class OrganizationService implements ServiceInterface
         $password = Str::password(12);
         $owner->update(['password' => Hash::make($password)]);
 
-        Mail::to($owner->email)->send(new AccessCredentialsMail($owner, $password, $organization));
+        OwnerCredentialsSent::dispatch($owner, $organization, $password);
 
         $this->logAdminAction(
             'organization.credentials_sent',

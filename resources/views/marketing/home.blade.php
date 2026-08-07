@@ -1,9 +1,11 @@
 <x-layouts.marketing>
     @include('marketing.partials.hero')
+    @include('marketing.partials.smart-kiosk')
     @include('marketing.partials.trusted')
     @include('marketing.partials.features')
     @include('marketing.partials.showcase')
     @include('marketing.partials.workflow')
+    @include('marketing.partials.employee-workflow')
     @include('marketing.partials.industries')
     @include('marketing.partials.why-choose')
     @include('marketing.partials.pricing')

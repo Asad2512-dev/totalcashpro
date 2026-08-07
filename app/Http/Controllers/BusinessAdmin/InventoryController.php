@@ -39,6 +39,14 @@ final class InventoryController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:160'],
+            'sku' => ['nullable', 'string', 'max:80'],
+            'barcode' => ['nullable', 'string', 'max:80'],
+            'brand' => ['nullable', 'string', 'max:120'],
+            'cost_price' => ['nullable', 'numeric', 'min:0'],
+            'selling_price' => ['nullable', 'numeric', 'min:0'],
+            'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
+            'batch_number' => ['nullable', 'string', 'max:80'],
+            'expiry_date' => ['nullable', 'date'],
             'branch_id' => ['required', 'integer'],
             'category_id' => ['nullable', 'integer'],
             'packaging' => ['required', 'in:box,pcs,box.pcs'],

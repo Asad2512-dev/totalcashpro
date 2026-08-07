@@ -32,6 +32,10 @@ final class StaffUiService implements ServiceInterface
                 'items' => [
                     ['label' => 'Cash Up', 'route' => 'staff.cash-up', 'icon' => 'cash', 'feature' => PlanFeature::CashUp->value],
                     ['label' => 'My Shift', 'route' => 'staff.shift', 'icon' => 'repeat', 'feature' => PlanFeature::Rota->value],
+                    ['label' => 'Shift Swaps', 'route' => 'staff.shift-swap', 'icon' => 'repeat', 'feature' => PlanFeature::Rota->value],
+                    ['label' => 'Weekly Hours', 'route' => 'staff.hours', 'icon' => 'activity', 'feature' => PlanFeature::Attendance->value],
+                    ['label' => 'Availability', 'route' => 'staff.availability', 'icon' => 'clock', 'feature' => PlanFeature::Attendance->value],
+                    ['label' => 'Leave', 'route' => 'staff.leave', 'icon' => 'user', 'feature' => PlanFeature::Attendance->value],
                 ],
             ],
             [

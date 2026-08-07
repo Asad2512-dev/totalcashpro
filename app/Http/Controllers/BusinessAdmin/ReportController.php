@@ -5,39 +5,55 @@ declare(strict_types=1);
 namespace App\Http\Controllers\BusinessAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Services\BusinessAdmin\ReportService;
+use App\Services\BusinessAdmin\ReportCenterService;
+use App\Services\BusinessAdmin\ReportExportService;
+use App\Services\BusinessAdmin\SavedReportService;
+use App\Support\Reports\ReportCenterFilter;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class ReportController extends Controller
 {
-    public function __construct(private readonly ReportService $reports) {}
+    public function __construct(
+        private readonly ReportCenterService $reports,
+        private readonly ReportExportService $export,
+        private readonly SavedReportService $savedReports,
+    ) {}
 
     public function index(Request $request): View
     {
-        $period = $request->string('period', 'weekly')->toString();
-        $from = $request->input('from', now()->subDays(13)->toDateString());
-        $to = $request->input('to', now()->toDateString());
+        $filter = ReportCenterFilter::fromRequest($request);
+        $report = $this->reports->build($request->user(), $filter);
 
-        if ($period === 'weekly' && ! $request->filled('from')) {
-            $from = now()->startOfWeek()->toDateString();
-            $to = now()->endOfWeek()->toDateString();
-        } elseif ($period === 'monthly' && ! $request->filled('from')) {
-            $from = now()->startOfMonth()->toDateString();
-            $to = now()->endOfMonth()->toDateString();
-        } elseif ($period === 'daily' && ! $request->filled('from')) {
-            $from = $request->input('date', now()->toDateString());
-            $to = $from;
-        } elseif ($period === 'custom') {
-            $period = 'custom';
-        }
+        return view('business-admin.reports.index', [
+            'report' => $report,
+            'filter' => $filter,
+            'savedReports' => $this->savedReports->list($request->user()),
+        ]);
+    }
 
-        $data = $this->reports->aggregate($request->user(), $period, $from, $to);
+    public function storeSaved(Request $request): RedirectResponse
+    {
+        $validated = $request->validate(['name' => ['required', 'string', 'max:120']]);
+        $filter = ReportCenterFilter::fromRequest($request);
+        $this->savedReports->save($request->user(), $filter, $validated['name']);
 
-        return view('business-admin.reports.index', array_merge($data, [
-            'period' => $period,
-            'from' => $from,
-            'to' => $to,
-        ]));
+        return back()->with('status', 'Report saved.');
+    }
+
+    public function export(Request $request): StreamedResponse
+    {
+        $filter = ReportCenterFilter::fromRequest($request);
+        $report = $this->reports->build($request->user(), $filter);
+        $format = $request->string('format', 'csv')->toString();
+        $slug = $filter->reportType->value;
+        $filename = "totalcashpro-{$slug}-{$filter->from}-to-{$filter->to}";
+
+        return match ($format) {
+            'excel', 'xls' => $this->export->excel($report['table'], "{$filename}.xls"),
+            default => $this->export->csv($report['table'], "{$filename}.csv"),
+        };
     }
 }

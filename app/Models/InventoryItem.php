@@ -20,6 +20,14 @@ final class InventoryItem extends Model
         'branch_id',
         'category_id',
         'name',
+        'sku',
+        'barcode',
+        'brand',
+        'cost_price',
+        'selling_price',
+        'supplier_id',
+        'batch_number',
+        'expiry_date',
         'packaging',
         'pcs_per_box',
         'stock_total_pcs',
@@ -32,6 +40,9 @@ final class InventoryItem extends Model
             'pcs_per_box' => 'integer',
             'stock_total_pcs' => 'integer',
             'stock_limit' => 'integer',
+            'cost_price' => 'decimal:2',
+            'selling_price' => 'decimal:2',
+            'expiry_date' => 'date',
         ];
     }
 

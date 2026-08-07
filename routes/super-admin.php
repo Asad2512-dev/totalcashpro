@@ -164,5 +164,9 @@ Route::get('permissions/{permission}/edit', [PermissionController::class, 'edit'
 Route::put('permissions/{permission}', [PermissionController::class, 'update'])->name('permissions.update');
 Route::delete('permissions/{permission}', [PermissionController::class, 'destroy'])->name('permissions.destroy');
 
+Route::get('email-queue', [\App\Http\Controllers\SuperAdmin\EmailQueueController::class, 'index'])->name('email-queue');
+
 Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
+
+Route::prefix('security')->name('security.')->group(base_path('routes/security.php'));

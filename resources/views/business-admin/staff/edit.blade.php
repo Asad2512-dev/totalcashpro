@@ -1,9 +1,7 @@
 <x-layouts.business-admin title="Edit Staff" active="staff">
     <div class="mx-auto max-w-2xl">
-        <x-admin.toolbar title="Edit Staff Member">
-            <x-slot:actions>
-                <a href="{{ route('business-admin.staff') }}" class="text-sm text-gray-600 hover:text-gray-700">← Back</a>
-            </x-slot:actions>
+        <x-admin.toolbar>
+            <x-admin.button variant="secondary" size="sm" :href="route('business-admin.staff')">← Back</x-admin.button>
         </x-admin.toolbar>
 
         <div class="mt-6">

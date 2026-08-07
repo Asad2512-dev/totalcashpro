@@ -2,6 +2,7 @@
     'user' => null,
     'profileRoute' => 'super-admin.profile',
     'settingsRoute' => 'super-admin.settings',
+    'securityRoute' => 'super-admin.security.index',
 ])
 
 <x-admin.dropdown align="right" width="w-56">
@@ -16,6 +17,7 @@
     </x-slot:trigger>
 
     <a href="{{ route($profileRoute) }}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800">Profile</a>
+    <a href="{{ route($securityRoute) }}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800">Account Security</a>
     <a href="{{ route($settingsRoute) }}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800">Settings</a>
     <button
         type="button"

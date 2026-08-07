@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Marketing;
 
-use App\Mail\ContactMessageSubmittedMail;
+use App\Events\ContactMessageSubmitted;
 use App\Models\ContactMessage;
-use Illuminate\Support\Facades\Mail;
 
 final class StoreContactMessageAction
 {
@@ -23,11 +22,7 @@ final class StoreContactMessageAction
     {
         $message = ContactMessage::query()->create($data);
 
-        $supportEmail = (string) config('totalcashpro.support_email');
-
-        if ($supportEmail !== '') {
-            Mail::to($supportEmail)->send(new ContactMessageSubmittedMail($message));
-        }
+        ContactMessageSubmitted::dispatch($message);
 
         return $message;
     }

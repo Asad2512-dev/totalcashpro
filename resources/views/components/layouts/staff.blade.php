@@ -9,14 +9,21 @@
     $commandLinks = $ui->commandLinks();
     $user = auth()->user();
     $organization = $user?->organization;
+    $unreadNotifications = $user
+        ? \App\Models\AppNotification::query()->where('user_id', $user->id)->whereNull('read_at')->count()
+        : 0;
 @endphp
 
 <!DOCTYPE html>
-<html lang="en" x-data="adminShell" :class="{ 'dark': dark }">
+<html lang="en" class="admin-panel" x-data="adminShell" :class="{ 'dark': dark }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#16A34A">
+    <link rel="manifest" href="{{ asset('staff-manifest.webmanifest') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="TCP Staff">
     <title>{{ $title }} — Staff · {{ brand_name() }}</title>
     <x-brand-favicon />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,20 +31,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="admin-shell bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
-    <div class="flex min-h-screen">
+<body class="admin-shell admin-shell--viewport bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <div class="admin-shell-layout flex min-h-0">
         <x-admin.sidebar :nav="$nav" :active="$active" :business-tree="[]" home-route="staff.dashboard" />
 
-        <div class="flex min-w-0 flex-1 flex-col transition-[padding] duration-300 lg:pl-72" :class="collapsed ? 'lg:pl-[5.25rem]' : 'lg:pl-72'">
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden transition-[padding] duration-300 lg:pl-72" :class="collapsed ? 'lg:pl-[5.25rem]' : 'lg:pl-72'">
             <x-admin.topbar
                 :title="$title"
                 :user="$user"
                 panel-label="{{ $organization?->name ?? 'Staff' }} · Staff"
                 profile-route="staff.profile"
                 settings-route="staff.profile"
+                security-route="staff.security.index"
+                notifications-route="staff.notifications"
+                :unread-notifications="$unreadNotifications"
             />
 
-            <main class="admin-fade-in flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <main class="admin-shell-main admin-fade-in flex-1 px-4 py-6 sm:px-6 lg:px-8">
                 @if (session('status'))
                     <div class="mb-5">
                         <x-admin.alert tone="success">{{ session('status') }}</x-admin.alert>

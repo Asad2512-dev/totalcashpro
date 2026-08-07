@@ -26,7 +26,7 @@
                 ·
                 <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="font-medium text-gray-600 hover:text-gray-800">Sign out</a>
             </p>
-            <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">@csrf</form>
+            <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden" data-no-auth-spinner>@csrf</form>
         </div>
     </div>
 </x-layouts.auth>

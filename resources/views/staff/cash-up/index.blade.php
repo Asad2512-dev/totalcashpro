@@ -110,15 +110,10 @@
                 <p class="mb-4 min-h-[1.25rem] text-sm" :class="error ? 'text-red-600' : 'text-primary-700'" x-text="statusMessage"></p>
 
                 @if ($viewTab === 'cashup')
-                    <div class="mb-4">
-                        <span class="inline-flex rounded-full bg-primary-600 px-4 py-1.5 text-sm font-semibold text-white">
-                            <span x-text="(step + 1) + '. ' + steps[step]">{{ ($step + 1).'. '.$stepLabels[$step] }}</span>
-                        </span>
-                    </div>
+                    <x-cashup.steps-nav :steps="$stepLabels" :current-step="$step" />
 
                     {{-- Coins --}}
                     <div x-show="step === 0" @if ($step !== 0) x-cloak style="display:none" @endif>
-                        <p class="mb-3 text-sm text-gray-500">Step 1: Enter the quantity of each coin to calculate your coins total.</p>
                         <table class="cashup-table">
                             <thead>
                                 <tr>
@@ -149,7 +144,6 @@
 
                     {{-- Notes --}}
                     <div x-show="step === 1" @if ($step !== 1) x-cloak style="display:none" @endif>
-                        <p class="mb-3 text-sm text-gray-500">Step 2: Enter the quantity of each note and any extra coin amount.</p>
                         <table class="cashup-table">
                             <thead>
                                 <tr>
@@ -186,7 +180,6 @@
 
                     {{-- Cards --}}
                     <div x-show="step === 2" @if ($step !== 2) x-cloak style="display:none" @endif>
-                        <p class="mb-3 text-sm text-gray-500">Step 3: Enter card machine totals and any refunds for this shift.</p>
                         <div class="cashup-table overflow-hidden">
                             <div class="cashup-row cashup-head">
                                 <div class="cashup-col-label">Payment Type</div>
@@ -226,7 +219,6 @@
 
                     {{-- Expenses --}}
                     <div x-show="step === 3" @if ($step !== 3) x-cloak style="display:none" @endif>
-                        <p class="mb-3 text-sm text-gray-500">Step 4: Enter expense descriptions and amounts for this shift.</p>
                         <div class="cashup-table overflow-hidden">
                             <div class="cashup-row cashup-head">
                                 <div class="cashup-col-label">Description</div>
@@ -261,7 +253,6 @@
 
                     {{-- Online --}}
                     <div x-show="step === 4" @if ($step !== 4) x-cloak style="display:none" @endif>
-                        <p class="mb-3 text-sm text-gray-500">Step 5: Enter the amount for each online order platform.</p>
                         <table class="cashup-table">
                             <thead>
                                 <tr>
@@ -292,25 +283,25 @@
 
                     <div class="cashup-actions mt-6">
                         <div>
-                            <a
-                                href="{{ route('staff.cash-up', ['date' => $date, 'shift' => $shift, 'view' => 'cashup', 'step' => max(0, $step - 1)]) }}"
+                            <button
+                                type="button"
                                 class="inline-flex rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200"
                                 x-show="step > 0"
-                                @click.prevent="step = Math.max(0, step - 1); syncStep()"
+                                @click="goToStep(step - 1)"
                                 @if ($step === 0) style="display:none" @endif
-                            >Previous</a>
+                            >Previous</button>
                         </div>
                         <div class="text-center">
                             <button type="button" class="rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60" @click="saveCashUp()" :disabled="loading">Save Cash Up</button>
                         </div>
                         <div class="text-right">
-                            <a
-                                href="{{ route('staff.cash-up', ['date' => $date, 'shift' => $shift, 'view' => 'cashup', 'step' => min(4, $step + 1)]) }}"
+                            <button
+                                type="button"
                                 class="inline-flex rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
                                 x-show="step < steps.length - 1"
-                                @click.prevent="step = Math.min(steps.length - 1, step + 1); syncStep()"
+                                @click="goToStep(step + 1)"
                                 @if ($step >= 4) style="display:none" @endif
-                            >Next Step</a>
+                            >Next Step</button>
                         </div>
                     </div>
                 @else

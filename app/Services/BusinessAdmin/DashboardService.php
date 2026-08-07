@@ -35,10 +35,12 @@ final class DashboardService implements ServiceInterface
         $today = now()->startOfDay();
         $weekStart = now()->startOfWeek();
         $monthStart = now()->startOfMonth();
+        $yearStart = now()->startOfYear();
 
         $todayCash = $this->cashUps->sumNetForRange($orgId, $branchId, $today, now());
         $weekCash = $this->cashUps->sumNetForRange($orgId, $branchId, $weekStart, now());
         $monthCash = $this->cashUps->sumNetForRange($orgId, $branchId, $monthStart, now());
+        $yearCash = $this->cashUps->sumNetForRange($orgId, $branchId, $yearStart, now());
 
         $recentCashUps = $this->cashUps->forRange($orgId, $branchId, now()->subDays(14), now())->take(8);
         $lowStock = $this->inventory->lowStock($orgId, $branchId);
@@ -51,7 +53,8 @@ final class DashboardService implements ServiceInterface
             ->groupBy('user_id')
             ->count();
 
-        $revenueBars = $this->dailyBars($orgId, $branchId, 14);
+        $cashChart = $this->currentMonthCashChart($orgId, $branchId, $monthStart, $today, $user);
+        $cashChartPeriod = now()->format('F Y');
 
         $upcomingPayments = SupplierInvoice::query()
             ->with('supplier')
@@ -79,22 +82,28 @@ final class DashboardService implements ServiceInterface
 
         return [
             'stats' => [
-                ['label' => "Today's Cash", 'value' => $this->money($todayCash, $user), 'change' => 'Live', 'tone' => 'success'],
-                ['label' => 'Weekly Revenue', 'value' => $this->money($weekCash, $user), 'change' => 'This week', 'tone' => 'info'],
-                ['label' => 'Monthly Revenue', 'value' => $this->money($monthCash, $user), 'change' => 'This month', 'tone' => 'success'],
+                ['label' => "Today's cash up", 'value' => $this->money($todayCash, $user), 'change' => 'Live', 'tone' => 'success'],
+                ['label' => 'This week', 'value' => $this->money($weekCash, $user), 'change' => 'Cash up net', 'tone' => 'info'],
+                ['label' => 'This month', 'value' => $this->money($monthCash, $user), 'change' => 'Cash up net', 'tone' => 'success'],
+                ['label' => 'This year', 'value' => $this->money($yearCash, $user), 'change' => now()->format('Y').' YTD', 'tone' => 'info'],
                 ['label' => 'Staff Clocked In', 'value' => (string) $clockedIn, 'change' => $staffCount.' active', 'tone' => 'info'],
                 ['label' => 'Attendance Today', 'value' => (string) $attendanceToday, 'change' => 'Present', 'tone' => 'success'],
                 ['label' => 'Inventory Alerts', 'value' => (string) $lowStock->count(), 'change' => 'Low stock', 'tone' => $lowStock->count() ? 'warning' : 'success'],
                 ['label' => 'Pending Suppliers', 'value' => (string) $pendingSuppliers, 'change' => $this->money($outstanding, $user).' due', 'tone' => $pendingSuppliers ? 'warning' : 'success'],
             ],
-            'revenueBars' => $revenueBars,
+            'cashChart' => $cashChart,
+            'cashChartPeriod' => $cashChartPeriod,
+            'cashChartTotal' => $this->money(
+                array_sum(array_column($cashChart, 'amount')),
+                $user,
+            ).' · this month',
             'recentCashUps' => $recentCashUps,
             'lowStock' => $lowStock->take(6),
             'upcomingPayments' => $upcomingPayments,
             'recentActivity' => $recentActivity,
             'quickActions' => [
                 ['label' => 'Daily Cash Up', 'route' => 'business-admin.cash-up', 'icon' => 'cash'],
-                ['label' => 'Clock In', 'route' => 'business-admin.clock-in', 'icon' => 'clock'],
+                ['label' => 'Smart Kiosks', 'route' => 'business-admin.kiosks.index', 'icon' => 'clock'],
                 ['label' => 'Add Staff', 'route' => 'business-admin.staff.create', 'icon' => 'users'],
                 ['label' => 'Inventory', 'route' => 'business-admin.inventory', 'icon' => 'tag'],
             ],
@@ -102,25 +111,65 @@ final class DashboardService implements ServiceInterface
     }
 
     /**
-     * @return list<int> bar heights as percentages for chart-card
+     * @return list<array{label: string, value: string, amount: float, height: int}>
      */
-    private function dailyBars(int $orgId, ?int $branchId, int $days): array
+    private function currentMonthCashChart(int $orgId, ?int $branchId, Carbon $from, Carbon $to, User $user): array
     {
-        $values = [];
-        for ($i = $days - 1; $i >= 0; $i--) {
-            $day = now()->subDays($i)->startOfDay();
-            $values[] = $this->cashUps->sumNetForRange($orgId, $branchId, $day, $day->copy()->endOfDay());
+        $points = [];
+        $chartHeight = 144;
+        $day = $from->copy()->startOfDay();
+        $end = $to->copy()->startOfDay();
+        $cashUpsByDate = $this->cashUps
+            ->forRange($orgId, $branchId, $from, $to)
+            ->groupBy(fn (CashUp $cashUp): string => $cashUp->cashup_date?->toDateString() ?? '');
+
+        while ($day->lte($end)) {
+            $dateKey = $day->toDateString();
+            $dayCashUps = $cashUpsByDate->get($dateKey, collect());
+
+            $coins = (float) $dayCashUps->sum('coins_total');
+            $notes = (float) $dayCashUps->sum('notes_total');
+            $cards = (float) $dayCashUps->sum('cards_total');
+            $online = (float) $dayCashUps->sum('online_orders_total');
+            $expenses = (float) $dayCashUps->sum('expenses_total');
+            $deductions = (float) $dayCashUps->sum('platform_deductions_total');
+            $gross = $coins + $notes + $cards + $online;
+            $amount = $gross - $expenses - $deductions;
+            $shiftCount = $dayCashUps->count();
+
+            $points[] = [
+                'label' => $day->format('j'),
+                'date_label' => $day->format('j M Y'),
+                'value' => $this->money($amount, $user),
+                'amount' => $amount,
+                'height' => 0,
+                'details' => array_values(array_filter([
+                    ['label' => 'Net cash up', 'value' => $this->money($amount, $user), 'emphasis' => true],
+                    $shiftCount > 0 ? ['label' => 'Shifts', 'value' => (string) $shiftCount] : null,
+                    $coins > 0 ? ['label' => 'Coins', 'value' => $this->money($coins, $user)] : null,
+                    $notes > 0 ? ['label' => 'Notes', 'value' => $this->money($notes, $user)] : null,
+                    $cards > 0 ? ['label' => 'Cards', 'value' => $this->money($cards, $user)] : null,
+                    $online > 0 ? ['label' => 'Online', 'value' => $this->money($online, $user)] : null,
+                    $expenses > 0 ? ['label' => 'Expenses', 'value' => '−'.$this->money($expenses, $user)] : null,
+                    $deductions > 0 ? ['label' => 'Deductions', 'value' => '−'.$this->money($deductions, $user)] : null,
+                ])),
+            ];
+
+            $day->addDay();
         }
 
-        $max = max($values ?: [0]);
+        $max = max(array_column($points, 'amount') ?: [0.0]);
         if ($max <= 0) {
             return [];
         }
 
-        return array_map(
-            fn (float $value): int => max(8, (int) round(($value / $max) * 100)),
-            $values,
-        );
+        return array_map(static function (array $point) use ($max, $chartHeight): array {
+            $point['height'] = $point['amount'] > 0
+                ? max(4, (int) round(($point['amount'] / $max) * $chartHeight))
+                : 0;
+
+            return $point;
+        }, $points);
     }
 
     private function money(float $amount, User $user): string

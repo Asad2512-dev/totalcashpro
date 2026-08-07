@@ -14,12 +14,19 @@ final class NotificationController extends Controller
 {
     public function index(Request $request): View
     {
-        $notifications = AppNotification::query()
+        $query = AppNotification::query()
             ->where('user_id', $request->user()->id)
-            ->latest()
-            ->paginate(20);
+            ->latest();
 
-        return view('staff.notifications.index', compact('notifications'));
+        if ($request->filled('category')) {
+            $query->where('category', $request->string('category'));
+        }
+
+        return view('staff.notifications.index', [
+            'notifications' => $query->paginate(20)->withQueryString(),
+            'categories' => \App\Enums\NotificationCategory::cases(),
+            'activeCategory' => $request->input('category'),
+        ]);
     }
 
     public function markRead(Request $request): RedirectResponse

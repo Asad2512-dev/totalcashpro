@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\Security\PasswordService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -12,10 +13,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Password as PasswordRule;
 
 final class PasswordResetController extends Controller
 {
+    public function __construct(
+        private readonly PasswordService $passwordService,
+    ) {}
+
     public function requestForm(): View
     {
         return view('auth.forgot-password');
@@ -45,7 +49,7 @@ final class PasswordResetController extends Controller
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email'],
-            'password' => ['required', 'confirmed', PasswordRule::defaults()],
+            'password' => $this->passwordService->rules(),
         ]);
 
         $status = Password::reset(
@@ -53,6 +57,7 @@ final class PasswordResetController extends Controller
             function ($user) use ($request): void {
                 $user->forceFill([
                     'password' => Hash::make($request->string('password')->toString()),
+                    'password_changed_at' => now(),
                     'remember_token' => Str::random(60),
                 ])->save();
 

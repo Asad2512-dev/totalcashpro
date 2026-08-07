@@ -23,9 +23,9 @@ final class MarketingPagesTest extends TestCase
         $response->assertSee('Start Your Free 14-Day Trial', false);
     }
 
-    public function test_marketing_section_routes_redirect_to_home_anchors(): void
+    public function test_marketing_section_routes(): void
     {
-        $this->get(route('features'))->assertRedirect('/#features');
+        $this->get(route('features'))->assertOk()->assertSee('Attendance Kiosk');
         $this->get(route('solutions'))->assertRedirect('/#solutions');
         $this->get(route('pricing'))->assertRedirect('/#pricing');
     }

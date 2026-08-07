@@ -1,7 +1,7 @@
 @props([
     'columns' => [],
     'rows' => [],
-    'empty' => 'No records yet — UI placeholder for Phase 2.',
+    'empty' => 'No records yet.',
 ])
 
 <x-admin.table :columns="$columns" :rows="$rows" :empty="$empty" />

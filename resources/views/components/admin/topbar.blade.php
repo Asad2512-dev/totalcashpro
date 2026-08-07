@@ -4,6 +4,9 @@
     'panelLabel' => 'Super Admin',
     'profileRoute' => 'super-admin.profile',
     'settingsRoute' => 'super-admin.settings',
+    'securityRoute' => 'super-admin.security.index',
+    'notificationsRoute' => null,
+    'unreadNotifications' => 0,
 ])
 
 <header class="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-900/90">
@@ -43,6 +46,8 @@
             >
                 <x-admin.icon name="search" class="h-4 w-4" />
             </button>
+            <x-admin.notification-bell :route="$notificationsRoute" :count="$unreadNotifications" />
+
             <button
                 type="button"
                 class="admin-touch-target inline-flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700"
@@ -53,7 +58,7 @@
                 <span x-cloak x-show="dark"><x-admin.icon name="sun" /></span>
             </button>
 
-            <x-admin.profile-menu :user="$user" :profile-route="$profileRoute" :settings-route="$settingsRoute" />
+            <x-admin.profile-menu :user="$user" :profile-route="$profileRoute" :settings-route="$settingsRoute" :security-route="$securityRoute" />
         </div>
     </div>
 </header>

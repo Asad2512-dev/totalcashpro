@@ -21,7 +21,7 @@
                 <div class="mb-8 flex items-center justify-between gap-4">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-primary-600">Welcome wizard</p>
-                        <h1 class="mt-2 font-display text-2xl font-extrabold text-gray-900">Step {{ $step }} of 5</h1>
+                        <h1 class="mt-2 font-display text-2xl font-extrabold text-gray-900">Step {{ $step }} of {{ $totalSteps }}</h1>
                     </div>
                     <form method="POST" action="{{ route('business-admin.onboarding.skip') }}">
                         @csrf
@@ -30,8 +30,8 @@
                 </div>
 
                 <div class="mb-8 flex gap-2">
-                    @for ($i = 1; $i <= 5; $i++)
-                        <div class="h-1.5 flex-1 rounded-full {{ $i <= $step ? 'bg-primary-600' : 'bg-gray-200' }}"></div>
+                    @for ($i = 1; $i <= $totalSteps; $i++)
+                        <div class="h-1.5 flex-1 rounded-full {{ $i <= $step ? 'bg-primary-600' : 'bg-gray-200' }}" title="Step {{ $i }}"></div>
                     @endfor
                 </div>
 
@@ -77,15 +77,73 @@
                             <input name="address" value="{{ old('address', $branch?->address) }}" class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm">
                         </div>
                     @elseif ($step === 4)
+                        <h2 class="text-lg font-bold text-gray-900">Business settings</h2>
+                        <p class="text-sm text-gray-600">Set your currency, timezone and default VAT rate.</p>
+                        <div>
+                            <label class="text-sm font-semibold">Currency</label>
+                            <select name="currency" class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm">
+                                @foreach ($currencies as $currency)
+                                    <option value="{{ $currency }}" @selected(old('currency', $organization?->currency) === $currency)>{{ $currency }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold">Timezone</label>
+                            <select name="timezone" class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm">
+                                @foreach ($timezones as $timezone)
+                                    <option value="{{ $timezone }}" @selected(old('timezone', $organization?->timezone) === $timezone)>{{ $timezone }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold">Default VAT rate (%)</label>
+                            <input type="number" step="0.01" min="0" max="100" name="vat_rate" value="{{ old('vat_rate', $organization?->settings['vat_rate'] ?? 20) }}" class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm">
+                        </div>
+                    @elseif ($step === 5)
+                        <h2 class="text-lg font-bold text-gray-900">Opening cash drawer</h2>
+                        <p class="text-sm text-gray-600">Set the float in your main till drawer. You can adjust this later in Finance.</p>
+                        <div>
+                            <label class="text-sm font-semibold">Opening balance (£)</label>
+                            <input type="number" step="0.01" min="0" name="drawer_opening_balance" value="{{ old('drawer_opening_balance', $drawer?->opening_balance ?? 200) }}" class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm">
+                        </div>
+                    @elseif ($step === 6)
                         <h2 class="text-lg font-bold text-gray-900">Invite staff (optional)</h2>
-                        <p class="text-sm text-gray-600">Add staff emails separated by commas. You can add team members later from Staff.</p>
+                        <p class="text-sm text-gray-600">Add staff emails separated by commas. Invitation emails with login credentials will be sent automatically.</p>
                         <textarea name="staff_invites" rows="4" class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm" placeholder="staff1@example.com, staff2@example.com">{{ old('staff_invites') }}</textarea>
+                    @elseif ($step === 7)
+                        <h2 class="text-lg font-bold text-gray-900">First supplier (optional)</h2>
+                        <p class="text-sm text-gray-600">Add your main supplier now or skip and add later from Suppliers.</p>
+                        <div>
+                            <label class="text-sm font-semibold">Supplier name</label>
+                            <input name="supplier_name" value="{{ old('supplier_name') }}" class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm">
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold">Contact name</label>
+                            <input name="supplier_contact" value="{{ old('supplier_contact') }}" class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm">
+                        </div>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label class="text-sm font-semibold">Email</label>
+                                <input type="email" name="supplier_email" value="{{ old('supplier_email') }}" class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold">Phone</label>
+                                <input name="supplier_phone" value="{{ old('supplier_phone') }}" class="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm">
+                            </div>
+                        </div>
                     @else
                         <h2 class="text-lg font-bold text-gray-900">Finish setup</h2>
                         <p class="text-sm text-gray-600">You're all set. Click finish to open your Business Admin dashboard.</p>
                         <input type="hidden" name="business_name" value="{{ old('business_name', $organization?->name) }}">
                         <input type="hidden" name="phone" value="{{ old('phone', $organization?->phone) }}">
+                        <input type="hidden" name="tax_number" value="{{ old('tax_number', $organization?->tax_number) }}">
                         <input type="hidden" name="branch_name" value="{{ old('branch_name', $branch?->name) }}">
+                        <input type="hidden" name="city" value="{{ old('city', $branch?->city) }}">
+                        <input type="hidden" name="address" value="{{ old('address', $branch?->address) }}">
+                        <input type="hidden" name="currency" value="{{ old('currency', $organization?->currency) }}">
+                        <input type="hidden" name="timezone" value="{{ old('timezone', $organization?->timezone) }}">
+                        <input type="hidden" name="vat_rate" value="{{ old('vat_rate', $organization?->settings['vat_rate'] ?? 20) }}">
+                        <input type="hidden" name="drawer_opening_balance" value="{{ old('drawer_opening_balance', $drawer?->opening_balance ?? 200) }}">
                     @endif
 
                     <div class="flex gap-3 pt-2">
@@ -93,7 +151,7 @@
                             <a href="{{ route('business-admin.onboarding', ['step' => $step - 1]) }}" class="inline-flex flex-1 items-center justify-center rounded-2xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700">Back</a>
                         @endif
                         <button type="submit" class="inline-flex flex-1 items-center justify-center rounded-2xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-700">
-                            {{ $step === 5 ? 'Finish setup' : 'Continue' }}
+                            {{ $step === $totalSteps ? 'Finish setup' : 'Continue' }}
                         </button>
                     </div>
                 </form>

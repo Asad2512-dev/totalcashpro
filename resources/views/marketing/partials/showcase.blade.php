@@ -5,10 +5,10 @@
                 Product Showcase
             </span>
             <h2 id="showcase-heading" class="mt-4 font-display text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-4xl lg:text-[2.75rem]">
-                A dashboard your team can use on any screen.
+                Super Admin · Business Admin · Staff · Attendance Kiosk
             </h2>
             <p class="mt-4 text-base leading-relaxed text-white/70 sm:text-lg">
-                Desktop for managers, tablet for supervisors, and mobile for the floor — clear layouts ready for your real product screenshots.
+                Desktop for managers, tablet for the attendance kiosk, mobile for staff — real panels built for restaurant operations, finance and reports.
             </p>
         </div>
 
@@ -42,16 +42,20 @@
             <div class="rounded-[1.75rem] border border-white/10 bg-white/5 p-3" data-reveal>
                 <div class="rounded-[1.25rem] border border-[#E5E7EB] bg-white p-4 text-[#111827]">
                     <div class="mb-4 flex items-center justify-between">
-                        <p class="font-display text-sm font-bold">Tablet Manager</p>
-                        <span class="text-[11px] font-semibold text-[#6B7280]">1024</span>
+                        <p class="font-display text-sm font-bold">Attendance Kiosk</p>
+                        <span class="text-[11px] font-semibold text-[#6B7280]">Tablet · PIN</span>
                     </div>
                     <div class="space-y-3">
-                        <div class="h-14 rounded-xl bg-[#EFF6FF]"></div>
-                        <div class="h-24 rounded-xl bg-[#0F172A]"></div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="h-20 rounded-xl bg-[#F1F5F9]"></div>
-                            <div class="h-20 rounded-xl bg-[#ECFDF5]"></div>
+                        <div class="rounded-2xl bg-emerald-600 p-4 text-center text-white">
+                            <p class="text-xs opacity-80">09:01 AM</p>
+                            <p class="mt-1 font-display text-lg font-bold">Clock In</p>
                         </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="h-12 rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] text-center text-lg leading-[3rem]">1</div>
+                            <div class="h-12 rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] text-center text-lg leading-[3rem]">2</div>
+                            <div class="h-12 rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] text-center text-lg leading-[3rem]">3</div>
+                        </div>
+                        <div class="h-10 rounded-xl bg-[#ECFDF5] text-center text-xs leading-10 text-emerald-800">PIN · Branch scoped</div>
                     </div>
                 </div>
             </div>

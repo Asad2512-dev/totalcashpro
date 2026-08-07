@@ -1,10 +1,5 @@
 <x-layouts.admin title="Dashboard" active="dashboard">
-    <x-admin.breadcrumb :items="['Overview']" />
-
-    <x-admin.toolbar
-        title="Platform overview"
-        description="Live metrics calculated from your TotalCashPro database."
-    >
+    <x-admin.toolbar description="Live metrics calculated from your TotalCashPro database.">
         <x-admin.button variant="secondary" size="sm" :href="route('super-admin.export', ['type' => 'businesses'])">Export</x-admin.button>
         <x-admin.button size="sm" href="{{ route('super-admin.businesses') }}">
             <x-admin.icon name="plus" class="h-4 w-4" /> View businesses
@@ -39,7 +34,7 @@
 
     <div class="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div>
-            <x-admin.toolbar title="Recent businesses" description="Newest customer accounts." />
+            <x-admin.toolbar section title="Recent businesses" description="Newest customer accounts." />
             @if (count($recentBusinesses) === 0)
                 <x-admin.empty-state
                     title="No businesses yet"
@@ -105,7 +100,7 @@
 
     <div class="mt-6 grid gap-6 xl:grid-cols-2">
         <div>
-            <x-admin.toolbar title="Recent tickets" description="Latest support activity." />
+            <x-admin.toolbar section title="Recent tickets" description="Latest support activity." />
             @if (count($recentTickets) === 0)
                 <x-admin.empty-state
                     title="No support tickets"
@@ -125,7 +120,7 @@
             @endif
         </div>
         <div>
-            <x-admin.toolbar title="Latest signups" description="Newest businesses entering the platform." />
+            <x-admin.toolbar section title="Latest signups" description="Newest businesses entering the platform." />
             @if (count($recentBusinesses) === 0)
                 <x-admin.empty-state
                     title="No signups yet"

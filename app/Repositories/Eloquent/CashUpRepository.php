@@ -82,7 +82,8 @@ final class CashUpRepository extends BaseRepository implements CashUpRepositoryI
             ->with(['branch', 'creator'])
             ->where('organization_id', $organizationId)
             ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
-            ->whereBetween('cashup_date', [$startDate, $endDate])
+            ->whereDate('cashup_date', '>=', $startDate)
+            ->whereDate('cashup_date', '<=', $endDate)
             ->orderByDesc('cashup_date')
             ->orderBy('shift')
             ->get();

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http/Controllers\BusinessAdmin;
+namespace App\Http\Controllers\BusinessAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BusinessAdmin\OnboardingRequest;
@@ -29,13 +29,17 @@ final class OnboardingController extends Controller
             return redirect()->route('business-admin.dashboard');
         }
 
-        $step = max(1, min(5, (int) $request->query('step', 1)));
+        $step = max(1, min(OnboardingService::TOTAL_STEPS, (int) $request->query('step', 1)));
 
         return view('business-admin.onboarding.index', [
             'step' => $step,
+            'totalSteps' => OnboardingService::TOTAL_STEPS,
             'organization' => $organization,
             'branch' => $branch,
+            'drawer' => $branch?->cashDrawer,
             'trial' => $organization ? $this->trials->summary($organization) : null,
+            'currencies' => ['GBP', 'EUR', 'USD'],
+            'timezones' => ['Europe/London', 'Europe/Dublin', 'Europe/Paris'],
         ]);
     }
 
@@ -54,7 +58,19 @@ final class OnboardingController extends Controller
             $this->onboarding->updateBranch($branch, $request->branchPayload());
         }
 
-        if ($step < 5) {
+        if ($step === 4 && $organization !== null) {
+            $this->onboarding->updateSettings($organization, $request->settingsPayload());
+        }
+
+        if ($step === 5 && $organization !== null && $branch !== null) {
+            $this->onboarding->ensureCashDrawer(
+                $organization,
+                $branch,
+                (float) ($request->input('drawer_opening_balance') ?? 0),
+            );
+        }
+
+        if ($step < OnboardingService::TOTAL_STEPS) {
             return redirect()->route('business-admin.onboarding', ['step' => $step + 1]);
         }
 
@@ -62,7 +78,10 @@ final class OnboardingController extends Controller
             $user,
             $request->businessPayload(),
             $request->branchPayload(),
+            $request->settingsPayload(),
+            (float) ($request->input('drawer_opening_balance') ?? 0),
             $request->staffInviteEmails(),
+            $request->supplierPayload(),
         );
 
         return redirect()

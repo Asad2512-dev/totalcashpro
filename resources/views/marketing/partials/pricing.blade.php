@@ -12,7 +12,7 @@
             </p>
         </div>
 
-        <div id="buy" class="scroll-mt-28 mx-auto mt-16 grid max-w-5xl items-stretch gap-6 pt-4 lg:grid-cols-2 lg:gap-8 lg:items-center">
+        <div id="buy" class="scroll-mt-28 mx-auto mt-16 grid max-w-6xl items-stretch gap-6 pt-4 lg:grid-cols-3 lg:gap-6 lg:items-center">
             @foreach ($pricingPlans as $plan)
                 <x-pricing-card
                     :name="$plan['name']"
@@ -33,5 +33,7 @@
         <p class="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-[#6B7280]" data-reveal>
             ✔ 14-Day Free Trial · ✔ No Setup Fees · ✔ Cancel Anytime
         </p>
+
+        @include('marketing.partials.pricing-comparison')
     </x-container>
 </section>

@@ -108,7 +108,8 @@
                     </label>
                     <button
                         type="submit"
-                        class="btn-ripple inline-flex w-full items-center justify-center rounded-2xl bg-primary-600 px-6 py-3.5 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-700"
+                        class="btn-ripple inline-flex w-full min-h-[52px] items-center justify-center rounded-2xl bg-primary-600 px-6 py-3.5 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-700 disabled:pointer-events-none disabled:translate-y-0 disabled:opacity-80"
+                        x-bind:disabled="$store.authUi.submitting"
                     >
                         Sign In
                     </button>

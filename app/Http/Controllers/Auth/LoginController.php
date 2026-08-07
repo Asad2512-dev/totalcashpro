@@ -47,7 +47,12 @@ final class LoginController extends Controller
             $credentials['email'],
             $credentials['password'],
             (bool) ($credentials['remember'] ?? false),
+            $request,
         );
+
+        if ($result['requires_two_factor']) {
+            return redirect()->route('two-factor.challenge');
+        }
 
         $request->session()->regenerate();
 
@@ -56,7 +61,7 @@ final class LoginController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
-        $this->loginService->logout();
+        $this->loginService->logout($request);
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

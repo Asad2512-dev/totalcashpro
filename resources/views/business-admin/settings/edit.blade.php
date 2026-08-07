@@ -1,7 +1,5 @@
 <x-layouts.business-admin title="Settings" active="settings">
     <div class="mx-auto max-w-3xl">
-        <x-admin.toolbar title="Organization Settings" />
-
         <div class="mt-6">
             <x-admin.card>
                 <form method="POST" action="{{ route('business-admin.settings.update') }}" class="space-y-6">

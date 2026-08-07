@@ -45,7 +45,12 @@
         </button>
     </div>
 
-    <nav class="min-h-0 flex-1 space-y-4 overflow-y-auto overflow-x-hidden px-2 py-4">
+    <nav
+        id="admin-sidebar-nav"
+        class="min-h-0 flex-1 space-y-4 overflow-y-auto overflow-x-hidden px-2 py-4 overscroll-y-contain"
+        @scroll.passive="saveSidebarScroll()"
+        @click="saveSidebarScroll()"
+    >
         @foreach ($nav as $group)
             <div>
                 <p
@@ -64,8 +69,7 @@
                                 $routeKey = str_replace('staff.', '', $item['route']);
                             }
                             $isActive = $active === $routeKey
-                                || $active === \Illuminate\Support\Str::afterLast($item['route'], '.')
-                                || ($active === 'dashboard' && $routeKey === 'dashboard')
+                                || str_starts_with($routeKey, $active.'.')
                                 || ($routeKey === 'businesses' && $businessesSectionOpen);
                             $isBusinesses = $routeKey === 'businesses';
                             $businessesActive = $isBusinesses && ($active === 'businesses' || $active === 'organizations');
@@ -75,7 +79,8 @@
                                 <a
                                     href="{{ route($item['route']) }}"
                                     title="{{ $item['label'] }}"
-                                    @click="closeSidebar()"
+                                    @click="closeSidebar(); saveSidebarScroll()"
+                                    @if (($isActive && ! $isBusinesses) || $businessesActive) data-sidebar-active @endif
                                     @class([
                                         'admin-sidebar-link group min-w-0',
                                         'bg-primary-50 text-primary-700 dark:bg-primary-900/25 dark:text-primary-300' => ($isActive && ! $isBusinesses) || $businessesActive,
@@ -115,7 +120,7 @@
                                             <div class="flex items-stretch gap-0.5">
                                                 <a
                                                     href="{{ $business['url'] }}"
-                                                    @click="closeSidebar()"
+                                                    @click="closeSidebar(); saveSidebarScroll()"
                                                     @class([
                                                         'admin-sidebar-sublink min-w-0 truncate',
                                                         'bg-primary-50 text-primary-700 dark:bg-primary-900/25 dark:text-primary-300' => $currentOrganizationId === (int) $business['id'],
@@ -140,7 +145,7 @@
                                                         <li>
                                                             <a
                                                                 href="{{ $branch['url'] }}"
-                                                                @click="closeSidebar()"
+                                                                @click="closeSidebar(); saveSidebarScroll()"
                                                                 @class([
                                                                     'admin-sidebar-nested-link truncate',
                                                                     'bg-primary-50 font-medium text-primary-700 dark:bg-primary-900/25 dark:text-primary-300' => $currentBranchId === (int) $branch['id'],

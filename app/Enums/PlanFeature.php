@@ -13,6 +13,7 @@ enum PlanFeature: string
     case Payroll = 'payroll';
     case Rota = 'rota';
     case Suppliers = 'suppliers';
+    case Accounting = 'accounting';
     case AdvancedReports = 'advanced_reports';
     case MultipleBranches = 'multiple_branches';
     case StaffPanel = 'staff_panel';
@@ -27,6 +28,7 @@ enum PlanFeature: string
             self::Payroll => 'Payroll',
             self::Rota => 'Staff Rota',
             self::Suppliers => 'Suppliers',
+            self::Accounting => 'Accounting',
             self::AdvancedReports => 'Advanced Reports',
             self::MultipleBranches => 'Multiple Branches',
             self::StaffPanel => 'Staff Panel',
@@ -46,6 +48,7 @@ enum PlanFeature: string
             self::Payroll,
             self::Rota,
             self::Suppliers,
+            self::Accounting,
             self::AdvancedReports,
             self::MultipleBranches,
             self::StaffPanel,

@@ -6,15 +6,18 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AccessRequest;
+use App\Services\Mail\MailSender;
 use App\Services\SuperAdmin\AccessRequestService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 
 final class AccessRequestController extends Controller
 {
-    public function __construct(private readonly AccessRequestService $service) {}
+    public function __construct(
+        private readonly AccessRequestService $service,
+        private readonly MailSender $mail,
+    ) {}
 
     public function show(AccessRequest $accessRequest): View
     {
@@ -68,7 +71,7 @@ final class AccessRequestController extends Controller
 
     public function email(AccessRequest $accessRequest): RedirectResponse
     {
-        Mail::raw(
+        $this->mail->sendRaw(
             'We received your TotalCashPro access request for '.$accessRequest->business_name.'. Our team is reviewing it.',
             function ($message) use ($accessRequest): void {
                 $message->to($accessRequest->email)->subject('Your TotalCashPro access request');

@@ -5,9 +5,16 @@ declare(strict_types=1);
 namespace App\Services\Auth;
 
 use App\Contracts\ServiceInterface;
+use App\Enums\SecurityLogEvent;
 use App\Models\User;
+use App\Models\UserDevice;
 use App\Services\Logging\ActivityLogger;
 use App\Services\Logging\AuditLogger;
+use App\Services\Security\DeviceSessionService;
+use App\Services\Security\LoginHistoryService;
+use App\Services\Security\SecurityLogService;
+use App\Services\Security\TwoFactorService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -16,16 +23,30 @@ final class LoginService implements ServiceInterface
     public function __construct(
         private readonly ActivityLogger $activityLogger,
         private readonly AuditLogger $auditLogger,
+        private readonly LoginHistoryService $loginHistoryService,
+        private readonly SecurityLogService $securityLogService,
+        private readonly DeviceSessionService $deviceSessionService,
+        private readonly TwoFactorService $twoFactorService,
     ) {}
 
     /**
-     * Authenticate Super Admin or Business Admin and return the post-login route name.
+     * @return array{user: User, route: string, requires_two_factor: bool}
      *
      * @throws ValidationException
      */
-    public function attempt(string $email, string $password, bool $remember = false): array
+    public function attempt(string $email, string $password, bool $remember = false, ?Request $request = null): array
     {
         if (! Auth::attempt(['email' => $email, 'password' => $password], $remember)) {
+            if ($request !== null) {
+                $this->loginHistoryService->recordFailure($email, $request, 'Invalid credentials');
+                $this->securityLogService->log(
+                    SecurityLogEvent::LoginFailure,
+                    null,
+                    'Failed login attempt for '.$email,
+                    $request,
+                );
+            }
+
             throw ValidationException::withMessages([
                 'email' => 'These credentials do not match our records.',
             ]);
@@ -38,37 +59,73 @@ final class LoginService implements ServiceInterface
         if (! $user->isActive()) {
             Auth::logout();
 
+            if ($request !== null) {
+                $this->loginHistoryService->recordFailure($email, $request, 'Inactive account');
+            }
+
             throw ValidationException::withMessages([
                 'email' => 'This account is inactive.',
             ]);
         }
 
-        if ($user->isSuperAdmin()) {
-            $user->forceFill(['last_login_at' => now()])->save();
-            $this->logLogin($user, 'Super Admin signed in', 'auth.login');
+        $route = $this->resolveRoute($user);
 
-            return ['user' => $user, 'route' => 'super-admin.dashboard'];
+        if ($route === null) {
+            Auth::logout();
+
+            if ($request !== null) {
+                $this->loginHistoryService->recordFailure($email, $request, 'Unauthorized role');
+            }
+
+            throw ValidationException::withMessages([
+                'email' => 'This account cannot sign in.',
+            ]);
         }
 
-        if ($user->isAdmin() && $user->organization_id !== null) {
-            $user->forceFill(['last_login_at' => now()])->save();
-            $this->logLogin($user, 'Business Admin signed in', 'auth.login.business');
+        if ($this->twoFactorService->requiresChallenge($user)) {
+            Auth::logout();
 
-            return ['user' => $user, 'route' => 'business-admin.dashboard'];
+            if ($request !== null) {
+                $request->session()->put('login.id', $user->id);
+                $request->session()->put('login.remember', $remember);
+                $request->session()->put('login.intended_route', $route);
+                $this->twoFactorService->sendLoginChallenge($user, $request);
+            }
+
+            return [
+                'user' => $user,
+                'route' => 'two-factor.challenge',
+                'requires_two_factor' => true,
+            ];
         }
 
-        if ($user->isStaff() && $user->organization_id !== null) {
-            $user->forceFill(['last_login_at' => now()])->save();
-            $this->logLogin($user, 'Staff signed in', 'auth.login.staff');
+        $this->completeLogin($user, $request);
 
-            return ['user' => $user, 'route' => 'staff.dashboard'];
+        return [
+            'user' => $user,
+            'route' => $route,
+            'requires_two_factor' => false,
+        ];
+    }
+
+    public function completeTwoFactor(User $user, Request $request): array
+    {
+        $route = $this->resolveRoute($user);
+
+        if ($route === null) {
+            throw ValidationException::withMessages([
+                'otp' => 'This account cannot sign in.',
+            ]);
         }
 
-        Auth::logout();
+        $remember = (bool) $request->session()->pull('login.remember', false);
 
-        throw ValidationException::withMessages([
-            'email' => 'This account cannot sign in.',
-        ]);
+        Auth::login($user, $remember);
+        $request->session()->regenerate();
+
+        $this->completeLogin($user, $request);
+
+        return ['user' => $user, 'route' => $route];
     }
 
     /**
@@ -91,13 +148,40 @@ final class LoginService implements ServiceInterface
         return $result['user'];
     }
 
-    public function logout(): void
+    public function logout(?Request $request = null): void
     {
+        $user = Auth::user();
+
+        if ($user !== null && $request !== null) {
+            $this->loginHistoryService->recordLogout($user, $request);
+            $this->securityLogService->log(SecurityLogEvent::Logout, $user, 'User signed out', $request);
+
+            UserDevice::query()
+                ->where('user_id', $user->id)
+                ->where('session_id', $request->session()->getId())
+                ->whereNull('logged_out_at')
+                ->update(['logged_out_at' => now(), 'is_current' => false]);
+        }
+
         Auth::logout();
     }
 
-    private function logLogin(User $user, string $description, string $action): void
+    private function completeLogin(User $user, ?Request $request): void
     {
+        $user->forceFill(['last_login_at' => now()])->save();
+
+        $description = match (true) {
+            $user->isSuperAdmin() => 'Super Admin signed in',
+            $user->isAdmin() => 'Business Admin signed in',
+            default => 'Staff signed in',
+        };
+
+        $action = match (true) {
+            $user->isSuperAdmin() => 'auth.login',
+            $user->isAdmin() => 'auth.login.business',
+            default => 'auth.login.staff',
+        };
+
         $this->activityLogger->log(
             event: 'user.login',
             description: $description,
@@ -110,5 +194,28 @@ final class LoginService implements ServiceInterface
             user: $user,
             target: $user,
         );
+
+        if ($request !== null) {
+            $this->loginHistoryService->recordSuccess($user, $request);
+            $this->securityLogService->log(SecurityLogEvent::LoginSuccess, $user, $description, $request);
+            $this->deviceSessionService->register($user, $request);
+        }
+    }
+
+    private function resolveRoute(User $user): ?string
+    {
+        if ($user->isSuperAdmin()) {
+            return 'super-admin.dashboard';
+        }
+
+        if ($user->isAdmin() && $user->organization_id !== null) {
+            return 'business-admin.dashboard';
+        }
+
+        if ($user->isStaff() && $user->organization_id !== null) {
+            return 'staff.dashboard';
+        }
+
+        return null;
     }
 }

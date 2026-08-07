@@ -11,13 +11,17 @@
     $branches = $ui->branchesFor($user);
     $selectedBranchId = $ui->selectedBranchId($user);
     $organization = $user->organization;
+    $unreadNotifications = $user
+        ? \App\Models\AppNotification::query()->where('user_id', $user->id)->whereNull('read_at')->count()
+        : 0;
 @endphp
 
 <!DOCTYPE html>
-<html lang="en" x-data="adminShell" :class="{ 'dark': dark }">
+<html lang="en" class="admin-panel" x-data="adminShell" :class="{ 'dark': dark }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#16A34A">
     <title>{{ $title }} — {{ $organization?->name ?? 'Business' }} · {{ brand_name() }}</title>
     <x-brand-favicon />
@@ -26,40 +30,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="admin-shell bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
-    <div class="flex min-h-screen">
+<body class="admin-shell admin-shell--viewport bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <div class="admin-shell-layout flex min-h-0">
         <x-admin.sidebar :nav="$nav" :active="$active" :business-tree="[]" home-route="business-admin.dashboard" />
 
-        <div class="flex min-w-0 flex-1 flex-col transition-[padding] duration-300 lg:pl-72" :class="collapsed ? 'lg:pl-[5.25rem]' : 'lg:pl-72'">
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden transition-[padding] duration-300 lg:pl-72" :class="collapsed ? 'lg:pl-[5.25rem]' : 'lg:pl-72'">
             <x-admin.topbar
                 :title="$title"
                 :user="$user"
                 panel-label="{{ $organization?->name ?? 'Business Admin' }}"
                 profile-route="business-admin.profile"
                 settings-route="business-admin.settings"
+                security-route="business-admin.security.index"
+                notifications-route="business-admin.notifications"
+                :unread-notifications="$unreadNotifications"
             >
                 <x-slot:actions>
-                    <x-admin.branch-selector
-                        :branches="$branches"
-                        :selected-branch-id="$selectedBranchId"
-                        :action="route('business-admin.branch.select')"
-                        class="hidden min-w-0 sm:flex"
-                    />
+                    <x-admin.branch-filter compact class="hidden min-w-0 sm:flex" />
                 </x-slot:actions>
             </x-admin.topbar>
 
-            @if ($branches->isNotEmpty())
+            @if ($branches->count() > 1)
                 <div class="border-b border-gray-200 bg-white px-3 py-2.5 dark:border-gray-800 dark:bg-gray-900 sm:hidden">
-                    <x-admin.branch-selector
-                        :branches="$branches"
-                        :selected-branch-id="$selectedBranchId"
-                        :action="route('business-admin.branch.select')"
-                        compact
-                    />
+                    <x-admin.branch-filter compact />
                 </div>
             @endif
 
-            <main class="admin-fade-in flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <main class="admin-shell-main admin-fade-in flex-1 px-4 py-6 sm:px-6 lg:px-8">
                 @if ($user && ! $user->hasVerifiedEmail())
                     <div class="mb-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/40 dark:bg-amber-900/20 dark:text-amber-100">
                         Please verify your email address.

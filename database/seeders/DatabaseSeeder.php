@@ -18,6 +18,7 @@ final class DatabaseSeeder extends Seeder
             CmsSeeder::class,
             DemoDataSeeder::class,
             BusinessAdminDomainSeeder::class,
+            HarbourKitchenDemoSeeder::class,
         ]);
     }
 }

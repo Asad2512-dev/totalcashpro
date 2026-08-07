@@ -49,10 +49,13 @@ final class StaffDashboardService implements ServiceInterface
             ->limit(5)
             ->get();
 
+        $week = $this->attendance->personalWeek($staff);
+
         return [
             'state' => $this->attendance->currentStateForStaff($staff),
             'todayShift' => $todayShift,
             'branchName' => $staff->branch?->name ?? 'Unassigned',
+            'weeklyHours' => round(collect($week['days'])->sum('hours'), 2),
             'recentCashUps' => $recentCashUps,
             'notifications' => $notifications,
         ];

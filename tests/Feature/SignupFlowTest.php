@@ -51,7 +51,7 @@ final class SignupFlowTest extends TestCase
             'terms' => '1',
         ]);
 
-        $response->assertRedirect(route('business-admin.onboarding'));
+        $response->assertRedirect(route('verification.notice'));
 
         $this->assertAuthenticated();
         $user = User::query()->where('email', 'alex@sunrisecafe.test')->first();

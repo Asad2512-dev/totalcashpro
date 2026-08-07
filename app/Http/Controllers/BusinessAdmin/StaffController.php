@@ -40,7 +40,7 @@ final class StaffController extends Controller
     {
         $this->staffService->create($request->user(), $request->validated());
 
-        return redirect()->route('business-admin.staff')->with('status', 'Staff member created.');
+        return redirect()->route('business-admin.staff')->with('status', 'Staff member created. An invitation email has been sent.');
     }
 
     public function edit(Request $request, User $staff): View
@@ -76,8 +76,8 @@ final class StaffController extends Controller
 
     public function resetPassword(Request $request, User $staff): RedirectResponse
     {
-        $password = $this->staffService->resetPassword($request->user(), $staff);
+        $this->staffService->resetPassword($request->user(), $staff);
 
-        return back()->with('status', "Password reset. Temporary password: {$password}");
+        return back()->with('status', 'A new password has been emailed to the staff member.');
     }
 }

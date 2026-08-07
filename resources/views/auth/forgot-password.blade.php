@@ -6,7 +6,7 @@
             </a>
             <h1 class="mt-8 font-display text-3xl font-extrabold tracking-tight text-gray-900">Reset your password</h1>
             <p class="mt-3 text-sm leading-relaxed text-gray-500">
-                Password reset will be connected in Phase 2. For now, contact support if you need access restored.
+                Enter your email and we will send you a secure link to reset your password.
             </p>
             <form method="POST" action="{{ route('password.email') }}" class="mt-8 space-y-5">
                 @csrf

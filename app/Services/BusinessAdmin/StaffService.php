@@ -6,6 +6,8 @@ namespace App\Services\BusinessAdmin;
 
 use App\Contracts\ServiceInterface;
 use App\Enums\RoleSlug;
+use App\Events\StaffInvited;
+use App\Events\StaffPasswordReset;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\Contracts\StaffRepositoryInterface;
@@ -32,15 +34,16 @@ final class StaffService implements ServiceInterface
 
     /**
      * @param  array<string, mixed>  $data
+     * @return array{staff: User, password: string}
      */
-    public function create(User $admin, array $data): User
+    public function create(User $admin, array $data): array
     {
         $this->assertUniquePin($admin, $data['pin_code'] ?? null);
 
         $roleId = Role::query()->where('slug', RoleSlug::Staff->value)->value('id');
         $password = $data['password'] ?? Str::password(12);
 
-        return $this->staff->create([
+        $staff = $this->staff->create([
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
@@ -53,8 +56,12 @@ final class StaffService implements ServiceInterface
             'organization_id' => $admin->organization_id,
             'branch_id' => $data['branch_id'] ?? $this->branchContext->currentBranchId($admin),
             'status' => $data['status'] ?? 'active',
-            'email_verified_at' => now(),
+            'email_verified_at' => null,
         ]);
+
+        StaffInvited::dispatch($staff, $admin, $password);
+
+        return ['staff' => $staff, 'password' => $password];
     }
 
     /**
@@ -94,6 +101,8 @@ final class StaffService implements ServiceInterface
         $this->assertSameOrg($admin, $staff);
         $password = Str::password(12);
         $this->staff->update($staff->id, ['password' => Hash::make($password)]);
+
+        StaffPasswordReset::dispatch($staff->fresh(), $admin, $password);
 
         return $password;
     }
