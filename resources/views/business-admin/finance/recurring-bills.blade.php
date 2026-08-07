@@ -7,36 +7,32 @@
     @if ($templates->isEmpty())
         <x-admin.empty-state title="No recurring templates" description="Create rent, utilities and subscription templates here." />
     @else
-        <x-admin.card :padding="false">
-            <div class="admin-table-wrap">
-                <table class="admin-table min-w-full text-left text-sm">
-                    <thead>
-                        <tr>
-                            <th class="px-4 py-3">Title</th>
-                            <th class="px-4 py-3">Vendor</th>
-                            <th class="px-4 py-3">Amount</th>
-                            <th class="px-4 py-3">Frequency</th>
-                            <th class="px-4 py-3">Next due</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($templates as $template)
-                            <tr>
-                                <td class="px-4 py-3 font-medium">{{ $template->title }}</td>
-                                <td class="px-4 py-3">{{ $template->vendor ?: '—' }}</td>
-                                <td class="px-4 py-3">£{{ number_format((float) $template->amount, 2) }}</td>
-                                <td class="px-4 py-3 capitalize">{{ $template->frequency->value }}</td>
-                                <td class="px-4 py-3">{{ $template->next_due_date->format('d M Y') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </x-admin.card>
+        <x-admin.table-shell>
+            <thead>
+                <tr>
+                    <th class="px-4 py-3">Title</th>
+                    <th class="hidden px-4 py-3 sm:table-cell">Vendor</th>
+                    <th class="px-4 py-3">Amount</th>
+                    <th class="hidden px-4 py-3 md:table-cell">Frequency</th>
+                    <th class="hidden px-4 py-3 sm:table-cell">Next due</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($templates as $template)
+                    <tr>
+                        <td class="admin-table-stack-title px-4 py-3.5 font-medium" data-label="Title">{{ $template->title }}</td>
+                        <td class="hidden px-4 py-3.5 sm:table-cell" data-label="Vendor">{{ $template->vendor ?: '—' }}</td>
+                        <td class="px-4 py-3.5" data-label="Amount">£{{ number_format((float) $template->amount, 2) }}</td>
+                        <td class="hidden px-4 py-3.5 capitalize md:table-cell" data-label="Frequency">{{ $template->frequency->value }}</td>
+                        <td class="hidden px-4 py-3.5 sm:table-cell" data-label="Next due">{{ $template->next_due_date->format('d M Y') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </x-admin.table-shell>
     @endif
 
     <x-admin.modal name="add-recurring" title="Add recurring bill">
-        <form method="POST" action="{{ route('business-admin.finance.recurring-bills.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('business-admin.finance.recurring-bills.store') }}" class="admin-form-grid">
             @csrf
             <x-admin.input name="title" label="Title" required />
             <x-admin.input name="vendor" label="Vendor" />

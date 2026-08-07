@@ -18,7 +18,7 @@
             <x-admin.button :href="route('business-admin.staff.create')">Add staff</x-admin.button>
         </x-admin.empty-state>
     @else
-        <div class="admin-mobile-cards">
+        <div class="admin-mobile-cards md:hidden">
             @foreach ($staff as $member)
                 <article class="admin-mobile-card">
                     <div class="flex items-start justify-between gap-3">
@@ -42,19 +42,21 @@
                             <dd class="mt-1 text-gray-700 dark:text-gray-200">£{{ number_format((float) ($member->hourly_rate ?? 0), 2) }}</dd>
                         </div>
                     </dl>
-                    <div class="mt-4 flex flex-wrap gap-3">
-                        <a href="{{ route('business-admin.staff.edit', $member) }}" class="text-sm font-semibold text-primary-700">Edit</a>
-                        <form method="POST" action="{{ route('business-admin.staff.suspend', $member) }}" class="inline">
-                            @csrf
-                            <button type="submit" class="text-sm font-semibold text-amber-600">Suspend</button>
-                        </form>
+                    <div class="mt-4">
+                        <x-admin.table-actions>
+                            <x-admin.table-action :href="route('business-admin.staff.edit', $member)" variant="neutral">Edit</x-admin.table-action>
+                            <form method="POST" action="{{ route('business-admin.staff.suspend', $member) }}">
+                                @csrf
+                                <x-admin.table-action type="submit" variant="warning">Suspend</x-admin.table-action>
+                            </form>
+                        </x-admin.table-actions>
                     </div>
                 </article>
             @endforeach
         </div>
 
         <div class="admin-card hidden overflow-hidden md:block">
-            <div class="admin-table-wrap -mx-4 sm:mx-0">
+            <div class="admin-table-wrap">
                 <table class="admin-table min-w-full text-left text-sm">
                     <thead>
                         <tr>
@@ -83,13 +85,13 @@
                                 <td class="hidden px-4 py-3.5 text-gray-700 dark:text-gray-200 sm:table-cell">£{{ number_format((float) ($member->hourly_rate ?? 0), 2) }}</td>
                                 <td class="hidden px-4 py-3.5 text-gray-700 dark:text-gray-200 md:table-cell">{{ $member->status }}</td>
                                 <td class="px-4 py-3.5">
-                                    <div class="flex flex-wrap gap-3">
-                                        <a href="{{ route('business-admin.staff.edit', $member) }}" class="font-semibold text-primary-700">Edit</a>
-                                        <form method="POST" action="{{ route('business-admin.staff.suspend', $member) }}" class="inline">
+                                    <x-admin.table-actions>
+                                        <x-admin.table-action :href="route('business-admin.staff.edit', $member)" variant="neutral">Edit</x-admin.table-action>
+                                        <form method="POST" action="{{ route('business-admin.staff.suspend', $member) }}">
                                             @csrf
-                                            <button type="submit" class="font-semibold text-amber-600">Suspend</button>
+                                            <x-admin.table-action type="submit" variant="warning">Suspend</x-admin.table-action>
                                         </form>
-                                    </div>
+                                    </x-admin.table-actions>
                                 </td>
                             </tr>
                         @endforeach

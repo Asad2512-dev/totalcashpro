@@ -15,7 +15,7 @@
                 @foreach ($savedReports as $saved)
                     <li class="flex items-center justify-between rounded-xl border border-gray-100 px-3 py-2 dark:border-gray-700">
                         <span>{{ $saved->name }} · {{ ucfirst(str_replace('_', ' ', $saved->report_type)) }}</span>
-                        <a href="{{ route('business-admin.reports', array_merge($saved->filters ?? [], ['report_type' => $saved->report_type])) }}" class="font-semibold text-primary-700">Load</a>
+                        <x-admin.table-action :href="route('business-admin.reports', array_merge($saved->filters ?? [], ['report_type' => $saved->report_type]))" variant="neutral">Load</x-admin.table-action>
                     </li>
                 @endforeach
             </ul>

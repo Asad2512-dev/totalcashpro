@@ -6,10 +6,10 @@
         <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-wage')">Add wage</x-admin.button>
     </x-admin.toolbar>
 
-    <div class="mb-6 grid gap-4 sm:grid-cols-3">
-        <x-admin.stat-card label="Unpaid wages" :value="'£'.number_format((float) ($summary['unpaid_total'] ?? 0), 2)" :change="($summary['unpaid_count'] ?? 0).' pending'" tone="warning" />
-        <x-admin.stat-card label="Paid this month" :value="'£'.number_format((float) ($summary['paid_month_total'] ?? 0), 2)" change="Current month" tone="success" />
-        <x-admin.stat-card label="Records" :value="(string) $wages->total()" change="This filter" tone="neutral" />
+    <div class="admin-stat-grid mb-6">
+        <x-admin.stat label="Unpaid wages" :value="'£'.number_format((float) ($summary['unpaid_total'] ?? 0), 2)" :change="($summary['unpaid_count'] ?? 0).' pending'" tone="warning" />
+        <x-admin.stat label="Paid this month" :value="'£'.number_format((float) ($summary['paid_month_total'] ?? 0), 2)" change="Current month" tone="success" />
+        <x-admin.stat label="Records" :value="(string) $wages->total()" change="This filter" tone="neutral" />
     </div>
 
     @if ($wages->isEmpty())
@@ -34,7 +34,7 @@
                     @if ($pending)
                         <form method="POST" action="{{ route('business-admin.payroll.paid', $wage) }}" class="mt-4">
                             @csrf
-                            <x-admin.button type="submit" size="sm">Mark paid</x-admin.button>
+                            <x-admin.table-action type="submit" variant="success">Mark paid</x-admin.table-action>
                         </form>
                     @endif
                 </article>
@@ -42,7 +42,7 @@
         </div>
 
         <div class="admin-card hidden overflow-hidden md:block">
-            <div class="admin-table-wrap -mx-4 sm:mx-0">
+            <div class="admin-table-wrap">
                 <table class="admin-table min-w-full text-left text-sm">
                     <thead>
                         <tr>
@@ -70,9 +70,9 @@
                                 <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $wage->notes ?: '—' }}</td>
                                 <td class="px-4 py-3.5">
                                     @if ($pending)
-                                        <form method="POST" action="{{ route('business-admin.payroll.paid', $wage) }}" class="inline">
+                                        <form method="POST" action="{{ route('business-admin.payroll.paid', $wage) }}">
                                             @csrf
-                                            <button type="submit" class="font-semibold text-primary-700">Mark paid</button>
+                                            <x-admin.table-action type="submit" variant="success">Mark paid</x-admin.table-action>
                                         </form>
                                     @else
                                         —

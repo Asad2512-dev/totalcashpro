@@ -5,9 +5,10 @@
 ])
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="admin-panel">
 <head>
     <meta charset="utf-8">
+    <x-theme-init />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#16A34A">
     <title>{{ $code }} — {{ $title }} · {{ brand_name() }}</title>

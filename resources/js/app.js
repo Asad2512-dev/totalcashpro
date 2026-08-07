@@ -3,6 +3,40 @@ import { registerStaffPwa } from './staff-pwa';
 
 window.Alpine = Alpine;
 
+const THEME_STORAGE_KEY = 'tcp-admin-theme';
+
+function prefersDarkMode() {
+    try {
+        const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+
+        if (stored === 'dark') {
+            return true;
+        }
+
+        if (stored === 'light') {
+            return false;
+        }
+    } catch (error) {
+        // localStorage may be unavailable in private browsing.
+    }
+
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function applyThemeClass(isDark) {
+    document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+
+    const meta = document.querySelector('meta[name="theme-color"]');
+
+    if (meta) {
+        meta.setAttribute('content', isDark ? '#030712' : '#16A34A');
+    }
+}
+
+window.tcpApplyTheme = applyThemeClass;
+window.tcpPrefersDarkMode = prefersDarkMode;
+
 document.addEventListener('alpine:init', () => {
     Alpine.store('authUi', {
         submitting: false,
@@ -289,10 +323,44 @@ document.addEventListener('alpine:init', () => {
         searchResults: [],
         logoutConfirm: false,
         collapsed: false,
-        dark: window.localStorage.getItem('tcp-admin-theme') === 'dark',
+        dark: prefersDarkMode(),
 
         init() {
+            applyThemeClass(this.dark);
+
             window.localStorage.setItem('tcp-admin-collapsed', '0');
+
+            this.$watch('dark', (value) => {
+                window.localStorage.setItem(THEME_STORAGE_KEY, value ? 'dark' : 'light');
+                applyThemeClass(value);
+            });
+
+            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+            const onSystemThemeChange = () => {
+                try {
+                    const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+
+                    if (stored !== 'dark' && stored !== 'light') {
+                        this.dark = systemTheme.matches;
+                        applyThemeClass(this.dark);
+                    }
+                } catch (error) {
+                    // Ignore storage errors.
+                }
+            };
+
+            if (typeof systemTheme.addEventListener === 'function') {
+                systemTheme.addEventListener('change', onSystemThemeChange);
+            } else if (typeof systemTheme.addListener === 'function') {
+                systemTheme.addListener(onSystemThemeChange);
+            }
+
+            window.addEventListener('storage', (event) => {
+                if (event.key === THEME_STORAGE_KEY) {
+                    this.dark = prefersDarkMode();
+                    applyThemeClass(this.dark);
+                }
+            });
 
             if ('scrollRestoration' in history) {
                 history.scrollRestoration = 'manual';
@@ -300,10 +368,6 @@ document.addEventListener('alpine:init', () => {
 
             this.$nextTick(() => {
                 this.restoreSidebarScroll();
-            });
-
-            this.$watch('dark', (value) => {
-                window.localStorage.setItem('tcp-admin-theme', value ? 'dark' : 'light');
             });
 
             this.$watch('commandOpen', (value) => {

@@ -3,10 +3,14 @@
     'selectedBranchId' => null,
     'action' => '',
     'compact' => false,
+    'silent' => false,
 ])
 
 <form method="POST" action="{{ $action }}" {{ $attributes->class($compact ? 'admin-branch-select-form admin-branch-select-form-compact' : 'admin-branch-select-form') }}>
     @csrf
+    @if ($silent)
+        <input type="hidden" name="silent" value="1">
+    @endif
     <label for="{{ $compact ? 'branch-selector-mobile' : 'branch-selector' }}" class="sr-only">Branch</label>
     <div class="admin-branch-select-wrap">
         <select

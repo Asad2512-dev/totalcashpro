@@ -46,7 +46,7 @@
                                     @if (! ($customer->marketing_preferences['email'] ?? false) && ! ($customer->marketing_preferences['sms'] ?? false)) — @endif
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <a href="{{ route('business-admin.crm.show', $customer) }}" class="font-semibold text-primary-700">View</a>
+                                    <x-admin.table-action :href="route('business-admin.crm.show', $customer)" variant="neutral">View</x-admin.table-action>
                                 </td>
                             </tr>
                         @endforeach

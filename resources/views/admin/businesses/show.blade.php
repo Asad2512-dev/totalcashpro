@@ -124,7 +124,7 @@
                                     </td>
                                     <td class="px-4 py-3.5 text-gray-500">{{ $user->last_login_at?->format('d M Y H:i') ?? 'Never' }}</td>
                                     <td class="px-4 py-3.5 text-right">
-                                        <a href="{{ route('super-admin.users.show', $user) }}" class="font-semibold text-primary-700 hover:text-primary-800">Manage</a>
+                                        <x-admin.table-action :href="route('super-admin.users.show', $user)" variant="neutral">Manage</x-admin.table-action>
                                     </td>
                                 </tr>
                             @endforeach
@@ -178,14 +178,14 @@
                                         </x-admin.badge>
                                     </td>
                                     <td class="px-4 py-3.5 text-right">
-                                        <div class="flex justify-end gap-2">
-                                            <a href="{{ route('super-admin.branches.edit', $branch) }}" class="font-semibold text-primary-700 hover:text-primary-800">Edit</a>
+                                        <x-admin.table-actions class="justify-end">
+                                            <x-admin.table-action :href="route('super-admin.branches.edit', $branch)" variant="neutral">Edit</x-admin.table-action>
                                             <form method="POST" action="{{ route('super-admin.branches.destroy', $branch) }}" onsubmit="return confirm('Delete this branch?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="font-semibold text-red-600 hover:text-red-700">Delete</button>
+                                                <x-admin.table-action type="submit" variant="danger">Delete</x-admin.table-action>
                                             </form>
-                                        </div>
+                                        </x-admin.table-actions>
                                     </td>
                                 </tr>
                             @endforeach

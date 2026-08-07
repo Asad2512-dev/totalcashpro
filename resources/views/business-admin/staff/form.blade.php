@@ -57,7 +57,7 @@
             @endif
             </div>
         </x-admin.card>
-        <x-admin.form-actions>
+        <x-admin.form-actions class="staff-mobile-actions">
             <x-admin.button variant="secondary" :href="route('business-admin.staff')">Cancel</x-admin.button>
             <x-admin.button type="submit">Save</x-admin.button>
         </x-admin.form-actions>

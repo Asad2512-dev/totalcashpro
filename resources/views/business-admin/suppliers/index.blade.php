@@ -29,50 +29,44 @@
             @if ($invoices->isEmpty())
                 <x-admin.empty-state title="No invoices yet" description="Add supplier invoices to track payables in real time." />
             @else
-                <div class="admin-card overflow-hidden">
-                    <div class="admin-table-wrap -mx-4 sm:mx-0">
-                        <table class="admin-table min-w-full text-left text-sm">
-                            <thead class="border-b border-gray-200 bg-gray-50/90 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-400">
-                                <tr>
-                                    <th class="px-4 py-3">Supplier</th>
-                                    <th class="px-4 py-3">Invoice #</th>
-                                    <th class="px-4 py-3">Invoice date</th>
-                                    <th class="px-4 py-3">Due</th>
-                                    <th class="px-4 py-3">Amount</th>
-                                    <th class="px-4 py-3">Status</th>
-                                    <th class="px-4 py-3"></th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                                @foreach ($invoices as $invoice)
-                                    @php
-                                        $status = $invoice->status instanceof \BackedEnum ? $invoice->status->value : (string) $invoice->status;
-                                        $paid = strcasecmp($status, 'Paid') === 0;
-                                    @endphp
-                                    <tr class="transition hover:bg-primary-50/40 dark:hover:bg-gray-800/70">
-                                        <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $invoice->supplier?->name ?? '—' }}</td>
-                                        <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $invoice->invoice_no }}</td>
-                                        <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $invoice->invoice_date?->format('d M Y') }}</td>
-                                        <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $invoice->due_date?->format('d M Y') }}</td>
-                                        <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">£{{ number_format((float) $invoice->amount, 2) }}</td>
-                                        <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $status }}</td>
-                                        <td class="px-4 py-3.5">
-                                            @if ($paid)
-                                                —
-                                            @else
-                                                <form method="POST" action="{{ route('business-admin.suppliers.invoices.paid', $invoice) }}">
-                                                    @csrf
-                                                    <button type="submit" class="font-semibold text-primary-700">Mark paid</button>
-                                                </form>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="mt-4">{{ $invoices->links() }}</div>
+                <x-admin.table-shell sticky>
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3">Supplier</th>
+                            <th class="hidden px-4 py-3 sm:table-cell">Invoice #</th>
+                            <th class="hidden px-4 py-3 md:table-cell">Invoice date</th>
+                            <th class="hidden px-4 py-3 lg:table-cell">Due</th>
+                            <th class="px-4 py-3">Amount</th>
+                            <th class="hidden px-4 py-3 sm:table-cell">Status</th>
+                            <th class="px-4 py-3"><span class="sr-only">Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($invoices as $invoice)
+                            @php
+                                $status = $invoice->status instanceof \BackedEnum ? $invoice->status->value : (string) $invoice->status;
+                                $paid = strcasecmp($status, 'Paid') === 0;
+                            @endphp
+                            <tr>
+                                <td class="admin-table-stack-title px-4 py-3.5" data-label="Supplier">{{ $invoice->supplier?->name ?? '—' }}</td>
+                                <td class="hidden px-4 py-3.5 sm:table-cell" data-label="Invoice #">{{ $invoice->invoice_no }}</td>
+                                <td class="hidden px-4 py-3.5 md:table-cell" data-label="Invoice date">{{ $invoice->invoice_date?->format('d M Y') }}</td>
+                                <td class="hidden px-4 py-3.5 lg:table-cell" data-label="Due">{{ $invoice->due_date?->format('d M Y') }}</td>
+                                <td class="px-4 py-3.5" data-label="Amount">£{{ number_format((float) $invoice->amount, 2) }}</td>
+                                <td class="hidden px-4 py-3.5 sm:table-cell" data-label="Status">{{ $status }}</td>
+                                <td class="admin-table-stack-actions px-4 py-3.5" data-label="">
+                                    @unless ($paid)
+                                        <form method="POST" action="{{ route('business-admin.suppliers.invoices.paid', $invoice) }}">
+                                            @csrf
+                                            <x-admin.table-action type="submit" variant="success">Mark paid</x-admin.table-action>
+                                        </form>
+                                    @endunless
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </x-admin.table-shell>
+                <div class="admin-pagination mt-4">{{ $invoices->links() }}</div>
             @endif
         @endif
     </div>

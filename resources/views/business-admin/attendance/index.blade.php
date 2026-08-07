@@ -17,7 +17,7 @@
     @if (empty($report))
         <x-admin.empty-state title="No attendance data" description="Staff attendance appears here after PIN clock-ins." />
     @else
-        <div class="admin-mobile-cards">
+        <div class="admin-mobile-cards md:hidden">
             @foreach ($report as $row)
                 <article class="admin-mobile-card">
                     <div class="flex items-start justify-between gap-3">

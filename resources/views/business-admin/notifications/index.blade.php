@@ -32,9 +32,7 @@
                                 @if (!$notification->read_at)
                                     <form method="POST" action="{{ route('business-admin.notifications.read', $notification) }}">
                                         @csrf
-                                        <button type="submit" class="admin-touch-target text-sm font-semibold text-primary-600 hover:text-primary-700">
-                                            Mark Read
-                                        </button>
+                                        <x-admin.table-action type="submit" variant="success">Mark read</x-admin.table-action>
                                     </form>
                                 @else
                                     <x-admin.badge tone="secondary">Read</x-admin.badge>

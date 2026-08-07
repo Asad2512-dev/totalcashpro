@@ -281,7 +281,7 @@
                         </table>
                     </div>
 
-                    <div class="cashup-actions mt-6">
+                    <div class="cashup-footer-sticky cashup-actions mt-6">
                         <div>
                             <button
                                 type="button"
@@ -334,7 +334,7 @@
                             </tfoot>
                         </table>
 
-                        <div class="cashup-actions mt-6">
+                        <div class="cashup-footer-sticky cashup-actions mt-6">
                             <div></div>
                             <div class="text-center">
                                 <button type="button" class="rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60" @click="saveDeductions()" :disabled="loading">Save Deductions</button>

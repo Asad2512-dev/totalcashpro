@@ -3,42 +3,40 @@
         <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'create-po')">Create PO</x-admin.button>
     </x-admin.toolbar>
 
-    <div class="mb-4 flex flex-wrap gap-2">
+    <div class="admin-filter-pills mb-4">
         @foreach (['' => 'All', 'draft' => 'Draft', 'pending' => 'Pending', 'approved' => 'Approved', 'ordered' => 'Ordered', 'partial' => 'Partial', 'received' => 'Received'] as $value => $label)
-            <a href="{{ route('business-admin.purchase-orders.index', $value ? ['status' => $value] : []) }}" class="inline-flex rounded-full px-3 py-1 text-xs font-semibold {{ ($status ?? '') === $value ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-gray-800' }}">{{ $label }}</a>
+            <a href="{{ route('business-admin.purchase-orders.index', $value ? ['status' => $value] : []) }}" @class(['admin-filter-pill', ($status ?? '') === $value ? 'admin-filter-pill-active' : 'admin-filter-pill-inactive'])>{{ $label }}</a>
         @endforeach
     </div>
 
     @if ($orders->isEmpty())
         <x-admin.empty-state title="No purchase orders" description="Create a PO when stock runs low." />
     @else
-        <x-admin.card :padding="false">
-            <div class="admin-table-wrap">
-                <table class="admin-table min-w-full text-left text-sm">
-                    <thead>
-                        <tr>
-                            <th class="px-4 py-3">PO #</th>
-                            <th class="px-4 py-3">Supplier</th>
-                            <th class="px-4 py-3">Status</th>
-                            <th class="px-4 py-3">Total</th>
-                            <th class="px-4 py-3"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($orders as $order)
-                            <tr>
-                                <td class="px-4 py-3 font-medium">{{ $order->po_number }}</td>
-                                <td class="px-4 py-3">{{ $order->supplier?->name }}</td>
-                                <td class="px-4 py-3">{{ $order->status->label() }}</td>
-                                <td class="px-4 py-3">£{{ number_format((float) $order->total, 2) }}</td>
-                                <td class="px-4 py-3"><a href="{{ route('business-admin.purchase-orders.show', $order) }}" class="font-semibold text-primary-700">View</a></td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </x-admin.card>
-        <div class="mt-4">{{ $orders->links() }}</div>
+        <x-admin.table-shell sticky>
+            <thead>
+                <tr>
+                    <th class="px-4 py-3">PO #</th>
+                    <th class="hidden px-4 py-3 sm:table-cell">Supplier</th>
+                    <th class="hidden px-4 py-3 md:table-cell">Status</th>
+                    <th class="px-4 py-3">Total</th>
+                    <th class="px-4 py-3"><span class="sr-only">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($orders as $order)
+                    <tr>
+                        <td class="admin-table-stack-title px-4 py-3.5 font-medium" data-label="PO #">{{ $order->po_number }}</td>
+                        <td class="hidden px-4 py-3.5 sm:table-cell" data-label="Supplier">{{ $order->supplier?->name }}</td>
+                        <td class="hidden px-4 py-3.5 md:table-cell" data-label="Status">{{ $order->status->label() }}</td>
+                        <td class="px-4 py-3.5" data-label="Total">£{{ number_format((float) $order->total, 2) }}</td>
+                        <td class="admin-table-stack-actions px-4 py-3.5" data-label="">
+                            <x-admin.table-action :href="route('business-admin.purchase-orders.show', $order)" variant="neutral">View</x-admin.table-action>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </x-admin.table-shell>
+        <div class="admin-pagination mt-4">{{ $orders->links() }}</div>
     @endif
 
     <x-admin.modal name="create-po" title="Create purchase order">

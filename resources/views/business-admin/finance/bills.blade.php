@@ -7,41 +7,45 @@
     @if ($bills->isEmpty())
         <x-admin.empty-state title="No bills" description="Track rent, utilities and other recurring costs." />
     @else
-        <div class="admin-card overflow-hidden">
-            <div class="admin-table-wrap">
-                <table class="admin-table min-w-full text-left text-sm">
-                    <thead>
-                        <tr>
-                            <th class="px-4 py-3">Title</th>
-                            <th class="px-4 py-3">Vendor</th>
-                            <th class="px-4 py-3">Due</th>
-                            <th class="px-4 py-3">Gross</th>
-                            <th class="px-4 py-3">Status</th>
-                            <th class="px-4 py-3"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($bills as $bill)
-                            <tr>
-                                <td class="px-4 py-3 font-medium">{{ $bill->title }}</td>
-                                <td class="px-4 py-3">{{ $bill->vendor ?: '—' }}</td>
-                                <td class="px-4 py-3">{{ $bill->due_date->format('d M Y') }}</td>
-                                <td class="px-4 py-3">£{{ number_format((float) $bill->gross_amount, 2) }}</td>
-                                <td class="px-4 py-3">{{ $bill->status->label() }}</td>
-                                <td class="px-4 py-3">
-                                    @if ($bill->status->value === 'draft')
-                                        <form method="POST" action="{{ route('business-admin.finance.bills.approve', $bill) }}" class="inline">@csrf<button class="text-primary-700 font-semibold">Approve</button></form>
-                                    @elseif (in_array($bill->status->value, ['approved', 'pending', 'overdue'], true))
-                                        <form method="POST" action="{{ route('business-admin.finance.bills.paid', $bill) }}" class="inline">@csrf<button class="text-primary-700 font-semibold">Mark paid</button></form>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="mt-4">{{ $bills->links() }}</div>
+        <x-admin.table-shell sticky>
+            <thead>
+                <tr>
+                    <th class="px-4 py-3">Title</th>
+                    <th class="hidden px-4 py-3 sm:table-cell">Vendor</th>
+                    <th class="hidden px-4 py-3 md:table-cell">Due</th>
+                    <th class="px-4 py-3">Gross</th>
+                    <th class="hidden px-4 py-3 sm:table-cell">Status</th>
+                    <th class="px-4 py-3"><span class="sr-only">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($bills as $bill)
+                    <tr>
+                        <td class="admin-table-stack-title px-4 py-3.5 font-medium" data-label="Title">{{ $bill->title }}</td>
+                        <td class="hidden px-4 py-3.5 sm:table-cell" data-label="Vendor">{{ $bill->vendor ?: '—' }}</td>
+                        <td class="hidden px-4 py-3.5 md:table-cell" data-label="Due">{{ $bill->due_date->format('d M Y') }}</td>
+                        <td class="px-4 py-3.5" data-label="Gross">£{{ number_format((float) $bill->gross_amount, 2) }}</td>
+                        <td class="hidden px-4 py-3.5 sm:table-cell" data-label="Status">{{ $bill->status->label() }}</td>
+                        <td class="admin-table-stack-actions px-4 py-3.5" data-label="">
+                            <x-admin.table-actions>
+                                @if ($bill->status->value === 'draft')
+                                    <form method="POST" action="{{ route('business-admin.finance.bills.approve', $bill) }}">
+                                        @csrf
+                                        <x-admin.table-action type="submit">Approve</x-admin.table-action>
+                                    </form>
+                                @elseif (in_array($bill->status->value, ['approved', 'pending', 'overdue'], true))
+                                    <form method="POST" action="{{ route('business-admin.finance.bills.paid', $bill) }}">
+                                        @csrf
+                                        <x-admin.table-action type="submit" variant="success">Mark paid</x-admin.table-action>
+                                    </form>
+                                @endif
+                            </x-admin.table-actions>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </x-admin.table-shell>
+        <div class="admin-pagination mt-4">{{ $bills->links() }}</div>
     @endif
 
     <x-admin.modal name="add-bill" title="Add bill">

@@ -22,7 +22,7 @@
             </div>
         @endunless
 
-        <div class="admin-branch-tabs" role="tablist" aria-label="Branch filter">
+        <div @class(['admin-branch-tabs', 'admin-branch-tabs--scroll' => $compact]) role="tablist" aria-label="Branch filter">
             @foreach (collect([['id' => null, 'name' => 'All branches']])->merge($branches->map(fn ($branch) => ['id' => $branch->id, 'name' => $branch->name])) as $option)
                 @php
                     $isActive = $option['id'] === null

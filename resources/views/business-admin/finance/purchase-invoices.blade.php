@@ -7,33 +7,29 @@
     @if ($invoices->isEmpty())
         <x-admin.empty-state title="No purchase invoices" description="Record supplier invoices awaiting payment." />
     @else
-        <div class="admin-card overflow-hidden">
-            <div class="admin-table-wrap">
-                <table class="admin-table min-w-full text-left text-sm">
-                    <thead>
-                        <tr>
-                            <th class="px-4 py-3">Invoice</th>
-                            <th class="px-4 py-3">Supplier</th>
-                            <th class="px-4 py-3">Date</th>
-                            <th class="px-4 py-3">Net / VAT / Gross</th>
-                            <th class="px-4 py-3">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($invoices as $invoice)
-                            <tr>
-                                <td class="px-4 py-3 font-medium">{{ $invoice->invoice_no }}</td>
-                                <td class="px-4 py-3">{{ $invoice->supplier?->name ?? '—' }}</td>
-                                <td class="px-4 py-3">{{ $invoice->invoice_date->format('d M Y') }}</td>
-                                <td class="px-4 py-3">£{{ number_format((float) $invoice->net_amount, 2) }} / £{{ number_format((float) $invoice->vat_amount, 2) }} / £{{ number_format((float) $invoice->gross_amount, 2) }}</td>
-                                <td class="px-4 py-3 capitalize">{{ $invoice->status?->value ?? $invoice->status }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="mt-4">{{ $invoices->links() }}</div>
+        <x-admin.table-shell sticky>
+            <thead>
+                <tr>
+                    <th class="px-4 py-3">Invoice</th>
+                    <th class="hidden px-4 py-3 sm:table-cell">Supplier</th>
+                    <th class="hidden px-4 py-3 md:table-cell">Date</th>
+                    <th class="px-4 py-3">Net / VAT / Gross</th>
+                    <th class="hidden px-4 py-3 sm:table-cell">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($invoices as $invoice)
+                    <tr>
+                        <td class="admin-table-stack-title px-4 py-3.5 font-medium" data-label="Invoice">{{ $invoice->invoice_no }}</td>
+                        <td class="hidden px-4 py-3.5 sm:table-cell" data-label="Supplier">{{ $invoice->supplier?->name ?? '—' }}</td>
+                        <td class="hidden px-4 py-3.5 md:table-cell" data-label="Date">{{ $invoice->invoice_date->format('d M Y') }}</td>
+                        <td class="px-4 py-3.5" data-label="Amounts">£{{ number_format((float) $invoice->net_amount, 2) }} / £{{ number_format((float) $invoice->vat_amount, 2) }} / £{{ number_format((float) $invoice->gross_amount, 2) }}</td>
+                        <td class="hidden px-4 py-3.5 capitalize sm:table-cell" data-label="Status">{{ $invoice->status?->value ?? $invoice->status }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </x-admin.table-shell>
+        <div class="admin-pagination mt-4">{{ $invoices->links() }}</div>
     @endif
 
     <x-admin.modal name="add-purchase-invoice" title="Add purchase invoice">

@@ -15,9 +15,10 @@
 @endphp
 
 <!DOCTYPE html>
-<html lang="en" class="admin-panel" x-data="adminShell" :class="{ 'dark': dark }">
+<html lang="en" class="admin-panel" x-data="adminShell">
 <head>
     <meta charset="utf-8">
+    <x-theme-init />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#16A34A">

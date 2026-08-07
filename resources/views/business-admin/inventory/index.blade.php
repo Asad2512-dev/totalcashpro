@@ -77,7 +77,7 @@
         @if ($items->isEmpty())
             <x-admin.empty-state title="No products" description="Add products for a branch to start counting stock." />
         @else
-            <div class="admin-mobile-cards">
+            <div class="admin-mobile-cards md:hidden">
                 @foreach ($items as $item)
                     <article class="admin-mobile-card">
                         <div class="flex items-start justify-between gap-3">
@@ -103,7 +103,7 @@
             </div>
 
             <div class="admin-card hidden overflow-hidden md:block">
-                <div class="admin-table-wrap -mx-4 sm:mx-0">
+                <div class="admin-table-wrap">
                 <table class="admin-table min-w-full text-sm">
                     <thead class="bg-gray-50 text-xs uppercase text-gray-500 dark:bg-gray-800">
                         <tr>

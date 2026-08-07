@@ -7,33 +7,29 @@
     @if ($payments->isEmpty())
         <x-admin.empty-state title="No supplier payments" description="Record bank transfers and card payments to suppliers." />
     @else
-        <div class="admin-card overflow-hidden">
-            <div class="admin-table-wrap">
-                <table class="admin-table min-w-full text-left text-sm">
-                    <thead>
-                        <tr>
-                            <th class="px-4 py-3">Invoice</th>
-                            <th class="px-4 py-3">Supplier</th>
-                            <th class="px-4 py-3">Date</th>
-                            <th class="px-4 py-3">Amount</th>
-                            <th class="px-4 py-3">Reference</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($payments as $payment)
-                            <tr>
-                                <td class="px-4 py-3">{{ $payment->supplierInvoice?->invoice_no ?? '—' }}</td>
-                                <td class="px-4 py-3">{{ $payment->supplierInvoice?->supplier?->name ?? '—' }}</td>
-                                <td class="px-4 py-3">{{ $payment->payment_date->format('d M Y') }}</td>
-                                <td class="px-4 py-3">£{{ number_format((float) $payment->gross_amount, 2) }}</td>
-                                <td class="px-4 py-3">{{ $payment->reference ?: '—' }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="mt-4">{{ $payments->links() }}</div>
+        <x-admin.table-shell sticky>
+            <thead>
+                <tr>
+                    <th class="px-4 py-3">Invoice</th>
+                    <th class="hidden px-4 py-3 sm:table-cell">Supplier</th>
+                    <th class="hidden px-4 py-3 md:table-cell">Date</th>
+                    <th class="px-4 py-3">Amount</th>
+                    <th class="hidden px-4 py-3 lg:table-cell">Reference</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($payments as $payment)
+                    <tr>
+                        <td class="admin-table-stack-title px-4 py-3.5" data-label="Invoice">{{ $payment->supplierInvoice?->invoice_no ?? '—' }}</td>
+                        <td class="hidden px-4 py-3.5 sm:table-cell" data-label="Supplier">{{ $payment->supplierInvoice?->supplier?->name ?? '—' }}</td>
+                        <td class="hidden px-4 py-3.5 md:table-cell" data-label="Date">{{ $payment->payment_date->format('d M Y') }}</td>
+                        <td class="px-4 py-3.5" data-label="Amount">£{{ number_format((float) $payment->gross_amount, 2) }}</td>
+                        <td class="hidden px-4 py-3.5 lg:table-cell" data-label="Reference">{{ $payment->reference ?: '—' }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </x-admin.table-shell>
+        <div class="admin-pagination mt-4">{{ $payments->links() }}</div>
     @endif
 
     <x-admin.modal name="add-payment" title="Record supplier payment">

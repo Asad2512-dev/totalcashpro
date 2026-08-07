@@ -18,9 +18,10 @@
 @endphp
 
 <!DOCTYPE html>
-<html lang="en" class="admin-panel" x-data="adminShell" :class="{ 'dark': dark }">
+<html lang="en" class="admin-panel" x-data="adminShell">
 <head>
     <meta charset="utf-8">
+    <x-theme-init />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#16A34A">
@@ -53,13 +54,28 @@
                 :unread-notifications="$unreadNotifications"
             >
                 <x-slot:actions>
-                    <x-admin.branch-filter compact class="hidden min-w-0 sm:flex" />
+                    <x-admin.branch-selector
+                        :branches="$branches"
+                        :selected-branch-id="$selectedBranchId"
+                        :action="route('business-admin.branch.select')"
+                        compact
+                        silent
+                        class="hidden min-w-0 max-w-[11rem] sm:flex md:hidden"
+                    />
+                    <x-admin.branch-filter compact class="hidden min-w-0 md:flex" />
                 </x-slot:actions>
             </x-admin.topbar>
 
             @if ($branches->count() > 1)
-                <div class="border-b border-gray-200 bg-white px-3 py-2.5 dark:border-gray-800 dark:bg-gray-900 sm:hidden">
-                    <x-admin.branch-filter compact />
+                <div class="border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900 sm:hidden">
+                    <x-admin.branch-selector
+                        :branches="$branches"
+                        :selected-branch-id="$selectedBranchId"
+                        :action="route('business-admin.branch.select')"
+                        compact
+                        silent
+                        class="w-full"
+                    />
                 </div>
             @endif
 

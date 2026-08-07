@@ -6,6 +6,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
+    <x-theme-init />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#16A34A">
 
@@ -72,7 +73,7 @@
     <style>[x-cloak]{display:none!important}</style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
     <a
         href="#main-content"
         class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-navy-900 focus:px-4 focus:py-2 focus:text-white"

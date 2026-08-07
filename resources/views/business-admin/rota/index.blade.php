@@ -67,6 +67,40 @@
                     <div class="{{ $block['header'] }} px-4 py-3 text-white">
                         <h4 class="font-semibold">{{ $block['title'] }}</h4>
                     </div>
+                    <div class="admin-mobile-cards space-y-3 p-4 xl:hidden">
+                        @forelse ($block['grid'] as $row)
+                            <article class="admin-mobile-card">
+                                <h3 class="font-semibold text-gray-900 dark:text-white">{{ $row['name'] }}</h3>
+                                <p class="mt-1 text-xs text-gray-500">{{ $row['total_days'] }} days · {{ $row['total_hours'] }} hours</p>
+                                <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                                    @foreach ($row['cells'] as $idx => $cell)
+                                        @php $day = $days[$idx]; @endphp
+                                        <button
+                                            type="button"
+                                            class="rota-mobile-shift admin-touch-target min-h-[56px] text-left"
+                                            @if ($cell)
+                                                style="border-color: {{ $cell['color'] }}; background: {{ $cell['color'] }}15;"
+                                            @endif
+                                            @if ($sections->isNotEmpty())
+                                                @click="openShift({{ $row['user_id'] }}, @js($row['name']), @js($day['date']), @js($block['type']), @js($cell))"
+                                            @endif
+                                        >
+                                            <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">{{ $day['label'] }}</span>
+                                            @if ($cell)
+                                                <span class="mt-1 block text-xs font-semibold">{{ $cell['section'] ?? 'Section' }}</span>
+                                                <span class="text-[10px] text-gray-500">{{ $cell['start_time'] }}-{{ $cell['end_time'] }}</span>
+                                            @else
+                                                <span class="mt-1 block text-sm font-semibold text-gray-400">+ Add</span>
+                                            @endif
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </article>
+                        @empty
+                            <p class="text-sm text-gray-500">No staff yet — add staff, then assign shifts here.</p>
+                        @endforelse
+                    </div>
+                    <div class="hidden xl:block">
                     <x-admin.matrix-wrap>
                         <table>
                             <thead>
@@ -116,6 +150,7 @@
                             </tbody>
                         </table>
                     </x-admin.matrix-wrap>
+                    </div>
                 </x-admin.card>
             @endforeach
         @endif
@@ -128,28 +163,24 @@
             @if ($sections->isEmpty())
                 <x-admin.empty-state title="No sections" description="Add sections like Burgers, Fries, Front, Grill." />
             @else
-                <div class="admin-card overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-left text-sm">
-                            <thead class="border-b border-gray-200 bg-gray-50/90 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-400">
-                                <tr>
-                                    <th class="px-4 py-3">Color</th>
-                                    <th class="px-4 py-3">Section Name</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                                @foreach ($sections as $section)
-                                    <tr class="transition hover:bg-primary-50/40 dark:hover:bg-gray-800/70">
-                                        <td class="px-4 py-3.5">
-                                            <span class="inline-block h-6 w-6 rounded" style="background: {{ $section['color'] }}"></span>
-                                        </td>
-                                        <td class="px-4 py-3.5 text-gray-700 dark:text-gray-200">{{ $section['name'] }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <x-admin.table-shell>
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3">Color</th>
+                            <th class="px-4 py-3">Section name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($sections as $section)
+                            <tr>
+                                <td class="px-4 py-3.5" data-label="Color">
+                                    <span class="inline-block h-6 w-6 rounded" style="background: {{ $section['color'] }}"></span>
+                                </td>
+                                <td class="admin-table-stack-title px-4 py-3.5 text-gray-700 dark:text-gray-200" data-label="Section">{{ $section['name'] }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </x-admin.table-shell>
             @endif
         @endif
 

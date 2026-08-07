@@ -1,19 +1,19 @@
-<div class="flex flex-wrap items-center justify-end gap-2">
+<x-admin.table-actions class="justify-end">
     @if (! $notification->isRead())
         <form method="POST" action="{{ route('super-admin.notifications.read', $notification) }}">
             @csrf
-            <button type="submit" class="font-semibold text-primary-700 hover:text-primary-800">Mark read</button>
+            <x-admin.table-action type="submit" variant="success">Mark read</x-admin.table-action>
         </form>
     @endif
     @if ($notification->archived_at === null)
         <form method="POST" action="{{ route('super-admin.notifications.archive', $notification) }}">
             @csrf
-            <button type="submit" class="font-semibold text-primary-700 hover:text-primary-800">Archive</button>
+            <x-admin.table-action type="submit" variant="neutral">Archive</x-admin.table-action>
         </form>
     @endif
     <form method="POST" action="{{ route('super-admin.notifications.destroy', $notification) }}" onsubmit="return confirm('Delete this notification?')">
         @csrf
         @method('DELETE')
-        <button type="submit" class="font-semibold text-red-600 hover:text-red-700">Delete</button>
+        <x-admin.table-action type="submit" variant="danger">Delete</x-admin.table-action>
     </form>
-</div>
+</x-admin.table-actions>

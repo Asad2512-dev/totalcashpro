@@ -3,11 +3,11 @@
 
     <x-finance.nav active="dashboard" />
 
-    <div class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <x-admin.stat-card label="Income (period)" :value="'£'.number_format((float) ($snapshot['income'] ?? 0), 2)" change="Cash up + other income" tone="success" />
-        <x-admin.stat-card label="Expenses (period)" :value="'£'.number_format((float) ($snapshot['expenses'] ?? 0), 2)" change="Approved & paid" tone="warning" />
-        <x-admin.stat-card label="Bills due" :value="'£'.number_format((float) ($snapshot['bills_due'] ?? 0), 2)" :change="($snapshot['counts']['approved_bills'] ?? 0).' open'" tone="danger" />
-        <x-admin.stat-card label="Payroll due" :value="'£'.number_format((float) ($snapshot['payroll_due'] ?? 0), 2)" :change="($snapshot['counts']['pending_payroll'] ?? 0).' staff'" tone="info" />
+    <div class="admin-stat-grid mb-6">
+        <x-admin.stat label="Income (period)" :value="'£'.number_format((float) ($snapshot['income'] ?? 0), 2)" change="Cash up + other income" tone="success" />
+        <x-admin.stat label="Expenses (period)" :value="'£'.number_format((float) ($snapshot['expenses'] ?? 0), 2)" change="Approved & paid" tone="warning" />
+        <x-admin.stat label="Bills due" :value="'£'.number_format((float) ($snapshot['bills_due'] ?? 0), 2)" :change="($snapshot['counts']['approved_bills'] ?? 0).' open'" tone="danger" />
+        <x-admin.stat label="Payroll due" :value="'£'.number_format((float) ($snapshot['payroll_due'] ?? 0), 2)" :change="($snapshot['counts']['pending_payroll'] ?? 0).' staff'" tone="info" />
     </div>
 
     <div class="grid gap-6 lg:grid-cols-2">

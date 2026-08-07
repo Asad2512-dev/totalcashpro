@@ -56,8 +56,8 @@
     </template>
 
     <div class="flex items-center justify-between border-t border-gray-100 px-4 py-3 dark:border-gray-800" x-show="filteredRows.length > pageSize">
-        <button type="button" class="text-sm font-semibold text-primary-700 disabled:opacity-40" @click="prevPage()" :disabled="page === 1">Previous</button>
+        <x-admin.table-action type="button" variant="neutral" @click="prevPage()" x-bind:disabled="page === 1" x-bind:class="{ 'opacity-40 pointer-events-none': page === 1 }">Previous</x-admin.table-action>
         <span class="text-sm text-gray-500" x-text="`Page ${page} of ${totalPages}`"></span>
-        <button type="button" class="text-sm font-semibold text-primary-700 disabled:opacity-40" @click="nextPage()" :disabled="page >= totalPages">Next</button>
+        <x-admin.table-action type="button" variant="neutral" @click="nextPage()" x-bind:disabled="page >= totalPages" x-bind:class="{ 'opacity-40 pointer-events-none': page >= totalPages }">Next</x-admin.table-action>
     </div>
 </div>

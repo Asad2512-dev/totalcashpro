@@ -20,7 +20,7 @@
     <x-admin.toolbar :description="$toolbarDescription">
             <div class="flex flex-wrap items-center gap-2 print:hidden">
                 @if (! empty($report['generated_at']))
-                    <span class="hidden text-xs text-gray-400 lg:inline" title="Reports refresh automatically when your data changes">
+                    <span class="inline-flex min-w-[5.5rem] text-xs text-gray-400" title="Reports refresh automatically when your data changes">
                         Live · {{ \Illuminate\Support\Carbon::parse($report['generated_at'])->format('H:i') }}
                     </span>
                 @endif
@@ -31,11 +31,11 @@
         </x-admin.toolbar>
     @endif
 
-    <form method="GET" action="{{ route($actionRoute) }}" class="report-filters admin-card mb-6 space-y-4 p-4 print:hidden">
-        <div class="grid gap-4 xl:grid-cols-5">
+    <form method="GET" action="{{ route($actionRoute) }}" class="report-filters admin-card mb-6 p-4 print:hidden">
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             <label class="block space-y-1.5">
                 <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Date range</span>
-                <select name="date_preset" class="admin-input w-full" onchange="this.form.submit()">
+                <select name="date_preset" class="admin-input w-full min-h-[44px]">
                     @foreach ($report['date_presets'] as $preset)
                         <option value="{{ $preset->value }}" @selected($filter->datePreset === $preset)>{{ $preset->label() }}</option>
                     @endforeach
@@ -44,7 +44,7 @@
 
             <label class="block space-y-1.5">
                 <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Branch</span>
-                <select name="branch_id" class="admin-input w-full">
+                <select name="branch_id" class="admin-input w-full min-h-[44px]">
                     <option value="all" @selected($filter->branchId === null)>All branches</option>
                     @foreach ($report['branches'] as $branch)
                         <option value="{{ $branch->id }}" @selected($filter->branchId === $branch->id)>{{ $branch->name }}</option>
@@ -54,7 +54,7 @@
 
             <label class="block space-y-1.5">
                 <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Report type</span>
-                <select name="report_type" class="admin-input w-full">
+                <select name="report_type" class="admin-input w-full min-h-[44px]">
                     @foreach ($report['report_types'] as $type)
                         <option value="{{ $type->value }}" @selected($filter->reportType === $type)>{{ $type->label() }}</option>
                     @endforeach
@@ -63,7 +63,7 @@
 
             <label class="block space-y-1.5">
                 <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Employee</span>
-                <select name="employee_id" class="admin-input w-full">
+                <select name="employee_id" class="admin-input w-full min-h-[44px]">
                     <option value="all">All employees</option>
                     @foreach ($report['employees'] as $employee)
                         <option value="{{ $employee->id }}" @selected($filter->employeeId === $employee->id)>{{ $employee->name }}</option>
@@ -71,54 +71,56 @@
                 </select>
             </label>
 
-            <label class="block space-y-1.5">
+            <label class="block space-y-1.5 sm:col-span-2 lg:col-span-1">
                 <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Status</span>
-                <select name="status" class="admin-input w-full">
+                <select name="status" class="admin-input w-full min-h-[44px]">
                     @foreach ($report['statuses'] as $status)
                         <option value="{{ $status }}" @selected(($filter->status ?? 'all') === $status)>{{ ucfirst($status) }}</option>
                     @endforeach
                 </select>
             </label>
-        </div>
 
-        <div class="grid gap-4 lg:grid-cols-[1fr_1fr_1fr_auto]">
-            <x-admin.input type="date" name="from" label="From" :value="$filter->from" class="w-full" />
-            <x-admin.input type="date" name="to" label="To" :value="$filter->to" class="w-full" />
+            <x-admin.input type="date" name="from" label="From" :value="$filter->from" class="w-full min-h-[44px]" />
+            <x-admin.input type="date" name="to" label="To" :value="$filter->to" class="w-full min-h-[44px]" />
 
-            <label class="block space-y-1.5">
+            <label class="block space-y-1.5 sm:col-span-2 lg:col-span-1 xl:col-span-2">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Compare</span>
-                <select name="compare" class="admin-input w-full">
+                <select name="compare" class="admin-input w-full min-h-[44px]">
                     @foreach ($report['compare_modes'] as $mode)
                         <option value="{{ $mode->value }}" @selected($filter->compareMode === $mode)>{{ $mode->label() }}</option>
                     @endforeach
                 </select>
             </label>
 
-            <div class="flex items-end">
-                <x-admin.button type="submit" class="w-full lg:w-auto">Apply filters</x-admin.button>
+            <div class="flex items-end sm:col-span-2 lg:col-span-1 xl:col-span-2 xl:justify-end">
+                <x-admin.button type="submit" class="w-full sm:w-auto min-h-[44px]">Apply filters</x-admin.button>
             </div>
         </div>
 
-        @if ($filter->compareMode->value === 'branch')
-            <label class="block max-w-sm space-y-1.5">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Compare branch</span>
-                <select name="compare_branch_id" class="admin-input w-full">
-                    @foreach ($report['branches'] as $branch)
-                        <option value="{{ $branch->id }}" @selected($filter->compareBranchId === $branch->id)>{{ $branch->name }}</option>
-                    @endforeach
-                </select>
-            </label>
-        @endif
+        @if ($filter->compareMode->value === 'branch' || $filter->compareMode->value === 'employee')
+            <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                @if ($filter->compareMode->value === 'branch')
+                    <label class="block space-y-1.5 sm:col-span-2 lg:col-span-1 xl:col-span-2">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Compare branch</span>
+                        <select name="compare_branch_id" class="admin-input w-full min-h-[44px]">
+                            @foreach ($report['branches'] as $branch)
+                                <option value="{{ $branch->id }}" @selected($filter->compareBranchId === $branch->id)>{{ $branch->name }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                @endif
 
-        @if ($filter->compareMode->value === 'employee')
-            <label class="block max-w-sm space-y-1.5">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Compare employee</span>
-                <select name="compare_employee_id" class="admin-input w-full">
-                    @foreach ($report['employees'] as $employee)
-                        <option value="{{ $employee->id }}" @selected($filter->compareEmployeeId === $employee->id)>{{ $employee->name }}</option>
-                    @endforeach
-                </select>
-            </label>
+                @if ($filter->compareMode->value === 'employee')
+                    <label class="block space-y-1.5 sm:col-span-2 lg:col-span-1 xl:col-span-2">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Compare employee</span>
+                        <select name="compare_employee_id" class="admin-input w-full min-h-[44px]">
+                            @foreach ($report['employees'] as $employee)
+                                <option value="{{ $employee->id }}" @selected($filter->compareEmployeeId === $employee->id)>{{ $employee->name }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                @endif
+            </div>
         @endif
     </form>
 

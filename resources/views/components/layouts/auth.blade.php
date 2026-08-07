@@ -7,6 +7,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
+    <x-theme-init />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#16A34A">
     <title>{{ $seo['title'] ?? ($title.' — '.brand_name()) }}</title>
@@ -17,7 +18,7 @@
 </head>
 <body
     x-data
-    class="min-h-screen bg-gray-50 text-gray-900 antialiased"
+    class="min-h-screen bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100"
     @submit.window="if ($event.target.matches('form:not([data-no-auth-spinner])')) $store.authUi.start()"
 >
     {{ $slot }}

@@ -45,7 +45,7 @@
                                 <span class="mt-2 inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">Disabled</span>
                             @endif
                         </div>
-                        <a href="{{ route('business-admin.kiosks.activity', $kiosk) }}" class="text-sm font-semibold text-primary-600 hover:underline">Activity</a>
+                        <x-admin.table-action :href="route('business-admin.kiosks.activity', $kiosk)" variant="neutral">Activity</x-admin.table-action>
                     </div>
 
                     <div class="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-900/50" x-data="copyText(@js($kiosk->publicUrl()))">
