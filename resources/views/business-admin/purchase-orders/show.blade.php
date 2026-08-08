@@ -1,5 +1,6 @@
 <x-layouts.business-admin title="PO {{ $order->po_number }}" active="purchase-orders">
     <x-admin.toolbar :title="'PO '.$order->po_number" :description="$order->supplier?->name ?? 'Purchase order'">
+        <a href="{{ route('business-admin.purchase-orders.print', $order) }}" target="_blank" class="text-sm font-semibold text-primary-700 hover:underline">Print</a>
         <a href="{{ route('business-admin.purchase-orders') }}" class="text-sm font-semibold text-primary-700">← Back</a>
     </x-admin.toolbar>
 
@@ -68,6 +69,43 @@
         <x-admin.card>
             <h3 class="font-display text-lg font-bold">Linked finance</h3>
             <p class="mt-2 text-sm">Invoice {{ $order->supplierInvoice->invoice_no }} · £{{ number_format((float) $order->supplierInvoice->gross_amount, 2) }} · {{ $order->supplierInvoice->status->label() }}</p>
+        </x-admin.card>
+    @endif
+
+    @if ($delivery)
+        <x-admin.card class="mb-6">
+            <h3 class="font-display text-lg font-bold">Delivery</h3>
+            <p class="mt-2 text-sm">
+                Rider: {{ $delivery->rider?->user?->name ?? '—' }} ·
+                Status: {{ $delivery->status->label() }}
+            </p>
+            @if ($delivery->expected_pickup_at)
+                <p class="text-xs text-gray-500">Expected pickup: {{ $delivery->expected_pickup_at->format('d M Y H:i') }}</p>
+            @endif
+            @if ($delivery->expected_delivery_at)
+                <p class="text-xs text-gray-500">Expected delivery: {{ $delivery->expected_delivery_at->format('d M Y H:i') }}</p>
+            @endif
+        </x-admin.card>
+    @elseif (in_array($order->status, [\App\Enums\PurchaseOrderStatus::Approved, \App\Enums\PurchaseOrderStatus::Ordered, \App\Enums\PurchaseOrderStatus::Sent], true) && $riders->isNotEmpty())
+        <x-admin.card class="mb-6">
+            <h3 class="font-display text-lg font-bold">Assign rider</h3>
+            <form method="POST" action="{{ route('business-admin.purchase-orders.assign-rider', $order) }}" class="mt-4 grid gap-4 sm:grid-cols-2">
+                @csrf
+                <div>
+                    <label class="text-xs font-semibold uppercase text-gray-500">Rider</label>
+                    <select name="rider_id" required class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900">
+                        @foreach ($riders as $rider)
+                            <option value="{{ $rider->id }}">{{ $rider->user?->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <x-admin.input type="datetime-local" name="expected_pickup_at" label="Expected pickup" />
+                <x-admin.input type="datetime-local" name="expected_delivery_at" label="Expected delivery" />
+                <x-admin.textarea name="notes" label="Notes" rows="2" class="sm:col-span-2" />
+                <div class="sm:col-span-2">
+                    <x-admin.button type="submit" size="sm">Assign rider</x-admin.button>
+                </div>
+            </form>
         </x-admin.card>
     @endif
 

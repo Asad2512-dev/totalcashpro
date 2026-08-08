@@ -11,7 +11,13 @@ use Illuminate\Support\Carbon;
 
 interface CashUpRepositoryInterface extends BaseRepositoryInterface
 {
-    public function findByDateShift(int $organizationId, int $branchId, Carbon|string $date, CashUpShift|string $shift): ?CashUp;
+    public function findByDateShift(
+        int $organizationId,
+        int $branchId,
+        Carbon|string $date,
+        CashUpShift|string $shift,
+        ?int $cashDrawerId = null,
+    ): ?CashUp;
 
     /**
      * @param  array<string, mixed>  $attributes

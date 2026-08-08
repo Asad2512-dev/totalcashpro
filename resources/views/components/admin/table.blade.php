@@ -5,6 +5,7 @@
     'rawHtml' => false,
     'stack' => true,
     'sticky' => false,
+    'bare' => false,
 ])
 
 @if ($slot->isNotEmpty() && count($columns) === 0 && count($rows) === 0)
@@ -12,13 +13,13 @@
         {{ $slot }}
     </x-admin.table-shell>
 @else
-<div class="admin-card overflow-hidden">
+<div {{ $attributes->class(['w-full overflow-hidden', 'admin-card' => ! $bare]) }}>
     @if (count($rows) === 0)
         <x-admin.empty-state :title="$empty" description="Records will appear here once data is available." />
     @else
-        <div @class(['admin-table-wrap', 'admin-table-wrap--stack' => $stack])>
+        <div @class(['admin-table-wrap w-full', 'admin-table-wrap--stack' => $stack])>
             <table @class([
-                'admin-table min-w-full text-left text-sm',
+                'admin-table w-full min-w-full text-left text-sm',
                 'admin-table--stack' => $stack,
                 'admin-table-head-sticky' => $sticky,
             ])>
@@ -43,7 +44,7 @@
                                     @endif
                                     @class([
                                         'px-4 py-3.5 text-gray-700 dark:text-gray-200',
-                                        'whitespace-nowrap' => $index > 0,
+                                        'whitespace-nowrap' => ! $stack && $index > 0,
                                         'admin-table-stack-title' => $stack && $index === 0,
                                         'hidden md:table-cell' => ! $stack && $index > 0 && $index >= max(count($columns) - 2, 2),
                                         'hidden sm:table-cell' => ! $stack && $index > 0 && $index === 1 && count($columns) > 4,

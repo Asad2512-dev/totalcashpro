@@ -6,6 +6,8 @@
 @php
     $ui = app(\App\Services\BusinessAdmin\BusinessAdminUiService::class);
     $nav = $ui->navigation();
+    $mobileNav = $ui->mobileNavigation();
+    $mobileMore = $ui->mobileMoreNavigation();
     $commandLinks = $ui->commandLinks();
     $user = auth()->user();
     $branches = $ui->branchesFor($user);
@@ -32,7 +34,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="admin-shell admin-shell--viewport bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+<body class="admin-shell admin-shell--viewport admin-shell--mobile-nav bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
     <x-admin.impersonation-banner
         :impersonator="$impersonation['impersonator']"
         :organization-name="$impersonation['organization_name']"
@@ -79,7 +81,7 @@
                 </div>
             @endif
 
-            <main class="admin-shell-main admin-fade-in flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <main class="admin-shell-main admin-page admin-fade-in flex-1 px-4 py-3 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
                 @if ($user && ! $user->hasVerifiedEmail())
                     <div class="mb-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/40 dark:bg-amber-900/20 dark:text-amber-100">
                         Please verify your email address.
@@ -135,6 +137,8 @@
     </div>
 
     <x-admin.mobile-backdrop />
+
+    <x-admin.mobile-nav :items="$mobileNav" :more-groups="$mobileMore" :active="$active" />
 
     <x-admin.logout-confirm :user-name="$user?->name" />
 </body>

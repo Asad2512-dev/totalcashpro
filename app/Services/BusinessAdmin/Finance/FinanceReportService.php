@@ -47,7 +47,7 @@ final class FinanceReportService implements ServiceInterface
             ->whereDate('cashup_date', '>=', $fromStr)
             ->whereDate('cashup_date', '<=', $toStr)
             ->get()
-            ->sum(fn (CashUp $c) => $c->netTotal());
+            ->sum(fn (CashUp $c) => $c->revenueTotal());
 
         $expenseOut = $this->expenses->sumForPeriod($orgId, $branchId, $fromStr, $toStr, FinanceStatus::Paid->value);
         $supplierOut = $this->supplierPayments->sumForPeriod($orgId, $branchId, $fromStr, $toStr);
@@ -92,7 +92,7 @@ final class FinanceReportService implements ServiceInterface
             ->whereDate('cashup_date', '>=', $fromStr)
             ->whereDate('cashup_date', '<=', $toStr)
             ->get()
-            ->sum(fn (CashUp $c) => $c->netTotal());
+            ->sum(fn (CashUp $c) => $c->revenueTotal());
 
         $cogs = $this->expenses->sumForPeriod($orgId, $branchId, $fromStr, $toStr);
         $operating = (float) Bill::query()

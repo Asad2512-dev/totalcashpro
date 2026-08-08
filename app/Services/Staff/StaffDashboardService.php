@@ -7,14 +7,17 @@ namespace App\Services\Staff;
 use App\Contracts\ServiceInterface;
 use App\Models\AppNotification;
 use App\Models\CashUp;
-use App\Models\RotaShift;
+use App\Services\Staff\StaffRotaService;
 use App\Models\User;
 use App\Services\BusinessAdmin\AttendanceService;
 use Illuminate\Support\Collection;
 
 final class StaffDashboardService implements ServiceInterface
 {
-    public function __construct(private readonly AttendanceService $attendance) {}
+    public function __construct(
+        private readonly AttendanceService $attendance,
+        private readonly StaffRotaService $rota,
+    ) {}
 
     /**
      * @return array{
@@ -29,12 +32,8 @@ final class StaffDashboardService implements ServiceInterface
     {
         $staff->loadMissing(['branch', 'organization']);
 
-        $todayShift = RotaShift::query()
-            ->with('rotaSection')
-            ->where('user_id', $staff->id)
-            ->whereDate('shift_date', now()->toDateString())
-            ->orderBy('start_time')
-            ->first();
+        $rotaData = $this->rota->weekView($staff, now()->startOfWeek()->toDateString());
+        $todayShift = $rotaData['todayShift'];
 
         $recentCashUps = CashUp::query()
             ->where('organization_id', $staff->organization_id)

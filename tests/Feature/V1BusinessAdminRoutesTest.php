@@ -40,7 +40,7 @@ final class V1BusinessAdminRoutesTest extends TestCase
             ['business-admin.staff'],
             ['business-admin.hr'],
             ['business-admin.crm'],
-            ['business-admin.kiosks.index'],
+            ['business-admin.kiosk.settings'],
             ['business-admin.attendance'],
             ['business-admin.inventory'],
             ['business-admin.inventory-history'],

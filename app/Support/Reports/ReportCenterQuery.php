@@ -44,7 +44,7 @@ final class ReportCenterQuery
     {
         return (float) $this->cashUpQuery()
             ->get()
-            ->sum(fn (CashUp $c) => $c->netTotal());
+            ->sum(fn (CashUp $c) => $c->revenueTotal());
     }
 
     public function cashUpGross(): float
@@ -189,6 +189,20 @@ final class ReportCenterQuery
             ->count();
     }
 
+    public function inventoryValue(): float
+    {
+        return (float) InventoryItem::query()
+            ->where('organization_id', $this->organizationId)
+            ->when($this->branchId, fn ($q) => $q->where('branch_id', $this->branchId))
+            ->get()
+            ->sum(fn (InventoryItem $item) => (float) $item->stock_total_pcs * (float) ($item->cost_price ?? 0));
+    }
+
+    public function grossProfitEstimate(): float
+    {
+        return $this->revenueTotal() - $this->supplierSpend();
+    }
+
     public function inventoryAdjustments(): int
     {
         return InventoryCount::query()
@@ -249,7 +263,7 @@ final class ReportCenterQuery
             ->groupBy('branch_id')
             ->map(fn (Collection $rows, $branchId) => [
                 'branch' => $rows->first()?->branch?->name ?? 'Branch #'.$branchId,
-                'revenue' => round((float) $rows->sum(fn (CashUp $c) => $c->netTotal()), 2),
+                'revenue' => round((float) $rows->sum(fn (CashUp $c) => $c->revenueTotal()), 2),
             ])
             ->sortByDesc('revenue')
             ->values()

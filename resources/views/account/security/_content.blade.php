@@ -95,34 +95,22 @@
         </div>
     </x-admin.card>
 
-    <x-admin.card class="mt-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent login history</h3>
-        <div class="admin-table-wrap mt-4">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>IP</th>
-                        <th>Browser</th>
-                        <th>Event</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($loginHistories as $entry)
-                        <tr>
-                            <td>{{ $entry->logged_in_at->format('d M Y H:i') }}</td>
-                            <td>{{ $entry->ip_address ?? '—' }}</td>
-                            <td>{{ $entry->browser ?? '—' }}</td>
-                            <td>{{ ucfirst($entry->event_type ?? 'login') }}</td>
-                            <td>{{ $entry->success ? 'Success' : 'Failed' }}</td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="4" class="text-gray-500">No login history yet.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
+    <x-admin.card class="mt-6 overflow-hidden" :padding="false">
+        <div class="border-b border-gray-200 px-4 py-4 sm:px-5 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent login history</h3>
         </div>
+        <x-admin.table
+            bare
+            :columns="['Date', 'IP', 'Browser', 'Event', 'Status']"
+            :rows="collect($loginHistories->items())->map(fn ($entry) => [
+                $entry->logged_in_at->format('d M Y H:i'),
+                $entry->ip_address ?? '—',
+                $entry->browser ?? '—',
+                ucfirst($entry->event_type ?? 'login'),
+                $entry->success ? 'Success' : 'Failed',
+            ])->all()"
+            empty="No login history yet."
+        />
     </x-admin.card>
 
     <x-admin.card class="mt-6">

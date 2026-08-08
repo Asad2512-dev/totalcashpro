@@ -16,6 +16,7 @@ enum ReportDatePreset: string
     case LastMonth = 'last_month';
     case ThisQuarter = 'this_quarter';
     case ThisYear = 'this_year';
+    case LastYear = 'last_year';
     case Custom = 'custom';
 
     public function label(): string
@@ -31,6 +32,7 @@ enum ReportDatePreset: string
             self::LastMonth => 'Last month',
             self::ThisQuarter => 'This quarter',
             self::ThisYear => 'This year',
+            self::LastYear => 'Last year',
             self::Custom => 'Custom range',
         };
     }

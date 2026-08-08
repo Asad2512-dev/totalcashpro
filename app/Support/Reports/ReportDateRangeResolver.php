@@ -27,6 +27,7 @@ final class ReportDateRangeResolver
             ReportDatePreset::LastMonth => [$now->copy()->subMonth()->startOfMonth(), $now->copy()->subMonth()->endOfMonth(), 'Last month'],
             ReportDatePreset::ThisQuarter => [$now->copy()->startOfQuarter(), $now->copy()->endOfQuarter(), 'This quarter'],
             ReportDatePreset::ThisYear => [$now->copy()->startOfYear(), $now->copy()->endOfYear(), 'This year'],
+            ReportDatePreset::LastYear => [$now->copy()->subYear()->startOfYear(), $now->copy()->subYear()->endOfYear(), 'Last year'],
             ReportDatePreset::Custom => [
                 Carbon::parse($from ?? $now->copy()->subDays(29)->toDateString())->startOfDay(),
                 Carbon::parse($to ?? $now->toDateString())->endOfDay(),

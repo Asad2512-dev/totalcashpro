@@ -11,7 +11,7 @@ final class GoodsReceivedLine extends Model
 {
     protected $fillable = [
         'goods_received_note_id', 'purchase_order_line_id',
-        'quantity_received', 'quantity_damaged', 'quantity_missing',
+        'quantity_received', 'quantity_damaged', 'quantity_missing', 'quantity_accepted',
     ];
 
     protected function casts(): array
@@ -20,6 +20,7 @@ final class GoodsReceivedLine extends Model
             'quantity_received' => 'decimal:3',
             'quantity_damaged' => 'decimal:3',
             'quantity_missing' => 'decimal:3',
+            'quantity_accepted' => 'decimal:3',
         ];
     }
 

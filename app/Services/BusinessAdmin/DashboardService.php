@@ -103,7 +103,7 @@ final class DashboardService implements ServiceInterface
             'recentActivity' => $recentActivity,
             'quickActions' => [
                 ['label' => 'Daily Cash Up', 'route' => 'business-admin.cash-up', 'icon' => 'cash'],
-                ['label' => 'Smart Kiosks', 'route' => 'business-admin.kiosks.index', 'icon' => 'clock'],
+                ['label' => 'Kiosk', 'route' => 'business-admin.kiosk.settings', 'icon' => 'clock'],
                 ['label' => 'Add Staff', 'route' => 'business-admin.staff.create', 'icon' => 'users'],
                 ['label' => 'Inventory', 'route' => 'business-admin.inventory', 'icon' => 'tag'],
             ],

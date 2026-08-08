@@ -12,7 +12,7 @@
             {{ $header ?? '' }}
         </div>
     @endif
-    <div @class(['p-4 sm:p-5' => $padding])>
+    <div @class(['p-3.5 sm:p-5' => $padding])>
         {{ $slot }}
     </div>
 </section>

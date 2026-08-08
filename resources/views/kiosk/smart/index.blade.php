@@ -9,6 +9,7 @@
             'sessionAdminEmail' => $sessionAdminEmail,
             'startUrl' => route('kiosk.start', $kiosk->token),
             'pinUrl' => route('kiosk.pin', $kiosk->token),
+            'actionUrl' => route('kiosk.action', $kiosk->token),
             'exitUrl' => route('kiosk.exit', $kiosk->token),
             'csrf' => csrf_token(),
             'branchName' => $branch->name,
@@ -180,19 +181,6 @@
                 </div>
             </div>
             <div class="flex shrink-0 items-center gap-3">
-                <button
-                    type="button"
-                    x-show="sessionActive"
-                    x-cloak
-                    class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-red-900 dark:hover:bg-red-950/40 dark:hover:text-red-400 sm:px-4 sm:text-sm"
-                    @click="openExitModal()"
-                >
-                    <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                    </svg>
-                    <span class="hidden sm:inline">Close Kiosk</span>
-                    <span class="sm:hidden">Close</span>
-                </button>
                 <div class="text-right">
                     <p class="font-display text-2xl font-bold tabular-nums tracking-tight text-gray-900 dark:text-white sm:text-3xl" x-text="clockTime"></p>
                     <p class="text-xs font-semibold uppercase tracking-[0.14em] text-gray-500 dark:text-gray-400" x-text="clockDate"></p>
@@ -234,6 +222,40 @@
                     <button type="button" class="kiosk-keypad-btn kiosk-keypad-btn-muted" @click="clearPin()" :disabled="loading">Clear</button>
                     <button type="button" class="kiosk-keypad-btn" @click="press('0')" :disabled="loading">0</button>
                     <button type="button" class="kiosk-keypad-btn kiosk-keypad-btn-danger" @click="backspace()" :disabled="loading" aria-label="Delete">⌫</button>
+                </div>
+            </div>
+
+            {{-- Action chooser --}}
+            <div x-show="screen === 'choose'" x-cloak class="w-full max-w-lg">
+                <div class="text-center">
+                    <p class="text-sm font-semibold uppercase tracking-[0.14em] text-emerald-600 dark:text-emerald-400" x-text="'Hi, ' + (currentUser?.name?.split(' ')[0] || '')"></p>
+                    <h2 class="mt-2 font-display text-2xl font-bold text-gray-900 dark:text-white" x-text="actionMessage"></h2>
+                </div>
+                <div class="mt-8 grid gap-3">
+                    <template x-for="item in actionChoices" :key="item.action + (item.break_type || '')">
+                        <button
+                            type="button"
+                            class="kiosk-action-btn"
+                            :class="item.action === 'clock-out' ? 'kiosk-action-btn-danger' : ''"
+                            @click="performAction(item)"
+                            :disabled="loading"
+                            x-text="item.label"
+                        ></button>
+                    </template>
+                    <button type="button" class="kiosk-action-btn kiosk-action-btn-muted mt-2" @click="resetHome()" :disabled="loading">Cancel</button>
+                </div>
+            </div>
+
+            {{-- Rota restricted --}}
+            <div x-show="screen === 'rota'" x-cloak class="w-full max-w-lg text-center">
+                <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                </div>
+                <h2 class="font-display text-2xl font-bold text-gray-900 dark:text-white">Outside scheduled window</h2>
+                <p class="mt-3 text-base text-gray-600 dark:text-gray-300" x-text="rotaMessage"></p>
+                <div class="mt-8 grid gap-3">
+                    <button type="button" class="kiosk-action-btn" @click="performAction({ action: 'clock-in-override' })" :disabled="loading">Admin Override</button>
+                    <button type="button" class="kiosk-action-btn kiosk-action-btn-muted" @click="resetHome()" :disabled="loading">Cancel</button>
                 </div>
             </div>
 

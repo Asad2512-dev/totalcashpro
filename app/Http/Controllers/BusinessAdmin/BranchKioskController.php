@@ -7,6 +7,7 @@ namespace App\Http\Controllers\BusinessAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\BranchKiosk;
 use App\Services\Kiosk\BranchKioskManagementService;
+use App\Services\Kiosk\KioskConfigurationService;
 use App\Services\Kiosk\SmartKioskService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -17,6 +18,7 @@ final class BranchKioskController extends Controller
     public function __construct(
         private readonly BranchKioskManagementService $kiosks,
         private readonly SmartKioskService $smartKiosk,
+        private readonly KioskConfigurationService $kioskConfig,
     ) {}
 
     public function index(Request $request): View
@@ -24,11 +26,14 @@ final class BranchKioskController extends Controller
         return view('business-admin.kiosks.index', [
             'kiosks' => $this->kiosks->listForOrganization($request->user()),
             'branches' => $this->kiosks->branchesForOrganization($request->user()),
+            'kioskDefaults' => $this->kioskConfig->defaults(),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $this->authorize('create', BranchKiosk::class);
+
         $data = $request->validate([
             'branch_id' => ['required', 'integer'],
             'name' => ['nullable', 'string', 'max:120'],
@@ -48,11 +53,24 @@ final class BranchKioskController extends Controller
 
     public function update(Request $request, BranchKiosk $kiosk): RedirectResponse
     {
+        $this->authorize('update', $kiosk);
+
         $this->kiosks->update($request->user(), $kiosk, $request->validate([
             'name' => ['required', 'string', 'max:120'],
+            'description' => ['nullable', 'string', 'max:500'],
             'welcome_message' => ['required', 'string', 'max:255'],
             'show_photos' => ['sometimes', 'boolean'],
-        ]) + ['show_photos' => $request->boolean('show_photos')]);
+            'settings' => ['sometimes', 'array'],
+            'settings.allow_clock_in' => ['sometimes', 'boolean'],
+            'settings.allow_clock_out' => ['sometimes', 'boolean'],
+            'settings.allow_breaks' => ['sometimes', 'boolean'],
+            'settings.rota_enforcement' => ['sometimes', 'string', 'in:disabled,soft,strict'],
+            'settings.early_clock_in_minutes' => ['sometimes', 'integer', 'min:0', 'max:120'],
+            'settings.late_clock_in_minutes' => ['sometimes', 'integer', 'min:0', 'max:120'],
+        ]) + [
+            'show_photos' => $request->boolean('show_photos'),
+            'settings' => $request->input('settings'),
+        ]);
 
         return back()->with('status', 'Kiosk updated.');
     }

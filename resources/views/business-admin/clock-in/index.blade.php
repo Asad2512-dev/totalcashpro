@@ -57,11 +57,25 @@
                 <h4 class="font-display text-xl font-bold text-gray-900 dark:text-white" x-text="'Hi! ' + userName"></h4>
                 <p class="mt-2 whitespace-pre-line text-sm text-gray-500" x-text="message"></p>
 
-                <div class="mt-6 grid gap-2">
-                    <button type="button" class="admin-touch-target min-h-[48px] rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold hover:bg-primary-50 disabled:opacity-60 dark:border-gray-700" x-show="state === 'not_checked_in'" @click="act('clock-in')" :disabled="loading">Clock In</button>
-                    <button type="button" class="admin-touch-target min-h-[48px] rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold hover:bg-primary-50 disabled:opacity-60 dark:border-gray-700" x-show="state === 'checked_in' || state === 'auto_checked_in'" @click="act('clock-out')" :disabled="loading">Clock Out</button>
-                    <button type="button" class="admin-touch-target min-h-[48px] rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold hover:bg-primary-50 disabled:opacity-60 dark:border-gray-700" x-show="state === 'checked_in' || state === 'auto_checked_in'" @click="act('start-break')" :disabled="loading">Start Break</button>
-                    <button type="button" class="admin-touch-target min-h-[48px] rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold hover:bg-primary-50 disabled:opacity-60 dark:border-gray-700" x-show="state === 'on_break'" @click="act('end-break')" :disabled="loading">End Break</button>
+                <div class="mt-6">
+                    <x-admin.action-grid>
+                        <button type="button" class="admin-action-tile" x-show="state === 'not_checked_in'" @click="act('clock-in')" :disabled="loading">
+                            <x-admin.icon name="clock" class="admin-action-tile__icon" />
+                            <span class="admin-action-tile__label">Clock In</span>
+                        </button>
+                        <button type="button" class="admin-action-tile" x-show="state === 'checked_in' || state === 'auto_checked_in'" @click="act('clock-out')" :disabled="loading">
+                            <x-admin.icon name="logout" class="admin-action-tile__icon" />
+                            <span class="admin-action-tile__label">Clock Out</span>
+                        </button>
+                        <button type="button" class="admin-action-tile" x-show="state === 'checked_in' || state === 'auto_checked_in'" @click="act('start-break')" :disabled="loading">
+                            <x-admin.icon name="pause" class="admin-action-tile__icon" />
+                            <span class="admin-action-tile__label">Start Break</span>
+                        </button>
+                        <button type="button" class="admin-action-tile" x-show="state === 'on_break'" @click="act('end-break')" :disabled="loading">
+                            <x-admin.icon name="check" class="admin-action-tile__icon" />
+                            <span class="admin-action-tile__label">End Break</span>
+                        </button>
+                    </x-admin.action-grid>
                 </div>
 
                 <button type="button" class="admin-touch-target mt-3 min-h-[44px] text-sm font-semibold text-gray-500" @click="resetToPin()">Cancel</button>

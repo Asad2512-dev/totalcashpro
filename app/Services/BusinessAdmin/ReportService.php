@@ -33,7 +33,7 @@ final class ReportService implements ServiceInterface
         $toDate = Carbon::parse($to)->endOfDay();
 
         $cashRows = $this->cashUps->forRange($orgId, $branchId, $fromDate, $toDate);
-        $totalRevenue = (float) $cashRows->sum(fn (CashUp $c) => $c->netTotal());
+        $totalRevenue = (float) $cashRows->sum(fn (CashUp $c) => $c->revenueTotal());
 
         $totalWages = (float) Wage::query()
             ->where('organization_id', $orgId)

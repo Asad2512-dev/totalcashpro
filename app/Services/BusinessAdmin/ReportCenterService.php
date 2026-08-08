@@ -284,7 +284,7 @@ final class ReportCenterService implements ServiceInterface
                 $row->cashup_date?->format('d M Y') ?? '—',
                 $row->branch?->name ?? '—',
                 $row->shift instanceof \BackedEnum ? $row->shift->value : (string) $row->shift,
-                '£'.number_format($row->netTotal(), 2),
+                '£'.number_format($row->revenueTotal(), 2),
                 '£'.number_format((float) $row->cards_total, 2),
                 '£'.number_format((float) $row->online_orders_total, 2),
             ])->all(),
@@ -305,7 +305,7 @@ final class ReportCenterService implements ServiceInterface
                 '£'.number_format((float) $row->notes_total, 2),
                 '£'.number_format((float) $row->cards_total, 2),
                 '£'.number_format((float) $row->expenses_total, 2),
-                '£'.number_format($row->netTotal(), 2),
+                '£'.number_format($row->revenueTotal(), 2),
             ])->all(),
         ];
     }

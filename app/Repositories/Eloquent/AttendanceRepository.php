@@ -41,7 +41,7 @@ final class AttendanceRepository extends BaseRepository implements AttendanceRep
     public function logsForRange(int $organizationId, ?int $branchId, Carbon $from, Carbon $to): Collection
     {
         return $this->model->newQuery()
-            ->with(['user', 'branch'])
+            ->with(['user', 'branch', 'branchKiosk'])
             ->where('organization_id', $organizationId)
             ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
             ->whereBetween('logged_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])
@@ -109,8 +109,7 @@ final class AttendanceRepository extends BaseRepository implements AttendanceRep
         return AttendanceBreak::query()
             ->where('user_id', $userId)
             ->whereDate('break_started_at', now()->toDateString())
-            ->where('break_started_at', '<=', now())
-            ->where('break_ended_at', '>', now())
+            ->whereNull('break_ended_at')
             ->latest('break_started_at')
             ->first();
     }

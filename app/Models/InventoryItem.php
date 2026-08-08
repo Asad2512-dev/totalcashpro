@@ -32,6 +32,13 @@ final class InventoryItem extends Model
         'pcs_per_box',
         'stock_total_pcs',
         'stock_limit',
+        'unit',
+        'par_level',
+        'min_level',
+        'max_level',
+        'order_multiple',
+        'pack_size',
+        'lead_time_days',
     ];
 
     protected function casts(): array
@@ -40,6 +47,12 @@ final class InventoryItem extends Model
             'pcs_per_box' => 'integer',
             'stock_total_pcs' => 'integer',
             'stock_limit' => 'integer',
+            'par_level' => 'integer',
+            'min_level' => 'integer',
+            'max_level' => 'integer',
+            'order_multiple' => 'integer',
+            'pack_size' => 'integer',
+            'lead_time_days' => 'integer',
             'cost_price' => 'decimal:2',
             'selling_price' => 'decimal:2',
             'expiry_date' => 'date',
@@ -66,8 +79,20 @@ final class InventoryItem extends Model
         return $this->hasMany(InventoryCount::class, 'item_id');
     }
 
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
     public function isLowStock(): bool
     {
-        return $this->stock_limit > 0 && $this->stock_total_pcs <= $this->stock_limit;
+        $par = $this->par_level > 0 ? $this->par_level : $this->stock_limit;
+
+        return $par > 0 && $this->stock_total_pcs <= $par;
+    }
+
+    public function parLevel(): int
+    {
+        return $this->par_level > 0 ? (int) $this->par_level : (int) $this->stock_limit;
     }
 }

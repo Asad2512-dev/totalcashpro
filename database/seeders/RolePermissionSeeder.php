@@ -62,6 +62,15 @@ final class RolePermissionSeeder extends Seeder
             ],
         );
 
+        Role::query()->updateOrCreate(
+            ['slug' => RoleSlug::Rider->value],
+            [
+                'name' => RoleSlug::Rider->label(),
+                'description' => 'Delivery rider role (Phase 4+).',
+                'is_protected' => true,
+            ],
+        );
+
         $superAdmin->permissions()->sync($permissionIds);
     }
 }

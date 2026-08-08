@@ -23,8 +23,8 @@
                 <x-admin.icon name="menu" />
             </button>
             <div class="min-w-0 flex-1">
-                <p class="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400 sm:text-[11px]">{{ $panelLabel }}</p>
-                <h1 class="truncate font-display text-base font-bold text-gray-900 dark:text-white sm:text-lg">{{ $title }}</h1>
+                <p class="truncate text-xs font-semibold uppercase tracking-[0.12em] text-gray-400 sm:text-[11px]">{{ $panelLabel }}</p>
+                <h1 class="truncate font-display text-lg font-bold text-gray-900 dark:text-white sm:text-xl">{{ $title }}</h1>
             </div>
         </div>
 

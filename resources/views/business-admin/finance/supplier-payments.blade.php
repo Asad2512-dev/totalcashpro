@@ -1,7 +1,10 @@
 <x-layouts.business-admin title="Supplier Payments" active="finance">
-    <x-admin.toolbar title="Supplier Payments" description="Payments made against purchase invoices.">
+    <x-finance.page-header title="Supplier Payments" description="Payments made against purchase invoices.">
+        <x-slot:actions>
+            <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-payment')">Add</x-admin.button>
+        </x-slot:actions>
         <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-payment')">Record payment</x-admin.button>
-    </x-admin.toolbar>
+    </x-finance.page-header>
     <x-finance.nav active="supplier-payments" />
 
     @if ($payments->isEmpty())

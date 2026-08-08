@@ -1,5 +1,5 @@
 <x-layouts.business-admin title="Cash drawers" active="finance">
-    <x-admin.toolbar title="Cash drawers" description="Manage till drawer opening balances per branch." />
+    <x-finance.page-header title="Cash drawers" description="Manage till drawer opening balances per branch." />
     <x-finance.nav active="cash-drawers" />
 
     @if ($drawers->isEmpty())

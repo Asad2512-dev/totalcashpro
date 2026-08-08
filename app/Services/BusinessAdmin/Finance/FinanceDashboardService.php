@@ -50,7 +50,7 @@ final class FinanceDashboardService implements ServiceInterface
             ->whereDate('cashup_date', '<=', $toStr)
             ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
             ->get()
-            ->sum(fn (CashUp $c) => $c->netTotal());
+            ->sum(fn (CashUp $c) => $c->revenueTotal());
 
         $manualIncome = $this->income->sumManualForPeriod($orgId, $branchId, $fromStr, $toStr);
         $expenseTotal = $this->expenses->sumForPeriod($orgId, $branchId, $fromStr, $toStr);

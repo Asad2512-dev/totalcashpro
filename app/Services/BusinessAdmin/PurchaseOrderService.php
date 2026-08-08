@@ -6,11 +6,10 @@ namespace App\Services\BusinessAdmin;
 
 use App\Contracts\ServiceInterface;
 use App\Enums\PurchaseOrderStatus;
-use App\Events\PurchaseOrderReceived;
-use App\Models\GoodsReceivedLine;
 use App\Models\GoodsReceivedNote;
 use App\Models\InventoryItem;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderAmendment;
 use App\Models\PurchaseOrderLine;
 use App\Models\Supplier;
 use App\Models\User;
@@ -24,6 +23,7 @@ final class PurchaseOrderService implements ServiceInterface
     public function __construct(
         private readonly PurchaseOrderRepositoryInterface $purchaseOrders,
         private readonly BranchContext $branchContext,
+        private readonly GoodsReceivingService $receiving,
     ) {}
 
     public function list(User $user, ?string $status = null): mixed
@@ -176,67 +176,60 @@ final class PurchaseOrderService implements ServiceInterface
         return $po;
     }
 
+    public function markSent(User $user, PurchaseOrder $po): PurchaseOrder
+    {
+        $this->authorize($user, $po);
+        $this->assertStatus($po, [PurchaseOrderStatus::Approved, PurchaseOrderStatus::Ordered]);
+
+        $po->update([
+            'status' => PurchaseOrderStatus::Ordered,
+            'sent_at' => now(),
+            'sent_by' => $user->id,
+            'ordered_at' => $po->ordered_at ?? now()->toDateString(),
+        ]);
+
+        return $po;
+    }
+
     /**
-     * @param  list<array{purchase_order_line_id: int, quantity_received: float, quantity_damaged?: float, quantity_missing?: float}>  $lines
+     * @param  list<array{purchase_order_line_id: int, quantity_received: float, quantity_damaged?: float, quantity_missing?: float, accept_over_delivery?: bool}>  $lines
      */
-    public function receiveGoods(User $user, PurchaseOrder $po, array $lines, ?string $notes = null): GoodsReceivedNote
+    public function receiveGoods(User $user, PurchaseOrder $po, array $lines, ?string $notes = null, bool $allowOverDelivery = false): GoodsReceivedNote
     {
         $this->authorize($user, $po);
 
-        if (! in_array($po->status, [PurchaseOrderStatus::Ordered, PurchaseOrderStatus::PartiallyReceived], true)) {
-            throw ValidationException::withMessages(['po' => 'Goods can only be received for ordered purchase orders.']);
+        return $this->receiving->receive(
+            $user,
+            $po,
+            $lines,
+            $notes,
+            $po->delivery?->id,
+            $allowOverDelivery,
+        );
+    }
+
+    public function amend(User $user, PurchaseOrder $po, string $field, mixed $newValue, string $reason): PurchaseOrder
+    {
+        $this->authorize($user, $po);
+
+        if (! in_array($po->status, [PurchaseOrderStatus::Approved, PurchaseOrderStatus::Ordered, PurchaseOrderStatus::PartiallyReceived], true)) {
+            throw ValidationException::withMessages(['po' => 'Only approved or in-progress purchase orders can be amended.']);
         }
 
-        return DB::transaction(function () use ($user, $po, $lines, $notes): GoodsReceivedNote {
-            $grn = GoodsReceivedNote::query()->create([
-                'purchase_order_id' => $po->id,
-                'organization_id' => $po->organization_id,
-                'branch_id' => $po->branch_id,
-                'received_at' => now()->toDateString(),
-                'received_by' => $user->id,
-                'notes' => $notes,
-            ]);
+        $oldValue = $po->getAttribute($field);
 
-            foreach ($lines as $row) {
-                $poLine = PurchaseOrderLine::query()
-                    ->where('purchase_order_id', $po->id)
-                    ->findOrFail((int) $row['purchase_order_line_id']);
+        PurchaseOrderAmendment::query()->create([
+            'purchase_order_id' => $po->id,
+            'amended_by' => $user->id,
+            'field' => $field,
+            'old_value' => is_scalar($oldValue) || $oldValue === null ? (string) $oldValue : json_encode($oldValue),
+            'new_value' => is_scalar($newValue) || $newValue === null ? (string) $newValue : json_encode($newValue),
+            'reason' => $reason,
+        ]);
 
-                $received = (float) ($row['quantity_received'] ?? 0);
-                $damaged = (float) ($row['quantity_damaged'] ?? 0);
-                $missing = (float) ($row['quantity_missing'] ?? 0);
-                $stockable = max(0, $received - $damaged);
+        $po->update([$field => $newValue]);
 
-                GoodsReceivedLine::query()->create([
-                    'goods_received_note_id' => $grn->id,
-                    'purchase_order_line_id' => $poLine->id,
-                    'quantity_received' => $received,
-                    'quantity_damaged' => $damaged,
-                    'quantity_missing' => $missing,
-                ]);
-
-                $poLine->update([
-                    'quantity_received' => (float) $poLine->quantity_received + $received,
-                ]);
-
-                if ($poLine->inventory_item_id && $stockable > 0) {
-                    InventoryItem::query()
-                        ->whereKey($poLine->inventory_item_id)
-                        ->increment('stock_total_pcs', (int) round($stockable));
-                }
-            }
-
-            $po->refresh()->load('lines');
-            $po->update([
-                'status' => $po->isFullyReceived()
-                    ? PurchaseOrderStatus::Received
-                    : PurchaseOrderStatus::PartiallyReceived,
-            ]);
-
-            PurchaseOrderReceived::dispatch($po, $grn, $user);
-
-            return $grn->load('lines');
-        });
+        return $po->refresh();
     }
 
     /**
@@ -260,6 +253,7 @@ final class PurchaseOrderService implements ServiceInterface
                 'description' => $line['description'] ?? 'Line item',
                 'quantity' => $qty,
                 'unit_cost' => $unitCost,
+                'snapshot_unit_cost' => $unitCost,
                 'vat_rate' => $vatRate,
                 'line_total' => $lineNet,
             ]);

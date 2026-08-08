@@ -1,16 +1,30 @@
 <x-layouts.business-admin title="Dashboard" active="dashboard">
+    <x-admin.mobile-page-header
+        class="lg:hidden"
+        title="Dashboard"
+        :description="'Live totals for your organisation'.(auth()->user()->organization?->name ? ' · '.auth()->user()->organization->name : '').'.'"
+    />
+
     <x-admin.toolbar
+        class="hidden lg:flex"
         description="Live totals for your organisation{{ auth()->user()->organization?->name ? ' · '.auth()->user()->organization->name : '' }}."
     >
         <x-admin.button size="sm" :href="route('business-admin.cash-up')">
             <x-admin.icon name="cash" class="h-4 w-4" /> Cash Up
         </x-admin.button>
-        <x-admin.button variant="secondary" size="sm" :href="route('business-admin.kiosks.index')">Smart Kiosks</x-admin.button>
+        <x-admin.button variant="secondary" size="sm" :href="route('business-admin.kiosk.settings')">Kiosk</x-admin.button>
     </x-admin.toolbar>
 
-    <div class="admin-stat-grid">
+    @php
+        $allStats = $stats;
+    @endphp
+
+    <x-admin.mobile-kpi-grid :items="$allStats" class="mb-4" />
+
+    <div class="admin-stat-grid--compact mb-4 hidden lg:grid">
         @foreach ($stats as $stat)
             <x-admin.stat
+                compact
                 :label="$stat['label']"
                 :value="$stat['value']"
                 :change="$stat['change']"
@@ -19,7 +33,7 @@
         @endforeach
     </div>
 
-    <div class="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+    <div class="admin-section-grid xl:grid-cols-[1.2fr_0.8fr]">
         <x-admin.chart-card
             :title="'Daily cash up · '.$cashChartPeriod"
             description="Net cash up for each day this month — matches the This month total above."
@@ -30,18 +44,20 @@
 
         <x-admin.card>
             <h3 class="font-display text-base font-bold text-gray-900 dark:text-white">Quick actions</h3>
-            <div class="mt-4 grid gap-2">
+            <x-admin.action-grid class="mt-3">
                 @foreach ($quickActions as $action)
-                    <a href="{{ route($action['route']) }}" class="admin-touch-target flex items-center gap-3 rounded-xl border border-gray-200 px-3 py-3 text-sm font-medium text-gray-700 transition hover:border-primary-300 hover:bg-primary-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-primary-900/20">
-                        <x-admin.icon :name="$action['icon']" class="h-4 w-4 text-primary-600" />
-                        {{ $action['label'] }}
-                    </a>
+                    <x-admin.action-tile
+                        :href="route($action['route'])"
+                        :icon="$action['icon']"
+                        :label="$action['label']"
+                        :variant="$action['variant'] ?? ($loop->first ? 'primary' : 'default')"
+                    />
                 @endforeach
-            </div>
+            </x-admin.action-grid>
         </x-admin.card>
     </div>
 
-    <div class="mt-6 grid gap-6 xl:grid-cols-2">
+    <div class="admin-section-grid">
         <div>
             <x-admin.toolbar section title="Recent cash ups" description="Latest saved shifts." />
             @if ($recentCashUps->isEmpty())
@@ -59,17 +75,17 @@
             @endif
         </div>
 
-        <div class="space-y-6">
+        <div class="admin-panel-grid">
             <x-admin.card>
                 <h3 class="font-display text-base font-bold text-gray-900 dark:text-white">Inventory alerts</h3>
                 @if ($lowStock->isEmpty())
                     <p class="mt-3 text-sm text-gray-500">No low-stock items.</p>
                 @else
-                    <ul class="mt-3 space-y-2">
+                    <ul class="admin-compact-grid mt-3">
                         @foreach ($lowStock as $item)
-                            <li class="flex items-center justify-between text-sm">
-                                <span>{{ $item->name }}</span>
-                                <x-admin.badge tone="warning">{{ $item->stock_total_pcs }} pcs</x-admin.badge>
+                            <li class="admin-compact-item">
+                                <p class="admin-compact-item__title">{{ $item->name }}</p>
+                                <x-admin.badge tone="warning" class="mt-1 w-fit text-[10px]">{{ $item->stock_total_pcs }} pcs</x-admin.badge>
                             </li>
                         @endforeach
                     </ul>
@@ -81,14 +97,12 @@
                 @if ($upcomingPayments->isEmpty())
                     <p class="mt-3 text-sm text-gray-500">No upcoming invoices.</p>
                 @else
-                    <ul class="mt-3 space-y-3">
+                    <ul class="admin-compact-grid mt-3">
                         @foreach ($upcomingPayments as $invoice)
-                            <li class="flex items-center justify-between text-sm">
-                                <div>
-                                    <p class="font-medium">{{ $invoice->supplier?->name }}</p>
-                                    <p class="text-xs text-gray-500">Due {{ $invoice->due_date?->format('d M Y') }}</p>
-                                </div>
-                                <span class="font-semibold">£{{ number_format((float) $invoice->amount, 2) }}</span>
+                            <li class="admin-compact-item">
+                                <p class="admin-compact-item__title">{{ $invoice->supplier?->name }}</p>
+                                <p class="admin-compact-item__meta">Due {{ $invoice->due_date?->format('d M Y') }}</p>
+                                <p class="admin-compact-item__value">£{{ number_format((float) $invoice->amount, 2) }}</p>
                             </li>
                         @endforeach
                     </ul>

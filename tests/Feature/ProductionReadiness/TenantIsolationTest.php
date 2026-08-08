@@ -7,6 +7,7 @@ namespace Tests\Feature\ProductionReadiness;
 use App\Enums\RoleSlug;
 use App\Enums\SubscriptionStatus;
 use App\Models\Branch;
+use App\Models\CashUp;
 use App\Models\Organization;
 use App\Models\Plan;
 use App\Models\Role;
@@ -64,6 +65,42 @@ final class TenantIsolationTest extends TestCase
                 'branch_id' => $foreignBranch->id,
             ])
             ->assertSessionHasErrors('branch_id');
+    }
+
+    public function test_cash_history_rejects_foreign_cash_up(): void
+    {
+        ['admin' => $admin, 'foreignBranch' => $foreignBranch] = $this->makeOrgs();
+        $foreignOrg = $foreignBranch->organization;
+
+        $foreignAdmin = User::query()->create([
+            'name' => 'Foreign Admin',
+            'email' => 'foreign-admin@test.test',
+            'password' => Hash::make('password'),
+            'role_id' => Role::query()->where('slug', RoleSlug::Admin->value)->firstOrFail()->id,
+            'organization_id' => $foreignOrg->id,
+            'status' => 'active',
+            'email_verified_at' => now(),
+            'onboarding_completed_at' => now(),
+        ]);
+
+        $foreignCashUp = CashUp::query()->create([
+            'organization_id' => $foreignOrg->id,
+            'branch_id' => $foreignBranch->id,
+            'cashup_date' => now()->toDateString(),
+            'shift' => 'Morning',
+            'opening_float' => 0,
+            'coins_total' => 0,
+            'notes_total' => 0,
+            'cards_total' => 0,
+            'online_orders_total' => 0,
+            'platform_deductions_total' => 0,
+            'created_by' => $foreignAdmin->id,
+            'status' => 'submitted',
+        ]);
+
+        $this->actingAsVerified($admin)
+            ->get(route('business-admin.cash-history.show', $foreignCashUp->id))
+            ->assertNotFound();
     }
 
   /**

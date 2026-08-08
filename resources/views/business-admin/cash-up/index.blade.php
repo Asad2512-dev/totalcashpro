@@ -56,6 +56,9 @@
         'initialDate' => $date,
         'initialShift' => $shift,
         'initialStep' => $step,
+        'openingFloat' => (float) ($cashUp?->opening_float ?? $selectedDrawer?->defaultOpeningFloat() ?? config('cash.default_opening_float', 100)),
+        'cashDrawerId' => $selectedDrawer?->id,
+        'varianceReason' => $cashUp?->variance_reason ?? '',
         'coins' => $coinRows,
         'notes' => $noteRows,
         'cards' => $cardRows,
@@ -84,15 +87,23 @@
                     </div>
                 </div>
 
-                <form method="GET" action="{{ route('business-admin.cash-up') }}" class="grid max-w-xl grid-cols-2 gap-3">
+                <form method="GET" action="{{ route('business-admin.cash-up') }}" class="admin-field-grid max-w-3xl">
                     <input type="hidden" name="view" value="{{ $viewTab }}">
                     <input type="hidden" name="step" value="{{ $step }}">
-                    <label class="block">
-                        <span class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-200">Date</span>
+                    <label class="admin-field">
+                        <span class="admin-label">Till</span>
+                        <select name="cash_drawer_id" class="admin-input" onchange="this.form.submit()">
+                            @foreach ($drawers as $drawer)
+                                <option value="{{ $drawer->id }}" @selected($selectedDrawer?->id === $drawer->id)>{{ $drawer->name }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label class="admin-field">
+                        <span class="admin-label">Date</span>
                         <input type="date" name="date" value="{{ $date }}" class="admin-input" x-model="date" @change="reloadForDate()">
                     </label>
-                    <label class="block">
-                        <span class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-200">Shift</span>
+                    <label class="admin-field">
+                        <span class="admin-label">Shift</span>
                         <select name="shift" class="admin-input" x-model="shift" @change="reloadForDate()">
                             <option value="Morning" @selected($shift === 'Morning')>Morning</option>
                             <option value="Evening" @selected($shift === 'Evening')>Evening</option>
@@ -279,6 +290,32 @@
                                 </tr>
                             </tfoot>
                         </table>
+                    </div>
+
+                    <div class="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/40">
+                        <h3 class="mb-3 font-display text-sm font-bold uppercase tracking-wide text-gray-500">Cash reconciliation</h3>
+                        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                            <div>
+                                <p class="text-xs text-gray-500">Opening float</p>
+                                <input type="number" min="0" step="0.01" class="admin-input mt-1" x-model.number="openingFloat">
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Expected cash</p>
+                                <p class="mt-1 text-lg font-bold text-gray-900 dark:text-white" x-text="money(expectedCash)"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Actual cash (coins + notes)</p>
+                                <p class="mt-1 text-lg font-bold text-gray-900 dark:text-white" x-text="money(actualCash)"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Variance</p>
+                                <p class="mt-1 text-lg font-bold" :class="Math.abs(variance) < 0.005 ? 'text-emerald-600' : 'text-amber-600'" x-text="money(variance)"></p>
+                            </div>
+                        </div>
+                        <label class="mt-3 block" x-show="Math.abs(variance) >= 0.01">
+                            <span class="mb-1 block text-xs text-gray-500">Variance reason (if required)</span>
+                            <input type="text" class="admin-input" x-model="varianceReason" placeholder="Cash handling error, missing receipt…">
+                        </label>
                     </div>
 
                     <div class="cashup-footer-sticky cashup-actions mt-6">

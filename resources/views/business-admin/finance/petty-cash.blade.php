@@ -1,7 +1,10 @@
 <x-layouts.business-admin title="Petty cash" active="finance">
-    <x-admin.toolbar title="Petty cash" description="Track floats, top-ups and small expenses.">
+    <x-finance.page-header title="Petty cash" description="Track floats, top-ups and small expenses.">
+        <x-slot:actions>
+            <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-petty')">Add</x-admin.button>
+        </x-slot:actions>
         <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-petty')">Add float</x-admin.button>
-    </x-admin.toolbar>
+    </x-finance.page-header>
     <x-finance.nav active="petty-cash" />
 
     @if ($accounts->isEmpty())

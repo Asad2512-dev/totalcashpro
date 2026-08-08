@@ -30,7 +30,7 @@ final class CreateFinanceRecordsFromPurchaseOrder implements ShouldQueue
                 continue;
             }
 
-            $qty = max(0, (float) $line->quantity_received - (float) $line->quantity_damaged);
+            $qty = max(0, (float) $line->quantity_accepted);
             $lineNet = round($qty * (float) $poLine->unit_cost, 2);
             $amounts = VatCalculator::fromNet($lineNet, (float) ($poLine->vat_rate ?? 20));
             $net += $amounts['net'];

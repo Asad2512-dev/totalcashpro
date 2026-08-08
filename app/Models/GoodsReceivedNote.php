@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 final class GoodsReceivedNote extends Model
 {
     protected $fillable = [
-        'purchase_order_id', 'organization_id', 'branch_id', 'received_at', 'received_by', 'notes',
+        'purchase_order_id', 'organization_id', 'branch_id', 'delivery_id',
+        'grn_number', 'received_at', 'received_by', 'notes', 'status',
     ];
 
     protected function casts(): array
@@ -32,5 +33,15 @@ final class GoodsReceivedNote extends Model
     public function receiver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'received_by');
+    }
+
+    public function delivery(): BelongsTo
+    {
+        return $this->belongsTo(Delivery::class);
+    }
+
+    public function totalAccepted(): float
+    {
+        return (float) $this->lines->sum('quantity_accepted');
     }
 }

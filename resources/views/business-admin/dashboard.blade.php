@@ -21,17 +21,16 @@
         />
 
         <x-admin.card title="Quick actions">
-            <div class="divide-y divide-gray-100 dark:divide-gray-800">
+            <x-admin.action-grid>
                 @foreach ($quickActions as $action)
-                    <a
-                        href="{{ route($action['route']) }}"
-                        class="admin-touch-target flex items-center gap-3 px-1 py-3 transition hover:bg-gray-50 dark:hover:bg-gray-800"
-                    >
-                        <x-admin.icon :name="$action['icon']" class="h-5 w-5 shrink-0 text-primary-600" />
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $action['label'] }}</span>
-                    </a>
+                    <x-admin.action-tile
+                        :href="route($action['route'])"
+                        :icon="$action['icon']"
+                        :label="$action['label']"
+                        :variant="$loop->first ? 'primary' : 'default'"
+                    />
                 @endforeach
-            </div>
+            </x-admin.action-grid>
         </x-admin.card>
     </div>
 

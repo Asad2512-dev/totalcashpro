@@ -32,9 +32,16 @@ final class PurchaseOrderController extends Controller
     {
         $this->authorize('view', $purchaseOrder);
         $order = $this->purchaseOrders->find($request->user(), $purchaseOrder->id);
+        $order->load(['goodsReceivedNotes.lines', 'supplier']);
 
         return view('business-admin.purchase-orders.show', [
             'order' => $order,
+            'riders' => \App\Models\Rider::query()
+                ->with('user')
+                ->where('organization_id', $request->user()->organization_id)
+                ->where('is_active', true)
+                ->get(),
+            'delivery' => \App\Models\Delivery::query()->where('purchase_order_id', $order->id)->first(),
         ]);
     }
 
@@ -99,6 +106,14 @@ final class PurchaseOrderController extends Controller
         return back()->with('status', 'Purchase order cancelled.');
     }
 
+    public function markSent(Request $request, PurchaseOrder $purchaseOrder): RedirectResponse
+    {
+        $this->authorize('approve', $purchaseOrder);
+        $this->purchaseOrders->markSent($request->user(), $purchaseOrder);
+
+        return back()->with('status', 'Purchase order marked as sent.');
+    }
+
     public function receive(PurchaseOrderReceiveRequest $request, PurchaseOrder $purchaseOrder): RedirectResponse
     {
         $this->authorize('receive', $purchaseOrder);
@@ -111,5 +126,15 @@ final class PurchaseOrderController extends Controller
         );
 
         return back()->with('status', 'Goods received. Stock and finance updated automatically.');
+    }
+
+    public function print(Request $request, PurchaseOrder $purchaseOrder): View
+    {
+        $this->authorize('view', $purchaseOrder);
+        $order = $this->purchaseOrders->find($request->user(), $purchaseOrder->id);
+
+        return view('business-admin.purchase-orders.print', [
+            'order' => $order->load(['lines', 'supplier', 'branch']),
+        ]);
     }
 }

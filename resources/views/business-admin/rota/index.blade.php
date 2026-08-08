@@ -56,6 +56,71 @@
                 <x-admin.nav-pill :href="route('business-admin.rota', ['week' => $nextWeek, 'tab' => 'weekly'])">Next Week →</x-admin.nav-pill>
             </div>
 
+            @if ($draftVersion ?? null)
+                <x-admin.card class="mb-4">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                        <div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <x-admin.badge tone="info">Draft v{{ $draftVersion->version_number }}</x-admin.badge>
+                                @if ($publishedVersion ?? null)
+                                    <x-admin.badge tone="success">Published v{{ $publishedVersion->version_number }}</x-admin.badge>
+                                @endif
+                            </div>
+                            <p class="mt-2 text-sm text-gray-500">Staff only see the published version. Your draft changes stay private until you publish.</p>
+                            @if (! empty($conflicts))
+                                <div class="mt-3 space-y-2">
+                                    @foreach ($conflicts as $conflict)
+                                        <p class="text-sm {{ ($conflict['severity'] ?? '') === 'error' ? 'text-red-600' : 'text-amber-700' }}">
+                                            ⚠ {{ $conflict['message'] }}
+                                        </p>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                        <div class="admin-action-grid shrink-0">
+                            <form method="POST" action="{{ route('business-admin.rota.copy-previous-week') }}">
+                                @csrf
+                                <input type="hidden" name="week" value="{{ $weekStart }}">
+                                <x-admin.button type="submit" size="sm" variant="secondary">Copy previous week</x-admin.button>
+                            </form>
+                            @if ($publishedVersion ?? null)
+                                <x-admin.button size="sm" variant="secondary" :href="route('business-admin.rota.print', $publishedVersion)" target="_blank">Print published</x-admin.button>
+                            @endif
+                            @if ($draftVersion->status->value === 'draft')
+                                <form method="POST" action="{{ route('business-admin.rota.finalize', $draftVersion) }}" onsubmit="return confirm('Finalize this rota? It will be reviewed before publishing.');">
+                                    @csrf
+                                    <input type="hidden" name="confirm" value="1">
+                                    <x-admin.button type="submit" size="sm" variant="secondary">Finalize</x-admin.button>
+                                </form>
+                            @endif
+                            @if (in_array($draftVersion->status->value, ['draft', 'finalized'], true))
+                                <form method="POST" action="{{ route('business-admin.rota.publish', $draftVersion) }}" onsubmit="return confirm('Publish rota for {{ $weekLabel }}? Staff will see this schedule.');">
+                                    @csrf
+                                    <input type="hidden" name="confirm" value="1">
+                                    <x-admin.button type="submit" size="sm">Publish rota</x-admin.button>
+                                </form>
+                            @endif
+                            @if (($publishedVersion ?? null) && $publishedVersion->status->value === 'published')
+                                <form method="POST" action="{{ route('business-admin.rota.lock', $publishedVersion) }}">
+                                    @csrf
+                                    <x-admin.button type="submit" size="sm" variant="secondary">Lock</x-admin.button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                    @if (! empty($versionChanges))
+                        <div class="mt-4 border-t border-gray-100 pt-4 dark:border-gray-800">
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">Changes from published version</p>
+                            <ul class="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                                @foreach (array_slice($versionChanges, 0, 8) as $change)
+                                    <li>{{ $change['user'] }} · {{ $change['day'] }}: {{ $change['before'] }} → {{ $change['after'] }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                </x-admin.card>
+            @endif
+
             @if ($sections->isEmpty())
                 <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                     Create a section first on the <a href="{{ $tabUrl('sections') }}" class="font-semibold underline">Sections</a> tab, then click a day cell to assign shifts.
@@ -67,7 +132,7 @@
                     <div class="{{ $block['header'] }} px-4 py-3 text-white">
                         <h4 class="font-semibold">{{ $block['title'] }}</h4>
                     </div>
-                    <div class="admin-mobile-cards space-y-3 p-4 xl:hidden">
+                    <div class="admin-mobile-cards space-y-3 p-4 lg:hidden">
                         @forelse ($block['grid'] as $row)
                             <article class="admin-mobile-card">
                                 <h3 class="font-semibold text-gray-900 dark:text-white">{{ $row['name'] }}</h3>
@@ -100,7 +165,7 @@
                             <p class="text-sm text-gray-500">No staff yet — add staff, then assign shifts here.</p>
                         @endforelse
                     </div>
-                    <div class="hidden xl:block">
+                    <div class="hidden lg:block">
                     <x-admin.matrix-wrap>
                         <table>
                             <thead>

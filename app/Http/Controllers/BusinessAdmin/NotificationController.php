@@ -44,4 +44,24 @@ final class NotificationController extends Controller
             ->route('business-admin.notifications')
             ->with('success', 'Notification marked as read.');
     }
+
+    public function markAllRead(Request $request): RedirectResponse
+    {
+        AppNotification::query()
+            ->where('user_id', $request->user()->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        return back()->with('success', 'All notifications marked as read.');
+    }
+
+    public function archive(Request $request, int $notificationId): RedirectResponse
+    {
+        AppNotification::query()
+            ->where('id', $notificationId)
+            ->where('user_id', $request->user()->id)
+            ->update(['archived_at' => now()]);
+
+        return back()->with('success', 'Notification archived.');
+    }
 }

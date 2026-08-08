@@ -319,6 +319,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('adminShell', () => ({
         sidebarOpen: false,
         commandOpen: false,
+        mobileMoreOpen: false,
         commandQuery: '',
         searchResults: [],
         logoutConfirm: false,
@@ -387,6 +388,10 @@ document.addEventListener('alpine:init', () => {
                 this.syncBodyScrollLock();
             });
 
+            this.$watch('mobileMoreOpen', () => {
+                this.syncBodyScrollLock();
+            });
+
             this.$el.addEventListener('confirm-logout', () => {
                 this.logoutConfirm = true;
             });
@@ -400,6 +405,11 @@ document.addEventListener('alpine:init', () => {
 
                     if (this.commandOpen) {
                         this.commandOpen = false;
+                        return;
+                    }
+
+                    if (this.mobileMoreOpen) {
+                        this.mobileMoreOpen = false;
                         return;
                     }
 
@@ -425,7 +435,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         syncBodyScrollLock() {
-            const locked = this.sidebarOpen || this.commandOpen || this.logoutConfirm;
+            const locked = this.sidebarOpen || this.commandOpen || this.logoutConfirm || this.mobileMoreOpen;
             document.documentElement.classList.toggle('admin-scroll-lock', locked);
         },
 
@@ -524,6 +534,9 @@ document.addEventListener('alpine:init', () => {
         saveUrl: config.saveUrl,
         deductionsUrl: config.deductionsUrl,
         csrf: config.csrf,
+        openingFloat: config.openingFloat || 100,
+        cashDrawerId: config.cashDrawerId || null,
+        varianceReason: config.varianceReason || '',
 
         money(value) {
             return '£' + Number(value || 0).toFixed(2);
@@ -552,6 +565,18 @@ document.addEventListener('alpine:init', () => {
         },
         get deductionsTotal() {
             return this.deductions.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+        },
+        get actualCash() {
+            return this.coinsTotal + this.notesTotal;
+        },
+        get cashSales() {
+            return Math.max(0, this.actualCash - Number(this.openingFloat || 0) + this.expensesTotal);
+        },
+        get expectedCash() {
+            return Number(this.openingFloat || 0) + this.cashSales - this.expensesTotal;
+        },
+        get variance() {
+            return this.actualCash - this.expectedCash;
         },
         get shiftTotal() {
             return this.coinsTotal + this.notesTotal + this.cardsTotal + this.expensesTotal + this.onlineTotal;
@@ -648,6 +673,9 @@ document.addEventListener('alpine:init', () => {
                 await this.postJson(this.saveUrl, {
                     cashup_date: this.date,
                     shift: this.shift,
+                    cash_drawer_id: this.cashDrawerId,
+                    opening_float: Number(this.openingFloat || 0),
+                    variance_reason: this.varianceReason || null,
                     overwrite,
                     coins: this.coins,
                     notes: this.notes,
@@ -1162,6 +1190,7 @@ document.addEventListener('alpine:init', () => {
         clockTimer: null,
         startUrl: config.startUrl,
         pinUrl: config.pinUrl,
+        actionUrl: config.actionUrl,
         exitUrl: config.exitUrl,
         csrf: config.csrf,
         branchName: config.branchName || '',
@@ -1181,6 +1210,11 @@ document.addEventListener('alpine:init', () => {
         successLabel: '',
         successTime: '',
         successInitials: '',
+        currentUser: null,
+        currentPin: '',
+        actionChoices: [],
+        actionMessage: '',
+        rotaMessage: '',
 
         init() {
             this.tickClock();
@@ -1215,10 +1249,15 @@ document.addEventListener('alpine:init', () => {
 
         resetHome() {
             this.pin = '';
+            this.currentPin = '';
             this.screen = 'home';
             this.message = '';
             this.error = false;
             this.successUser = null;
+            this.currentUser = null;
+            this.actionChoices = [];
+            this.actionMessage = '';
+            this.rotaMessage = '';
         },
 
         beginLogoHold() {
@@ -1281,6 +1320,7 @@ document.addEventListener('alpine:init', () => {
             this.loading = true;
             this.error = false;
             this.message = '';
+            this.currentPin = this.pin;
             try {
                 const res = await fetch(this.pinUrl, {
                     method: 'POST',
@@ -1294,12 +1334,25 @@ document.addEventListener('alpine:init', () => {
                 });
                 const data = await readJsonResponse(res);
                 if (!res.ok) throw data;
-                this.successUser = data.user;
-                this.successInitials = (data.user?.name || '?').split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase();
-                this.successLabel = data.action_label;
-                this.successTime = data.time;
-                this.screen = 'success';
-                setTimeout(() => this.resetHome(), 4000);
+
+                if (data.step === 'choose_action') {
+                    this.currentUser = data.user;
+                    this.actionChoices = data.actions || [];
+                    this.actionMessage = data.message || 'What would you like to do?';
+                    this.screen = 'choose';
+                    this.pin = '';
+                    return;
+                }
+
+                if (data.step === 'rota_restricted') {
+                    this.currentUser = data.user;
+                    this.rotaMessage = data.rota?.message || 'You are outside your scheduled clock-in window.';
+                    this.screen = 'rota';
+                    this.pin = '';
+                    return;
+                }
+
+                this.showSuccess(data);
             } catch (e) {
                 this.error = true;
                 this.message = e?.errors?.pin?.[0] || e?.errors?.action?.[0] || e?.message || 'Wrong PIN — try again.';
@@ -1308,6 +1361,48 @@ document.addEventListener('alpine:init', () => {
             } finally {
                 this.loading = false;
             }
+        },
+
+        async performAction(item) {
+            if (this.loading || !this.currentPin) return;
+            this.loading = true;
+            try {
+                const res = await fetch(this.actionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': csrfToken(this.csrf),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({
+                        pin: this.currentPin,
+                        action: item.action,
+                        break_type: item.break_type || null,
+                    }),
+                });
+                const data = await readJsonResponse(res);
+                if (!res.ok) throw data;
+                this.showSuccess(data);
+            } catch (e) {
+                this.error = true;
+                this.message = e?.errors?.action?.[0] || e?.message || 'Unable to complete action.';
+                this.screen = 'home';
+                setTimeout(() => { this.message = ''; this.error = false; }, 2500);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        showSuccess(data) {
+            this.successUser = data.user;
+            this.successInitials = (data.user?.name || '?').split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase();
+            this.successLabel = data.action_label;
+            this.successTime = data.time;
+            this.screen = 'success';
+            this.pin = '';
+            this.currentPin = '';
+            setTimeout(() => this.resetHome(), 4000);
         },
 
         async exitKiosk() {
@@ -1336,6 +1431,260 @@ document.addEventListener('alpine:init', () => {
                 this.resetHome();
             } catch (e) {
                 this.exitError = e?.errors?.password?.[0] || e?.errors?.email?.[0] || e?.message || 'Unable to close kiosk.';
+            } finally {
+                this.loading = false;
+            }
+        },
+    }));
+
+    Alpine.data('kioskV2Terminal', (config = {}) => ({
+        sessionActive: config.sessionActive === true,
+        needsBranch: config.needsBranch === true,
+        sessionAdminEmail: config.sessionAdminEmail || '',
+        screen: 'home',
+        pin: '',
+        message: '',
+        error: false,
+        loading: false,
+        clockTime: '',
+        clockDate: '',
+        clockTimer: null,
+        loginUrl: config.loginUrl,
+        selectBranchUrl: config.selectBranchUrl,
+        pinUrl: config.pinUrl,
+        actionUrl: config.actionUrl,
+        logoutUrl: config.logoutUrl,
+        csrf: config.csrf,
+        branchName: config.branchName || '',
+        displayName: config.displayName || 'Staff Clock',
+        logoUrl: config.logoUrl,
+        adminEmail: '',
+        adminPassword: '',
+        loginError: '',
+        branches: config.branches || [],
+        selectedBranchId: config.selectedBranchId || '',
+        showAttendance: config.showAttendance === true,
+        attendance: config.attendance || [],
+        showAdmin: false,
+        successUser: null,
+        successLabel: '',
+        successTime: '',
+        successDetail: '',
+        currentUser: null,
+        currentPin: '',
+        actionChoices: [],
+        breakOptions: [],
+        actionMessage: '',
+
+        init() {
+            this.tickClock();
+            this.clockTimer = setInterval(() => this.tickClock(), 1000);
+            if (this.needsBranch) {
+                this.screen = 'branch';
+            }
+        },
+
+        tickClock() {
+            const now = new Date();
+            this.clockTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            this.clockDate = now.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+        },
+
+        press(digit) {
+            if (this.loading || this.pin.length >= 4) return;
+            this.pin += String(digit);
+            this.error = false;
+            this.message = '';
+            if (this.pin.length === 4) this.submitPin();
+        },
+
+        backspace() {
+            this.pin = this.pin.slice(0, -1);
+            this.error = false;
+        },
+
+        resetHome() {
+            this.pin = '';
+            this.currentPin = '';
+            this.screen = 'home';
+            this.message = '';
+            this.error = false;
+            this.successUser = null;
+            this.currentUser = null;
+            this.actionChoices = [];
+            this.breakOptions = [];
+            this.actionMessage = '';
+        },
+
+        unwrap(data) {
+            return data?.data ?? data;
+        },
+
+        async login() {
+            this.loading = true;
+            this.loginError = '';
+            try {
+                const res = await fetch(this.loginUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': csrfToken(this.csrf),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ email: this.adminEmail, password: this.adminPassword }),
+                });
+                const data = await readJsonResponse(res);
+                if (!res.ok) throw data;
+                this.sessionAdminEmail = this.adminEmail;
+                this.adminPassword = '';
+                this.screen = 'branch';
+                this.needsBranch = true;
+            } catch (e) {
+                this.loginError = e?.errors?.email?.[0] || e?.message || 'Unable to log in.';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async selectBranch() {
+            if (!this.selectedBranchId) return;
+            this.loading = true;
+            try {
+                const res = await fetch(this.selectBranchUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': csrfToken(this.csrf),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ branch_id: Number(this.selectedBranchId) }),
+                });
+                const data = this.unwrap(await readJsonResponse(res));
+                if (!res.ok) throw data;
+                this.sessionActive = true;
+                this.needsBranch = false;
+                this.branchName = data.branch?.name || this.branchName;
+                this.attendance = data.attendance || [];
+                this.screen = 'home';
+            } catch (e) {
+                this.loginError = e?.errors?.branch_id?.[0] || e?.message || 'Unable to select branch.';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async submitPin() {
+            if (this.pin.length !== 4 || this.loading) return;
+            this.loading = true;
+            this.error = false;
+            this.currentPin = this.pin;
+            try {
+                const res = await fetch(this.pinUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': csrfToken(this.csrf),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ pin: this.pin }),
+                });
+                const payload = await readJsonResponse(res);
+                const data = this.unwrap(payload);
+                if (!res.ok) throw payload;
+
+                if (data.step === 'choose_action' || data.step === 'on_break') {
+                    this.currentUser = data.user;
+                    this.actionChoices = data.actions || [];
+                    this.breakOptions = data.break_options || [];
+                    this.actionMessage = data.message || 'What would you like to do?';
+                    this.screen = data.step === 'on_break' ? 'on_break' : 'choose';
+                    this.pin = '';
+                    return;
+                }
+
+                this.showSuccess(data);
+            } catch (e) {
+                this.error = true;
+                this.message = e?.errors?.pin?.[0] || e?.message || 'Invalid PIN.';
+                this.pin = '';
+                setTimeout(() => { this.message = ''; this.error = false; }, 2500);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async performAction(item) {
+            if (this.loading || !this.currentPin) return;
+
+            if (item.action === 'choose-break') {
+                this.screen = 'breaks';
+                this.breakOptions = this.breakOptions.length ? this.breakOptions : [];
+                return;
+            }
+
+            this.loading = true;
+            try {
+                const res = await fetch(this.actionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': csrfToken(this.csrf),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({
+                        pin: this.currentPin,
+                        action: item.action,
+                        break_type: item.break_type || item.value || null,
+                    }),
+                });
+                const payload = await readJsonResponse(res);
+                const data = this.unwrap(payload);
+                if (!res.ok) throw payload;
+
+                if (data.step === 'choose_break') {
+                    this.breakOptions = data.break_options || [];
+                    this.screen = 'breaks';
+                    return;
+                }
+
+                this.showSuccess(data);
+            } catch (e) {
+                this.error = true;
+                this.message = e?.errors?.action?.[0] || e?.message || 'Unable to complete action.';
+                this.screen = 'home';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        showSuccess(data) {
+            this.successUser = data.user;
+            this.successLabel = data.action_label;
+            this.successTime = data.time;
+            this.successDetail = data.net_label || '';
+            this.screen = 'success';
+            this.pin = '';
+            this.currentPin = '';
+            setTimeout(() => this.resetHome(), 3000);
+        },
+
+        async logoutKiosk() {
+            this.loading = true;
+            try {
+                await fetch(this.logoutUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': csrfToken(this.csrf),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+                window.location.reload();
             } finally {
                 this.loading = false;
             }

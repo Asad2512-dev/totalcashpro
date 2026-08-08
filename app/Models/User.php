@@ -135,6 +135,11 @@ final class User extends Authenticatable implements MustVerifyEmail
         return $this->role?->slug === RoleSlug::Staff->value;
     }
 
+    public function isRider(): bool
+    {
+        return $this->role?->slug === RoleSlug::Rider->value;
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';

@@ -3,7 +3,7 @@
     'name' => null,
 ])
 
-<label class="block space-y-1.5">
+<label class="admin-field">
     @if ($label)
         <span class="admin-label">{{ $label }}</span>
     @endif

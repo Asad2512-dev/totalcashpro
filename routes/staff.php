@@ -29,6 +29,12 @@ Route::middleware('plan_feature:attendance')->group(function (): void {
     Route::post('/leave', [LeaveController::class, 'store'])->name('leave.store');
 });
 
+Route::middleware('plan_feature:inventory')->group(function (): void {
+    Route::get('/stocktake', [\App\Http\Controllers\Staff\StocktakeController::class, 'index'])->name('stocktake');
+    Route::post('/stocktake/save', [\App\Http\Controllers\Staff\StocktakeController::class, 'save'])->name('stocktake.save');
+    Route::post('/stocktake/submit', [\App\Http\Controllers\Staff\StocktakeController::class, 'submit'])->name('stocktake.submit');
+});
+
 Route::middleware('plan_feature:cash_up')->group(function (): void {
     Route::get('/cash-up', [CashUpController::class, 'index'])->name('cash-up');
     Route::post('/cash-up', [CashUpController::class, 'store'])->name('cash-up.store');
@@ -37,6 +43,7 @@ Route::middleware('plan_feature:cash_up')->group(function (): void {
 
 Route::middleware('plan_feature:rota')->group(function (): void {
     Route::get('/shift', [ShiftController::class, 'index'])->name('shift');
+    Route::get('/shift/print', [ShiftController::class, 'print'])->name('shift.print');
     Route::get('/shift-swap', [ShiftSwapController::class, 'index'])->name('shift-swap');
     Route::post('/shift-swap', [ShiftSwapController::class, 'store'])->name('shift-swap.store');
 });

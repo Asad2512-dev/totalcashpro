@@ -1,17 +1,46 @@
 <x-layouts.business-admin title="Payroll" active="finance">
-    <x-admin.toolbar title="Payroll" description="Draft → approve → pay workflow with attendance generation.">
+    <x-finance.page-header title="Payroll" description="Draft → approve → pay workflow with attendance generation.">
+        <x-slot:actions>
+            <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-wage')">Add</x-admin.button>
+        </x-slot:actions>
         @foreach (['current' => 'All', 'draft' => 'Draft', 'approved' => 'Approved', 'paid' => 'Paid'] as $key => $label)
             <x-admin.nav-pill :href="route('business-admin.finance.payroll', ['period' => $key])" :active="$period === $key">{{ $label }}</x-admin.nav-pill>
         @endforeach
         <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-wage')">Add wage</x-admin.button>
         <x-admin.button size="sm" variant="secondary" x-data @click="$dispatch('open-modal', 'generate-payroll')">From attendance</x-admin.button>
-    </x-admin.toolbar>
+    </x-finance.page-header>
     <x-finance.nav active="payroll" />
 
-    <div class="admin-stat-grid mb-6">
-        <x-admin.stat label="Draft total" :value="'£'.number_format((float) ($summary['draft_total'] ?? 0), 2)" tone="neutral" />
-        <x-admin.stat label="Approved total" :value="'£'.number_format((float) ($summary['approved_total'] ?? 0), 2)" tone="warning" />
-        <x-admin.stat label="Paid this month" :value="'£'.number_format((float) ($summary['paid_month_total'] ?? 0), 2)" tone="success" />
+    <x-admin.filter-sheet title="Payroll period" :active-count="$period !== 'current' ? 1 : 0" class="mb-4 lg:hidden">
+        <div class="admin-action-grid">
+            @foreach (['current' => 'All', 'draft' => 'Draft', 'approved' => 'Approved', 'paid' => 'Paid'] as $key => $label)
+                <x-admin.action-tile
+                    :href="route('business-admin.finance.payroll', ['period' => $key])"
+                    :label="$label"
+                    :variant="$period === $key ? 'primary' : 'default'"
+                />
+            @endforeach
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-2">
+            <x-admin.button size="sm" class="w-full" x-data @click="$dispatch('open-modal', 'add-wage')">Add wage</x-admin.button>
+            <x-admin.button size="sm" variant="secondary" class="w-full" x-data @click="$dispatch('open-modal', 'generate-payroll')">From attendance</x-admin.button>
+        </div>
+    </x-admin.filter-sheet>
+
+    @php
+        $payrollKpis = [
+            ['label' => 'Draft total', 'value' => '£'.number_format((float) ($summary['draft_total'] ?? 0), 2), 'change' => 'Awaiting approval', 'tone' => 'neutral'],
+            ['label' => 'Approved total', 'value' => '£'.number_format((float) ($summary['approved_total'] ?? 0), 2), 'change' => 'Ready to pay', 'tone' => 'warning'],
+            ['label' => 'Paid this month', 'value' => '£'.number_format((float) ($summary['paid_month_total'] ?? 0), 2), 'change' => 'Completed', 'tone' => 'success'],
+        ];
+    @endphp
+
+    <x-admin.mobile-kpi-grid :items="$payrollKpis" class="mb-4" />
+
+    <div class="admin-stat-grid--compact mb-6 hidden lg:grid">
+        @foreach ($payrollKpis as $stat)
+            <x-admin.stat compact :label="$stat['label']" :value="$stat['value']" :change="$stat['change']" :tone="$stat['tone']" />
+        @endforeach
     </div>
 
     @if ($wages->isEmpty())

@@ -52,9 +52,9 @@ final class BusinessAdminPanelTest extends TestCase
         $admin = $this->makeBusinessAdmin();
 
         $this->actingAsVerified($admin)
-            ->get(route('business-admin.kiosks.index'))
+            ->get(route('business-admin.kiosk.settings'))
             ->assertOk()
-            ->assertSee('Smart Kiosks');
+            ->assertSee('Kiosk');
 
         $this->actingAsVerified($admin)
             ->get(route('business-admin.rota'))
@@ -116,7 +116,7 @@ final class BusinessAdminPanelTest extends TestCase
             'business-admin.reports',
             'business-admin.inventory',
             'business-admin.inventory-history',
-            'business-admin.kiosks.index',
+            'business-admin.kiosk.settings',
             'business-admin.attendance',
             'business-admin.suppliers',
             'business-admin.finance.dashboard',
@@ -140,13 +140,13 @@ final class BusinessAdminPanelTest extends TestCase
         }
     }
 
-    public function test_legacy_clock_in_redirects_to_kiosks(): void
+    public function test_legacy_clock_in_redirects_to_kiosk(): void
     {
         $admin = $this->makeBusinessAdmin();
 
         $this->actingAsVerified($admin)
             ->get(route('business-admin.clock-in'))
-            ->assertRedirect('/business-admin/kiosks');
+            ->assertRedirect('/kiosk');
     }
 
     private function makeBusinessAdmin(): User

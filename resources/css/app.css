@@ -11,6 +11,14 @@
     --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 
+    /* Mobile layout tokens */
+    --mobile-page-px: 1rem;
+    --mobile-nav-bar-height: 3.25rem;
+    --mobile-nav-height: calc(var(--mobile-nav-bar-height) + env(safe-area-inset-bottom, 0px));
+    --mobile-content-bottom: calc(var(--mobile-nav-height) + 1.75rem);
+    --mobile-touch-min: 2.75rem;
+    --mobile-section-gap: 0.875rem;
+
     /* Primary Green */
     --color-primary-50: #f0fdf4;
     --color-primary-100: #dcfce7;
@@ -216,6 +224,8 @@
     .admin-shell {
         @apply min-h-screen bg-gray-50 text-gray-900;
         font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        overflow-x: hidden;
+        max-width: 100vw;
     }
 
     .admin-shell.admin-shell--viewport {
@@ -229,6 +239,14 @@
     .admin-shell.admin-shell--viewport .admin-shell-main {
         @apply min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain;
         -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-page {
+        @apply min-w-0 max-w-full;
+    }
+
+    .admin-page > * {
+        @apply max-w-full;
     }
 
     .admin-shell {
@@ -300,7 +318,66 @@
     }
 
     .admin-input {
-        @apply w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20;
+        @apply w-full min-h-[44px] min-w-0 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20;
+    }
+
+    select.admin-input {
+        @apply cursor-pointer appearance-none truncate bg-white pr-11;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.875rem center;
+        background-size: 1.125rem;
+    }
+
+    input[type='date'].admin-input,
+    input[type='time'].admin-input,
+    input[type='datetime-local'].admin-input {
+        @apply pr-10;
+    }
+
+    input[type='date'].admin-input::-webkit-date-and-time-value,
+    input[type='time'].admin-input::-webkit-date-and-time-value,
+    input[type='datetime-local'].admin-input::-webkit-date-and-time-value {
+        text-align: left;
+    }
+
+    input[type='date'].admin-input::-webkit-calendar-picker-indicator,
+    input[type='time'].admin-input::-webkit-calendar-picker-indicator,
+    input[type='datetime-local'].admin-input::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.55;
+        margin-inline-end: 0.125rem;
+    }
+
+    textarea.admin-input {
+        @apply min-h-[5.5rem] py-3;
+    }
+
+    .admin-field {
+        @apply block min-w-0 space-y-1.5;
+    }
+
+    .admin-field-grid {
+        @apply grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3;
+    }
+
+    .admin-field-grid > .admin-field,
+    .admin-field-grid > label {
+        @apply min-w-0;
+    }
+
+    .admin-field-row {
+        @apply flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end;
+    }
+
+    .admin-field-row > .admin-field,
+    .admin-field-row > label {
+        @apply min-w-0 sm:min-w-[10rem] sm:flex-1;
+    }
+
+    .report-filters > div,
+    .report-filters > label {
+        @apply min-w-0;
     }
 
     .admin-branch-select-form {
@@ -374,6 +451,11 @@
 
     .dark .admin-input {
         @apply border-gray-700 bg-gray-900 text-gray-100;
+    }
+
+    .dark select.admin-input {
+        @apply bg-gray-900;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
     }
 
     .admin-label {
@@ -452,7 +534,7 @@
     }
 
     .cashup-input {
-        @apply w-full max-w-[11rem] rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100;
+        @apply w-full max-w-[11rem] min-h-[44px] rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100;
         /* Hide number spinners that block typing on some browsers */
         appearance: textfield;
     }
@@ -677,14 +759,29 @@
     }
 
     .admin-table-wrap--stack {
-        @apply px-0 md:overflow-x-auto;
+        @apply w-full px-0 lg:overflow-x-auto;
+    }
+
+    .admin-table {
+        @apply w-full;
     }
 
     .admin-table-head-sticky thead th {
         @apply sticky top-0 z-10 bg-gray-50/95 backdrop-blur dark:bg-gray-800/95;
     }
 
-    @media (max-width: 767px) {
+    @media (min-width: 1024px) {
+        .admin-table--stack {
+            table-layout: fixed;
+        }
+
+        .admin-table--stack th,
+        .admin-table--stack td {
+            @apply whitespace-normal break-words align-top;
+        }
+    }
+
+    @media (max-width: 1023px) {
         .admin-table-wrap--stack {
             overflow: visible;
         }
@@ -707,6 +804,10 @@
 
         .admin-table--stack td {
             @apply flex items-start justify-between gap-4 border-0 px-0 py-2 text-sm text-gray-700 dark:text-gray-200;
+        }
+
+        .admin-table--stack td:not(.admin-table-stack-title) {
+            @apply break-words;
         }
 
         .admin-table--stack td::before {
@@ -804,6 +905,24 @@
         overflow: visible;
     }
 
+    .admin-chart-axis,
+    .admin-report-line-chart__axis {
+        @apply leading-snug;
+    }
+
+    .admin-report-line-chart {
+        @apply pb-1;
+    }
+
+    .admin-report-line-chart-card,
+    .admin-chart-card {
+        overflow: visible;
+    }
+
+    .report-chart-grid .admin-report-line-chart-card {
+        @apply pb-6;
+    }
+
     .admin-chart-scroll {
         overflow-x: auto;
         overflow-y: visible;
@@ -833,11 +952,154 @@
     }
 
     .admin-stat-grid {
-        @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-4;
+        @apply grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 xl:grid-cols-4;
+    }
+
+    .admin-stat-grid--compact {
+        @apply grid grid-cols-2 gap-2 sm:gap-2.5 md:grid-cols-3 xl:grid-cols-4;
+    }
+
+    .admin-action-grid {
+        @apply grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-2 xl:grid-cols-2;
+    }
+
+    .admin-action-tile {
+        @apply inline-flex min-h-[4.25rem] min-w-[44px] flex-col items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-2 py-2.5 text-center shadow-[0_1px_0_rgb(17_24_39_/_0.03)] transition hover:-translate-y-px hover:border-primary-300 hover:bg-primary-50/80 hover:shadow-md dark:border-gray-700 dark:bg-gray-800/60 dark:hover:border-primary-700 dark:hover:bg-primary-900/25;
+    }
+
+    .admin-action-tile--primary {
+        @apply border-primary-200 bg-primary-50 text-primary-900 hover:border-primary-300 hover:bg-primary-100 dark:border-primary-800 dark:bg-primary-900 dark:text-primary-200 dark:hover:bg-primary-800;
+    }
+
+    .admin-action-tile__icon {
+        @apply h-5 w-5 text-primary-600 transition dark:text-primary-400;
+    }
+
+    .admin-action-tile:hover .admin-action-tile__icon {
+        @apply scale-105;
+    }
+
+    .admin-action-tile--primary .admin-action-tile__icon {
+        @apply text-primary-700 dark:text-primary-300;
+    }
+
+    .admin-action-tile__label {
+        @apply line-clamp-2 text-[11px] font-semibold leading-tight text-gray-700 dark:text-gray-200 sm:text-xs;
+    }
+
+    .admin-action-tile--primary .admin-action-tile__label {
+        @apply text-primary-900 dark:text-primary-100;
+    }
+
+    .admin-action-tile:disabled {
+        @apply pointer-events-none opacity-50;
+    }
+
+    .admin-compact-grid {
+        @apply grid grid-cols-2 gap-2;
+    }
+
+    .admin-compact-item {
+        @apply flex min-h-[3.75rem] flex-col justify-between rounded-xl border border-gray-200 bg-gray-50/70 p-2.5 dark:border-gray-700 dark:bg-gray-800/50;
+    }
+
+    .admin-compact-item__title {
+        @apply line-clamp-2 text-xs font-semibold leading-snug text-gray-900 dark:text-white;
+    }
+
+    .admin-compact-item__meta {
+        @apply mt-0.5 text-[10px] leading-tight text-gray-500 dark:text-gray-400;
+    }
+
+    .admin-compact-item__value {
+        @apply mt-1 text-sm font-bold leading-none text-gray-900 dark:text-white;
+    }
+
+    .admin-panel-grid {
+        @apply grid grid-cols-2 gap-3 lg:grid-cols-1 lg:gap-6;
+    }
+
+    .admin-section-grid {
+        @apply mt-3 grid gap-3 sm:gap-4 lg:mt-6 xl:grid-cols-2;
+    }
+
+    .admin-kpi-priority {
+        @apply space-y-2;
+    }
+
+    .admin-kpi-priority__item {
+        @apply flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800;
+    }
+
+    .admin-kpi-priority__label {
+        @apply text-sm font-medium text-gray-500 dark:text-gray-400;
+    }
+
+    .admin-kpi-priority__value {
+        @apply mt-0.5 font-display text-xl font-extrabold tracking-tight text-gray-900 dark:text-white;
+    }
+
+    .admin-kpi-priority__meta {
+        @apply shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold;
+    }
+
+    .admin-kpi-toggle {
+        @apply inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700;
+    }
+
+    .admin-mobile-records {
+        @apply space-y-2.5;
+    }
+
+    .admin-mobile-record {
+        @apply rounded-xl border border-gray-200 bg-white p-3.5 dark:border-gray-700 dark:bg-gray-800;
+    }
+
+    .admin-mobile-record__title {
+        @apply text-base font-semibold text-gray-900 dark:text-white;
+    }
+
+    .admin-mobile-record__row {
+        @apply flex items-start justify-between gap-3 py-1 text-sm;
+    }
+
+    .admin-mobile-record__label {
+        @apply shrink-0 text-gray-500 dark:text-gray-400;
+    }
+
+    .admin-mobile-record__value {
+        @apply text-right font-medium text-gray-800 dark:text-gray-100;
+    }
+
+    .admin-shell--mobile-nav .admin-shell-main {
+        padding-bottom: var(--mobile-content-bottom);
+        scroll-padding-bottom: var(--mobile-content-bottom);
+    }
+
+    .admin-mobile-nav {
+        @apply fixed bottom-0 left-0 right-0 z-40 flex min-h-[var(--mobile-nav-bar-height)] items-stretch border-t border-gray-200 bg-white/95 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/95 lg:hidden;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .admin-mobile-nav__item {
+        @apply flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1 text-[11px] font-semibold leading-tight text-gray-500 transition;
+    }
+
+    .admin-mobile-nav__item--active {
+        @apply text-primary-700 dark:text-primary-400;
+    }
+
+    .admin-mobile-more-sheet,
+    .admin-filter-sheet {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     .admin-form-grid {
         @apply grid gap-4 sm:grid-cols-2;
+    }
+
+    .admin-form-grid > * {
+        @apply min-w-0;
     }
 
     .admin-modal-panel {
@@ -845,7 +1107,80 @@
     }
 
     .staff-mobile-actions {
-        @apply sticky bottom-0 z-20 border-t border-gray-200 bg-white/95 py-3 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95 sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none;
+        @apply sticky z-20 border-t border-gray-200 bg-white/95 py-3 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95 sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none;
+    }
+
+    .admin-shell--mobile-nav .staff-mobile-actions {
+        bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+    }
+
+    .admin-shell--mobile-nav .cashup-footer-sticky {
+        bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+    }
+
+    .admin-filter-sheet-footer {
+        @apply sticky bottom-0 -mx-4 mt-4 flex gap-2 border-t border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-900 lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0;
+        padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    @media (max-width: 1023px) {
+        .admin-toolbar-title {
+            @apply text-xl leading-tight;
+        }
+
+        .admin-toolbar-actions > a,
+        .admin-toolbar-actions > button,
+        .admin-toolbar-actions > form > button,
+        .admin-toolbar-actions > .inline-flex > a,
+        .admin-toolbar-actions > .inline-flex > button {
+            @apply min-h-[44px];
+        }
+
+        .report-chart-grid {
+            @apply grid-cols-1 gap-4;
+        }
+
+        .report-chart-grid .admin-card {
+            @apply p-4;
+        }
+
+        .admin-card {
+            @apply min-w-0;
+        }
+
+        .admin-page .admin-section-grid {
+            @apply mt-3 gap-3;
+        }
+
+        /* Keep panels and sections clear of the fixed mobile nav */
+        .admin-shell--mobile-nav .admin-section-grid,
+        .admin-shell--mobile-nav .admin-panel-grid {
+            @apply pb-1;
+        }
+
+        .admin-shell--mobile-nav .admin-section-grid > :last-child,
+        .admin-shell--mobile-nav .admin-panel-grid > :last-child {
+            @apply mb-1;
+        }
+
+        .admin-shell--mobile-nav .admin-card > :last-child {
+            @apply pb-1;
+        }
+
+        .admin-shell--mobile-nav .admin-compact-grid {
+            @apply pb-0.5;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .admin-shell--mobile-nav .admin-shell-main {
+            padding-bottom: 1.5rem;
+        }
+
+        .admin-shell--mobile-nav .staff-mobile-actions,
+        .admin-shell--mobile-nav .cashup-footer-sticky {
+            bottom: auto;
+        }
     }
 
     @media (max-width: 640px) {
@@ -916,7 +1251,7 @@
     }
 
     .admin-toolbar-title {
-        @apply font-display text-xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-2xl;
+        @apply font-display text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl lg:text-2xl;
     }
 
     .admin-drawer-panel {
@@ -1029,6 +1364,10 @@
 
 .kiosk-action-btn-muted {
     @apply text-sm font-semibold text-gray-600 dark:text-gray-300;
+}
+
+.kiosk-action-btn-danger {
+    @apply border-red-200 text-red-700 hover:border-red-400 hover:bg-red-50 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/30;
 }
 
 @keyframes kiosk-shake {

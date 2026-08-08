@@ -10,6 +10,7 @@ use App\Enums\RoleSlug;
 use App\Enums\SupplierInvoiceStatus;
 use App\Enums\WageStatus;
 use App\Models\AttendanceLog;
+use App\Models\Bill;
 use App\Models\BranchKiosk;
 use App\Models\Branch;
 use App\Models\CashUp;
@@ -33,6 +34,8 @@ use App\Support\Security\StaffPinHasher;
 
 final class BusinessAdminDomainSeeder extends Seeder
 {
+    /** @var array<string, \App\Models\RotaVersion> */
+    private array $rotaVersionCache = [];
     public function run(): void
     {
         $org = Organization::query()->where('slug', 'harbour-kitchen-group')->first();
@@ -391,7 +394,28 @@ final class BusinessAdminDomainSeeder extends Seeder
             $endAt->addDay();
         }
 
+        $weekStart = Carbon::parse($date)->startOfWeek()->toDateString();
+        $cacheKey = $org->id.':'.$branch->id.':'.$weekStart;
+
+        if (! isset($this->rotaVersionCache[$cacheKey])) {
+            $this->rotaVersionCache[$cacheKey] = \App\Models\RotaVersion::query()->firstOrCreate(
+                [
+                    'organization_id' => $org->id,
+                    'branch_id' => $branch->id,
+                    'week_start' => $weekStart,
+                    'version_number' => 1,
+                ],
+                [
+                    'status' => 'published',
+                    'published_at' => now(),
+                ],
+            );
+        }
+
+        $version = $this->rotaVersionCache[$cacheKey];
+
         RotaShift::query()->create([
+            'rota_version_id' => $version->id,
             'organization_id' => $org->id,
             'branch_id' => $branch->id,
             'user_id' => $member->id,
@@ -400,6 +424,7 @@ final class BusinessAdminDomainSeeder extends Seeder
             'start_time' => $startAt,
             'end_time' => $endAt,
             'shift_type' => $type,
+            'status' => 'published',
         ]);
     }
 }

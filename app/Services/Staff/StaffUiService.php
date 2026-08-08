@@ -31,6 +31,7 @@ final class StaffUiService implements ServiceInterface
                 'label' => 'Work',
                 'items' => [
                     ['label' => 'Cash Up', 'route' => 'staff.cash-up', 'icon' => 'cash', 'feature' => PlanFeature::CashUp->value],
+                    ['label' => 'Weekly Stocktake', 'route' => 'staff.stocktake', 'icon' => 'tag', 'feature' => PlanFeature::Inventory->value],
                     ['label' => 'My Shift', 'route' => 'staff.shift', 'icon' => 'repeat', 'feature' => PlanFeature::Rota->value],
                     ['label' => 'Shift Swaps', 'route' => 'staff.shift-swap', 'icon' => 'repeat', 'feature' => PlanFeature::Rota->value],
                     ['label' => 'Weekly Hours', 'route' => 'staff.hours', 'icon' => 'activity', 'feature' => PlanFeature::Attendance->value],
@@ -80,5 +81,59 @@ final class StaffUiService implements ServiceInterface
         }
 
         return $links;
+    }
+
+    /**
+     * @return list<array{label: string, route?: string, icon: string, active: list<string>, feature?: string, more?: bool}>
+     */
+    public function mobileNavigation(): array
+    {
+        $items = [
+            ['label' => 'Home', 'route' => 'staff.dashboard', 'icon' => 'home', 'active' => ['dashboard']],
+            ['label' => 'Shift', 'route' => 'staff.shift', 'icon' => 'repeat', 'feature' => PlanFeature::Rota->value, 'active' => ['shift', 'shift-swap']],
+            ['label' => 'Clock', 'route' => 'staff.clock', 'icon' => 'clock', 'feature' => PlanFeature::Attendance->value, 'active' => ['clock', 'attendance']],
+            ['label' => 'Hours', 'route' => 'staff.hours', 'icon' => 'activity', 'feature' => PlanFeature::Attendance->value, 'active' => ['hours', 'availability', 'leave']],
+            ['label' => 'More', 'icon' => 'more', 'active' => ['notifications', 'profile', 'cash-up'], 'more' => true],
+        ];
+
+        $user = auth()->user();
+        if ($user === null) {
+            return $items;
+        }
+
+        return array_values(array_filter(
+            $items,
+            fn (array $item) => ! isset($item['feature']) || $this->features->can($user, $item['feature']),
+        ));
+    }
+
+    /**
+     * @return list<array{label: string, items: list<array{label: string, route: string, icon: string}>}>
+     */
+    public function mobileMoreNavigation(): array
+    {
+        $primaryRoutes = collect($this->mobileNavigation())
+            ->filter(fn (array $item) => ! ($item['more'] ?? false))
+            ->pluck('route')
+            ->filter()
+            ->all();
+
+        $more = [];
+
+        foreach ($this->navigation() as $group) {
+            $items = array_values(array_filter(
+                $group['items'],
+                fn (array $item) => ! in_array($item['route'], $primaryRoutes, true),
+            ));
+
+            if ($items !== []) {
+                $more[] = [
+                    'label' => $group['label'],
+                    'items' => $items,
+                ];
+            }
+        }
+
+        return $more;
     }
 }

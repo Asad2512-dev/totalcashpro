@@ -6,6 +6,7 @@ use App\Http\Controllers\BusinessAdmin\AccountingController;
 use App\Http\Controllers\BusinessAdmin\AttendanceController;
 use App\Http\Controllers\BusinessAdmin\BranchController;
 use App\Http\Controllers\BusinessAdmin\BranchManageController;
+use App\Http\Controllers\BusinessAdmin\CashDrawerController;
 use App\Http\Controllers\BusinessAdmin\CashHistoryController;
 use App\Http\Controllers\BusinessAdmin\CashUpController;
 use App\Http\Controllers\BusinessAdmin\CrmController;
@@ -34,7 +35,24 @@ Route::middleware('plan_feature:cash_up')->group(function (): void {
     Route::get('/cash-up', [CashUpController::class, 'index'])->name('cash-up');
     Route::post('/cash-up', [CashUpController::class, 'store'])->name('cash-up.store');
     Route::post('/cash-up/deductions', [CashUpController::class, 'storeDeductions'])->name('cash-up.deductions');
+    Route::post('/cash-up/{cashUp}/submit', [CashUpController::class, 'submit'])->name('cash-up.submit');
+    Route::post('/cash-up/{cashUp}/approve', [CashUpController::class, 'approve'])->name('cash-up.approve');
+    Route::post('/cash-up/{cashUp}/reject', [CashUpController::class, 'reject'])->name('cash-up.reject');
+    Route::post('/cash-up/{cashUp}/reopen', [CashUpController::class, 'reopen'])->name('cash-up.reopen');
+    Route::get('/cash-up/{cashUp}/print', [CashUpController::class, 'print'])->name('cash-up.print');
     Route::get('/cash-history', [CashHistoryController::class, 'index'])->name('cash-history');
+    Route::get('/cash-history/{cashUp}', [CashHistoryController::class, 'show'])->name('cash-history.show');
+    Route::get('/cash-drawers', [CashDrawerController::class, 'index'])->name('cash-drawers');
+    Route::post('/cash-drawers', [CashDrawerController::class, 'store'])->name('cash-drawers.store');
+    Route::get('/cash-drawers/{drawer}', [CashDrawerController::class, 'show'])->name('cash-drawers.show');
+    Route::put('/cash-drawers/{drawer}', [CashDrawerController::class, 'update'])->name('cash-drawers.update');
+    Route::post('/cash-drawers/{drawer}/activate', [CashDrawerController::class, 'activate'])->name('cash-drawers.activate');
+    Route::post('/cash-drawers/{drawer}/deactivate', [CashDrawerController::class, 'deactivate'])->name('cash-drawers.deactivate');
+    Route::post('/cash-drawers/{drawer}/lock', [CashDrawerController::class, 'lock'])->name('cash-drawers.lock');
+    Route::post('/cash-drawers/{drawer}/unlock', [CashDrawerController::class, 'unlock'])->name('cash-drawers.unlock');
+    Route::post('/cash-drawers/{drawer}/open', [CashDrawerController::class, 'open'])->name('cash-drawers.open');
+    Route::post('/cash-drawers/sessions/{session}/close', [CashDrawerController::class, 'close'])->name('cash-drawers.sessions.close');
+    Route::post('/cash-drawers/{drawer}/transfer', [CashDrawerController::class, 'transfer'])->name('cash-drawers.transfer');
 });
 
 Route::get('/staff', [StaffController::class, 'index'])->name('staff');
@@ -58,20 +76,23 @@ Route::post('/staff/{staff}/reset-password', [StaffController::class, 'resetPass
 Route::post('/staff/{staff}/reset-pin', [StaffController::class, 'resetPin'])->name('staff.reset-pin');
 
 Route::middleware('plan_feature:attendance')->group(function (): void {
-    Route::redirect('/clock-in', '/business-admin/kiosks')->name('clock-in');
+    Route::redirect('/clock-in', '/kiosk')->name('clock-in');
+    Route::get('/kiosks', fn () => redirect()->route('business-admin.kiosk.settings'))->name('kiosks.index');
+    Route::redirect('/kiosks/{any}', '/business-admin/kiosk')->where('any', '.*');
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance');
+    Route::get('/attendance/{user}/{date}', [AttendanceController::class, 'show'])->name('attendance.show')->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}');
     Route::post('/attendance/entries', [AttendanceController::class, 'updateEntries'])->name('attendance.entries');
 
-    Route::controller(\App\Http\Controllers\BusinessAdmin\BranchKioskController::class)->prefix('kiosks')->name('kiosks.')->group(function (): void {
-        Route::get('/', 'index')->name('index');
+    Route::controller(\App\Http\Controllers\BusinessAdmin\KioskSettingsController::class)->prefix('kiosk')->name('kiosk.')->group(function (): void {
+        Route::get('/', 'index')->name('settings');
+        Route::put('/', 'update')->name('settings.update');
+        Route::post('/revoke-session', 'revokeSession')->name('revoke-session');
+    });
+
+    Route::controller(\App\Http\Controllers\BusinessAdmin\KioskBreakTypeController::class)->prefix('kiosk/break-types')->name('kiosk.break-types.')->group(function (): void {
         Route::post('/', 'store')->name('store');
-        Route::put('/{kiosk}', 'update')->name('update');
-        Route::post('/{kiosk}/regenerate-token', 'regenerateToken')->name('regenerate-token');
-        Route::post('/{kiosk}/disable', 'disable')->name('disable');
-        Route::post('/{kiosk}/enable', 'enable')->name('enable');
-        Route::post('/{kiosk}/reset', 'reset')->name('reset');
-        Route::post('/{kiosk}/force-logout', 'forceLogout')->name('force-logout');
-        Route::get('/{kiosk}/activity', 'activity')->name('activity');
+        Route::put('/{breakType}', 'update')->name('update');
+        Route::delete('/{breakType}', 'destroy')->name('destroy');
     });
 });
 
@@ -81,13 +102,45 @@ Route::middleware('plan_feature:inventory')->group(function (): void {
     Route::post('/inventory/items', [InventoryController::class, 'storeItem'])->name('inventory.items.store');
     Route::post('/inventory/counts', [InventoryController::class, 'storeCount'])->name('inventory.counts.store');
     Route::get('/inventory-history', [InventoryHistoryController::class, 'index'])->name('inventory-history');
+
+    Route::controller(\App\Http\Controllers\BusinessAdmin\StocktakeController::class)->prefix('stocktake')->name('stocktake.')->group(function (): void {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{stocktake}', 'show')->name('show');
+        Route::post('/{stocktake}/review', 'review')->name('review');
+        Route::post('/{stocktake}/approve', 'approve')->name('approve');
+        Route::post('/{stocktake}/reject', 'reject')->name('reject');
+        Route::post('/{stocktake}/reopen', 'reopen')->name('reopen');
+        Route::get('/{stocktake}/print', 'print')->name('print');
+    });
+
+    Route::controller(\App\Http\Controllers\BusinessAdmin\RiderController::class)->prefix('riders')->name('riders.')->group(function (): void {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::post('/{rider}/toggle', 'toggle')->name('toggle');
+    });
 });
 
 Route::middleware('plan_feature:suppliers')->group(function (): void {
+    Route::get('/procurement', [SupplierController::class, 'dashboard'])->name('procurement.dashboard');
     Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers');
     Route::post('/suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
+    Route::get('/suppliers/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show');
+    Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
+    Route::post('/suppliers/{supplier}/archive', [SupplierController::class, 'archive'])->name('suppliers.archive');
+    Route::post('/suppliers/{supplier}/contacts', [SupplierController::class, 'storeContact'])->name('suppliers.contacts.store');
+    Route::post('/suppliers/{supplier}/products', [SupplierController::class, 'storeProduct'])->name('suppliers.products.store');
     Route::post('/suppliers/invoices', [SupplierController::class, 'storeInvoice'])->name('suppliers.invoices.store');
     Route::post('/suppliers/invoices/{invoice}/paid', [SupplierController::class, 'markPaid'])->name('suppliers.invoices.paid');
+    Route::post('/invoice-matches/{invoiceMatch}/approve', [SupplierController::class, 'approveMatch'])->name('invoice-matches.approve');
+    Route::post('/purchase-orders/{purchaseOrder}/invoice', [SupplierController::class, 'storeMatchedInvoice'])->name('purchase-orders.invoice');
+
+    Route::controller(\App\Http\Controllers\BusinessAdmin\GoodsReceivingController::class)->prefix('receiving')->name('receiving.')->group(function (): void {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create/{purchaseOrder}', 'create')->name('create');
+        Route::post('/{purchaseOrder}', 'store')->name('store');
+        Route::get('/grn/{goodsReceivedNote}', 'show')->name('show');
+        Route::get('/grn/{goodsReceivedNote}/print', 'print')->name('print');
+    });
 
     Route::controller(\App\Http\Controllers\BusinessAdmin\PurchaseOrderController::class)->prefix('purchase-orders')->name('purchase-orders.')->group(function (): void {
         Route::get('/', 'index')->name('index');
@@ -97,8 +150,11 @@ Route::middleware('plan_feature:suppliers')->group(function (): void {
         Route::post('/{purchaseOrder}/submit', 'submit')->name('submit');
         Route::post('/{purchaseOrder}/approve', 'approve')->name('approve');
         Route::post('/{purchaseOrder}/order', 'order')->name('order');
+        Route::post('/{purchaseOrder}/send', 'markSent')->name('send');
         Route::post('/{purchaseOrder}/cancel', 'cancel')->name('cancel');
         Route::post('/{purchaseOrder}/receive', 'receive')->name('receive');
+        Route::get('/{purchaseOrder}/print', 'print')->name('print');
+        Route::post('/{purchaseOrder}/assign-rider', [\App\Http\Controllers\BusinessAdmin\RiderController::class, 'assign'])->name('assign-rider');
     });
 });
 
@@ -175,11 +231,28 @@ Route::middleware('plan_feature:rota')->group(function (): void {
     Route::post('/rota/groups', [RotaController::class, 'storeGroup'])->name('rota.groups.store');
     Route::post('/rota/shifts', [RotaController::class, 'storeShift'])->name('rota.shifts.store');
     Route::delete('/rota/shifts/{shift}', [RotaController::class, 'destroyShift'])->name('rota.shifts.destroy');
+    Route::post('/rota/copy-previous-week', [RotaController::class, 'copyPreviousWeek'])->name('rota.copy-previous-week');
+    Route::post('/rota/versions/{version}/finalize', [RotaController::class, 'finalize'])->name('rota.finalize');
+    Route::post('/rota/versions/{version}/publish', [RotaController::class, 'publish'])->name('rota.publish');
+    Route::post('/rota/versions/{version}/lock', [RotaController::class, 'lock'])->name('rota.lock');
+    Route::post('/rota/versions/{version}/archive', [RotaController::class, 'archive'])->name('rota.archive');
+    Route::post('/rota/versions/{version}/clear', [RotaController::class, 'clearWeek'])->name('rota.clear');
+    Route::get('/rota/versions/{version}/print', [RotaController::class, 'print'])->name('rota.print');
 });
 
 Route::middleware('plan_feature:reports')->group(function (): void {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     Route::post('/reports/saved', [ReportController::class, 'storeSaved'])->name('reports.saved');
+
+    Route::controller(\App\Http\Controllers\BusinessAdmin\ExecutiveController::class)->prefix('executive')->name('executive.')->group(function (): void {
+        Route::get('/', 'index')->name('index');
+        Route::get('/print', 'print')->name('print');
+        Route::get('/export', 'export')->name('export');
+        Route::post('/alerts/{alert}/acknowledge', 'acknowledgeAlert')->name('alerts.acknowledge');
+        Route::post('/alerts/{alert}/resolve', 'resolveAlert')->name('alerts.resolve');
+        Route::post('/budgets', 'storeBudget')->name('budgets.store');
+        Route::post('/scheduled-reports', 'storeScheduledReport')->name('scheduled-reports.store');
+    });
     Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
 });
 
@@ -190,6 +263,8 @@ Route::put('/branches/{branch}', [BranchManageController::class, 'update'])->nam
 Route::get('/subscription', [SubscriptionController::class, 'index'])->name('subscription');
 Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
 Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+Route::post('/notifications/{notification}/archive', [NotificationController::class, 'archive'])->name('notifications.archive');
 
 Route::get('/settings', [SettingsController::class, 'edit'])->name('settings');
 Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');

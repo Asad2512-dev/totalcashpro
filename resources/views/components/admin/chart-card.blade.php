@@ -34,7 +34,7 @@
 @endphp
 
 <section
-    class="admin-card p-5"
+    class="admin-card admin-chart-card overflow-visible p-5 pb-6"
     @if ($hasData && count($normalized) > 0)
         x-data="{
             points: @js($chartPoints),
@@ -93,7 +93,7 @@
             <p class="mt-1 text-sm text-gray-500">{{ $empty }}</p>
         </div>
     @else
-        <div class="admin-chart-panel rounded-2xl bg-gray-50 px-2 pb-4 sm:px-3 dark:bg-gray-900/50">
+        <div class="admin-chart-panel rounded-2xl bg-gray-50 px-2 pb-2 pt-2 sm:px-3 sm:pb-4 dark:bg-gray-900/50">
             <div class="admin-chart-scroll overflow-x-auto overscroll-x-contain">
                 <div class="min-w-full">
                     <div class="flex items-end gap-1 sm:gap-1.5" style="height: {{ $chartHeight }}px;">
@@ -115,9 +115,9 @@
                         @endforeach
                     </div>
                     @if (collect($normalized)->contains(fn (array $point): bool => ! empty($point['label'])))
-                        <div class="mt-2 flex gap-1 sm:gap-1.5">
+                        <div class="admin-chart-axis mt-3 flex gap-1 pb-1 sm:gap-1.5">
                             @foreach ($normalized as $point)
-                                <div class="min-w-[2rem] flex-1 truncate text-center text-[10px] font-medium text-gray-500 sm:min-w-0 dark:text-gray-400">
+                                <div class="min-w-[2rem] flex-1 truncate text-center text-[10px] font-medium leading-tight text-gray-500 sm:min-w-0 dark:text-gray-400">
                                     {{ $point['label'] ?? '' }}
                                 </div>
                             @endforeach

@@ -1,7 +1,10 @@
 <x-layouts.business-admin title="Bank Accounts" active="finance">
-    <x-admin.toolbar title="Bank Accounts" description="Track business bank accounts for this organisation.">
+    <x-finance.page-header title="Bank Accounts" description="Track business bank accounts for this organisation.">
+        <x-slot:actions>
+            <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-account')">Add</x-admin.button>
+        </x-slot:actions>
         <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-account')">Add account</x-admin.button>
-    </x-admin.toolbar>
+    </x-finance.page-header>
     <x-finance.nav active="bank-accounts" />
 
     @if ($accounts->isEmpty())

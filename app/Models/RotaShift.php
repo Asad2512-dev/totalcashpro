@@ -13,6 +13,7 @@ final class RotaShift extends Model
     use HasFactory;
 
     protected $fillable = [
+        'rota_version_id',
         'organization_id',
         'branch_id',
         'user_id',
@@ -22,6 +23,8 @@ final class RotaShift extends Model
         'start_time',
         'end_time',
         'shift_type',
+        'break_minutes',
+        'status',
     ];
 
     protected function casts(): array
@@ -31,6 +34,16 @@ final class RotaShift extends Model
             'start_time' => 'datetime',
             'end_time' => 'datetime',
         ];
+    }
+
+    public function rotaVersion(): BelongsTo
+    {
+        return $this->belongsTo(RotaVersion::class);
+    }
+
+    public function version(): BelongsTo
+    {
+        return $this->rotaVersion();
     }
 
     public function organization(): BelongsTo

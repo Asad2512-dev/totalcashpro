@@ -44,6 +44,8 @@ final class FinanceModuleTest extends TestCase
             'branch_id' => $branch->id,
             'cashup_date' => now()->toDateString(),
             'shift' => 'Morning',
+            'opening_float' => 0,
+            'cash_sales_total' => 350,
             'coins_total' => 100,
             'notes_total' => 200,
             'cards_total' => 300,
@@ -82,9 +84,9 @@ final class FinanceModuleTest extends TestCase
         $snapshot = app(\App\Services\BusinessAdmin\Finance\FinanceDashboardService::class)
             ->snapshot($admin, now()->startOfDay(), now()->endOfDay());
 
-        $this->assertSame(550.0, (float) $snapshot['cash_up_income']);
+        $this->assertSame(650.0, (float) $snapshot['cash_up_income']);
         $this->assertSame(120.0, (float) $snapshot['manual_income']);
-        $this->assertSame(670.0, (float) $snapshot['income']);
+        $this->assertSame(770.0, (float) $snapshot['income']);
     }
 
     public function test_payroll_can_be_generated_from_attendance(): void

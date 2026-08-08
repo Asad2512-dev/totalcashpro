@@ -18,10 +18,18 @@ final class AttendanceController extends Controller
     {
         $week = $request->input('week', $request->input('start'));
         $report = $this->attendance->weeklyReport($request->user(), $week);
+        $sessions = $this->attendance->sessionRecords($request->user(), $week);
 
-        return view('business-admin.attendance.index', array_merge($report, [
+        return view('business-admin.attendance.index', array_merge($report, $sessions, [
             'weekStart' => $report['from']->toDateString(),
         ]));
+    }
+
+    public function show(Request $request, int $user, string $date): View
+    {
+        $detail = $this->attendance->sessionDetail($request->user(), $user, $date);
+
+        return view('business-admin.attendance.show', $detail);
     }
 
     public function updateEntries(Request $request): RedirectResponse

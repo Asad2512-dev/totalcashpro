@@ -108,7 +108,7 @@
         </select>
     </div>
 
-    {{-- Desktop: group tabs + section links --}}
+    {{-- Tablet/desktop: tab bar from lg --}}
     <div class="hidden lg:block">
         <div class="finance-subnav-groups flex flex-wrap gap-1 border-b border-gray-100 p-2 dark:border-gray-800">
             @foreach ($visibleGroups as $group)
@@ -143,32 +143,5 @@
                 </a>
             @endforeach
         </div>
-    </div>
-
-    {{-- Tablet: compact grouped grid --}}
-    <div class="hidden md:grid md:grid-cols-2 md:gap-px md:bg-gray-100 lg:hidden dark:md:bg-gray-800">
-        @foreach ($visibleGroups as $group)
-            <div class="bg-white p-3 dark:bg-gray-900">
-                <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
-                    {{ $group['label'] }}
-                </p>
-                <ul class="space-y-0.5">
-                    @foreach ($group['items'] as $item)
-                        <li>
-                            <a
-                                href="{{ route($item['route']) }}"
-                                @class([
-                                    'finance-subnav-link finance-subnav-link-block',
-                                    'finance-subnav-link-active' => $active === $item['key'],
-                                ])
-                                @if ($active === $item['key']) aria-current="page" @endif
-                            >
-                                {{ $item['label'] }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-        @endforeach
     </div>
 </nav>

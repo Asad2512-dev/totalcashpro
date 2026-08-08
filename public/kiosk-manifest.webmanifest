@@ -1,9 +1,9 @@
 {
-    "name": "TotalCashPro Attendance Kiosk",
+    "name": "TotalCashPro Smart Kiosk",
     "short_name": "TCP Kiosk",
     "description": "Dedicated attendance clock terminal for restaurants and retail.",
-    "start_url": "/business-admin/kiosk",
-    "scope": "/business-admin/kiosk",
+    "start_url": "/business-admin/kiosks",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#ECFDF5",
     "theme_color": "#16A34A",

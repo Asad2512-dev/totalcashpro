@@ -84,15 +84,15 @@
                     </div>
                 </div>
 
-                <form method="GET" action="{{ route('staff.cash-up') }}" class="grid max-w-xl grid-cols-2 gap-3">
+                <form method="GET" action="{{ route('staff.cash-up') }}" class="admin-field-grid max-w-xl sm:grid-cols-2">
                     <input type="hidden" name="view" value="{{ $viewTab }}">
                     <input type="hidden" name="step" value="{{ $step }}">
-                    <label class="block">
-                        <span class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-200">Date</span>
+                    <label class="admin-field">
+                        <span class="admin-label">Date</span>
                         <input type="date" name="date" value="{{ $date }}" class="admin-input" x-model="date" @change="reloadForDate()">
                     </label>
-                    <label class="block">
-                        <span class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-200">Shift</span>
+                    <label class="admin-field">
+                        <span class="admin-label">Shift</span>
                         <select name="shift" class="admin-input" x-model="shift" @change="reloadForDate()">
                             <option value="Morning" @selected($shift === 'Morning')>Morning</option>
                             <option value="Evening" @selected($shift === 'Evening')>Evening</option>

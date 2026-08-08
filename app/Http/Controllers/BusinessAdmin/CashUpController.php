@@ -7,6 +7,8 @@ namespace App\Http\Controllers\BusinessAdmin;
 use App\Enums\CashUpShift;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BusinessAdmin\CashUpStoreRequest;
+use App\Models\CashUp;
+use App\Services\BusinessAdmin\CashDrawerService;
 use App\Services\BusinessAdmin\CashUpService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -16,7 +18,10 @@ use Illuminate\Validation\ValidationException;
 
 final class CashUpController extends Controller
 {
-    public function __construct(private readonly CashUpService $cashUps) {}
+    public function __construct(
+        private readonly CashUpService $cashUps,
+        private readonly CashDrawerService $drawers,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -30,10 +35,23 @@ final class CashUpController extends Controller
             $shift = CashUpShift::Morning->value;
         }
 
-        $cashUp = $this->cashUps->findOrEmpty($request->user(), $date, $shift);
+        $drawerId = $request->integer('cash_drawer_id') ?: null;
+        $cashUp = $this->cashUps->findOrEmpty($request->user(), $date, $shift, $drawerId);
         $viewTab = $request->input('view', 'cashup');
         if (! in_array($viewTab, ['cashup', 'deductions'], true)) {
             $viewTab = 'cashup';
+        }
+
+        $drawerList = $this->drawers->list($request->user())
+            ->filter(fn ($d) => $d->isUsableForCashUp())
+            ->values();
+
+        $selectedDrawer = $drawerId
+            ? $drawerList->firstWhere('id', $drawerId)
+            : ($cashUp?->cashDrawer ?? $drawerList->first());
+
+        if ($drawerList->isEmpty()) {
+            $drawerList = $this->drawers->list($request->user());
         }
 
         return view('business-admin.cash-up.index', [
@@ -41,8 +59,11 @@ final class CashUpController extends Controller
             'shift' => $shift,
             'viewTab' => $viewTab,
             'cashUp' => $cashUp,
+            'drawers' => $drawerList,
+            'selectedDrawer' => $selectedDrawer,
             'coins' => CashUpService::COINS,
             'notes' => CashUpService::NOTES,
+            'openingFloatDenominations' => CashUpService::OPENING_FLOAT_DENOMINATIONS,
             'platforms' => CashUpService::PLATFORMS,
         ]);
     }
@@ -60,7 +81,7 @@ final class CashUpController extends Controller
                 return response()->json([
                     'message' => $e->getMessage(),
                     'errors' => $e->errors(),
-                    'code' => 'ALREADY_EXISTS',
+                    'code' => 'VALIDATION_ERROR',
                 ], 422);
             }
             throw $e;
@@ -112,5 +133,47 @@ final class CashUpController extends Controller
         }
 
         return back()->with('status', 'Platform deductions saved.');
+    }
+
+    public function submit(Request $request, CashUp $cashUp): RedirectResponse
+    {
+        $this->authorize('submit', $cashUp);
+        $this->cashUps->submit($request->user(), $cashUp);
+
+        return back()->with('status', 'Cash up submitted for approval.');
+    }
+
+    public function approve(Request $request, CashUp $cashUp): RedirectResponse
+    {
+        $this->authorize('approve', $cashUp);
+        $this->cashUps->approve($request->user(), $cashUp);
+
+        return back()->with('status', 'Cash up approved and locked.');
+    }
+
+    public function reject(Request $request, CashUp $cashUp): RedirectResponse
+    {
+        $this->authorize('update', $cashUp);
+        $validated = $request->validate(['reason' => ['nullable', 'string', 'max:500']]);
+        $this->cashUps->reject($request->user(), $cashUp, $validated['reason'] ?? null);
+
+        return back()->with('status', 'Cash up rejected.');
+    }
+
+    public function reopen(Request $request, CashUp $cashUp): RedirectResponse
+    {
+        $this->authorize('update', $cashUp);
+        $this->cashUps->reopen($request->user(), $cashUp);
+
+        return back()->with('status', 'Cash up reopened.');
+    }
+
+    public function print(Request $request, CashUp $cashUp): View
+    {
+        $this->authorize('view', $cashUp);
+
+        return view('business-admin.cash-up.print', [
+            'cashUp' => $cashUp->load(['branch', 'cashDrawer', 'creator', 'approver']),
+        ]);
     }
 }

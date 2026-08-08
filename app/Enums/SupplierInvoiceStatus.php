@@ -12,6 +12,8 @@ enum SupplierInvoiceStatus: string
     case PartiallyPaid = 'partially_paid';
     case Paid = 'paid';
     case Outstanding = 'outstanding';
+    case Disputed = 'disputed';
+    case Overdue = 'overdue';
     case Cancelled = 'cancelled';
 
     public function label(): string
@@ -23,6 +25,8 @@ enum SupplierInvoiceStatus: string
             self::PartiallyPaid => 'Partially paid',
             self::Paid => 'Paid',
             self::Outstanding => 'Outstanding',
+            self::Disputed => 'Disputed',
+            self::Overdue => 'Overdue',
             self::Cancelled => 'Cancelled',
         };
     }

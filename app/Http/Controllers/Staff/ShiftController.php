@@ -5,34 +5,29 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
-use App\Models\RotaShift;
+use App\Services\BusinessAdmin\RotaPrintService;
+use App\Services\Staff\StaffRotaService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 final class ShiftController extends Controller
 {
+    public function __construct(
+        private readonly StaffRotaService $rota,
+        private readonly RotaPrintService $print,
+    ) {}
+
     public function index(Request $request): View
     {
-        $user = $request->user();
-        $weekStart = $request->filled('week')
-            ? Carbon::parse($request->input('week'))->startOfWeek()
-            : now()->startOfWeek();
-        $weekEnd = $weekStart->copy()->endOfWeek();
+        $weekStart = $request->input('week', now()->startOfWeek()->toDateString());
 
-        $shifts = RotaShift::query()
-            ->with('rotaSection')
-            ->where('user_id', $user->id)
-            ->whereBetween('shift_date', [$weekStart->toDateString(), $weekEnd->toDateString()])
-            ->orderBy('shift_date')
-            ->orderBy('start_time')
-            ->get();
+        return view('staff.shift.index', $this->rota->weekView($request->user(), $weekStart));
+    }
 
-        return view('staff.shift.index', [
-            'weekStart' => $weekStart->toDateString(),
-            'weekLabel' => $weekStart->format('d M').' – '.$weekEnd->format('d M Y'),
-            'shifts' => $shifts,
-            'todayShift' => $shifts->first(fn ($s) => $s->shift_date->isSameDay(now())),
-        ]);
+    public function print(Request $request): View
+    {
+        $weekStart = $request->input('week', now()->startOfWeek()->toDateString());
+
+        return view('staff.shift.print', $this->print->staffPrintData($request->user(), $weekStart));
     }
 }

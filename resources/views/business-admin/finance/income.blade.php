@@ -1,7 +1,10 @@
 <x-layouts.business-admin title="Income" active="finance">
-    <x-admin.toolbar title="Income" description="Track sales and other inflows with VAT split.">
+    <x-finance.page-header title="Income" description="Track sales and other inflows with VAT split.">
+        <x-slot:actions>
+            <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-income')">Add</x-admin.button>
+        </x-slot:actions>
         <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-income')">Add income</x-admin.button>
-    </x-admin.toolbar>
+    </x-finance.page-header>
     <x-finance.nav active="income" />
 
     @if ($entries->isEmpty())

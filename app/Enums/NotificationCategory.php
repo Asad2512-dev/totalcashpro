@@ -13,6 +13,10 @@ enum NotificationCategory: string
     case System = 'system';
     case Security = 'security';
     case Support = 'support';
+    case Procurement = 'procurement';
+    case Deliveries = 'deliveries';
+    case Rota = 'rota';
+    case Executive = 'executive';
 
     public function label(): string
     {

@@ -1,7 +1,10 @@
 <x-layouts.business-admin title="Recurring bills" active="finance">
-    <x-admin.toolbar title="Recurring bills" description="Templates that auto-generate bills on schedule.">
+    <x-finance.page-header title="Recurring bills" description="Templates that auto-generate bills on schedule.">
+        <x-slot:actions>
+            <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-recurring')">Add</x-admin.button>
+        </x-slot:actions>
         <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-recurring')">Add template</x-admin.button>
-    </x-admin.toolbar>
+    </x-finance.page-header>
     <x-finance.nav active="recurring-bills" />
 
     @if ($templates->isEmpty())

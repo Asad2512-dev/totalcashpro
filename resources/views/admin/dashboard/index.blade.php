@@ -54,20 +54,17 @@
             @endif
         </div>
 
-        <div class="space-y-6">
+        <div class="admin-panel-grid">
             <x-admin.card>
                 <h3 class="font-display text-base font-bold text-gray-900 dark:text-white">Recent activity</h3>
                 @if (count($recentActivity) === 0)
                     <p class="mt-4 text-sm text-gray-500">No activity logged yet.</p>
                 @else
-                    <ul class="mt-4 space-y-4">
+                    <ul class="admin-compact-grid mt-4">
                         @foreach ($recentActivity as $item)
-                            <li class="flex gap-3">
-                                <span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary-500"></span>
-                                <div>
-                                    <p class="text-sm text-gray-800 dark:text-gray-100">{{ $item['action'] }}</p>
-                                    <p class="mt-1 text-xs text-gray-500">{{ $item['actor'] }} · {{ $item['time'] }}</p>
-                                </div>
+                            <li class="admin-compact-item">
+                                <p class="admin-compact-item__title">{{ $item['action'] }}</p>
+                                <p class="admin-compact-item__meta">{{ $item['actor'] }} · {{ $item['time'] }}</p>
                             </li>
                         @endforeach
                     </ul>
@@ -79,17 +76,13 @@
                 @if (count($latestPayments) === 0)
                     <p class="mt-4 text-sm text-gray-500">No payments recorded yet.</p>
                 @else
-                    <ul class="mt-4 space-y-3 text-sm">
+                    <ul class="admin-compact-grid mt-4">
                         @foreach ($latestPayments as $payment)
-                            <li class="flex items-center justify-between gap-3">
-                                <div>
-                                    <p class="font-medium text-gray-900 dark:text-white">{{ $payment['business'] }}</p>
-                                    <p class="text-xs text-gray-500">{{ $payment['invoice'] }}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-semibold">{{ $payment['amount'] }}</p>
-                                    <x-admin.badge :tone="$payment['status'] === 'Paid' ? 'success' : 'danger'">{{ $payment['status'] }}</x-admin.badge>
-                                </div>
+                            <li class="admin-compact-item">
+                                <p class="admin-compact-item__title">{{ $payment['business'] }}</p>
+                                <p class="admin-compact-item__meta">{{ $payment['invoice'] }}</p>
+                                <p class="admin-compact-item__value">{{ $payment['amount'] }}</p>
+                                <x-admin.badge :tone="$payment['status'] === 'Paid' ? 'success' : 'danger'" class="mt-1 w-fit text-[10px]">{{ $payment['status'] }}</x-admin.badge>
                             </li>
                         @endforeach
                     </ul>

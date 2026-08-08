@@ -72,7 +72,7 @@ final class SmartKioskTest extends TestCase
         ]);
     }
 
-    public function test_second_pin_clocks_out_automatically(): void
+    public function test_second_pin_shows_action_choices_when_checked_in(): void
     {
         ['admin' => $admin, 'kiosk' => $kiosk] = $this->makeKioskSetup();
 
@@ -95,40 +95,36 @@ final class SmartKioskTest extends TestCase
 
         $pin()->assertOk()->assertJsonPath('action', 'clock-in');
 
-        $pin()->assertOk()->assertJsonPath('action', 'clock-out');
+        $pin()->assertOk()->assertJsonPath('step', 'choose_action');
     }
 
     public function test_business_admin_kiosk_management_page(): void
     {
-        ['admin' => $admin, 'kiosk' => $kiosk] = $this->makeKioskSetup();
+        ['admin' => $admin] = $this->makeKioskSetup();
 
         $this->actingAsVerified($admin)
-            ->get(route('business-admin.kiosks.index'))
+            ->get(route('business-admin.kiosk.settings'))
             ->assertOk()
-            ->assertSee('Smart Kiosks')
-            ->assertSee($kiosk->publicUrl());
+            ->assertSee('Kiosk')
+            ->assertSee('/kiosk');
     }
 
-    public function test_clock_in_route_redirects_to_kiosks(): void
+    public function test_clock_in_route_redirects_to_kiosk(): void
     {
         ['admin' => $admin] = $this->makeKioskSetup();
 
         $this->actingAsVerified($admin)
             ->get(route('business-admin.clock-in'))
-            ->assertRedirect('/business-admin/kiosks');
+            ->assertRedirect('/kiosk');
     }
 
-    public function test_empty_kiosk_list_shows_create_for_all_branches(): void
+    public function test_legacy_kiosks_route_redirects_to_settings(): void
     {
         ['admin' => $admin] = $this->makeKioskSetup();
 
-        BranchKiosk::query()->delete();
-
         $this->actingAsVerified($admin)
             ->get(route('business-admin.kiosks.index'))
-            ->assertOk()
-            ->assertSee('Create Your First Kiosk')
-            ->assertSee('Create Kiosk', false);
+            ->assertRedirect(route('business-admin.kiosk.settings'));
     }
 
     public function test_admin_can_close_kiosk_with_password_only(): void
@@ -160,22 +156,15 @@ final class SmartKioskTest extends TestCase
         ]);
     }
 
-    public function test_can_create_multiple_kiosks_for_same_branch(): void
+    public function test_v2_kiosk_does_not_expose_create_kiosk_workflow(): void
     {
-        ['admin' => $admin, 'kiosk' => $existing] = $this->makeKioskSetup();
+        ['admin' => $admin] = $this->makeKioskSetup();
 
         $this->actingAsVerified($admin)
-            ->post(route('business-admin.kiosks.store'), [
-                'branch_id' => $existing->branch_id,
-                'name' => 'Back Office Kiosk',
-            ])
-            ->assertRedirect(route('business-admin.kiosks.index'));
-
-        $this->assertDatabaseCount('branch_kiosks', 2);
-        $this->assertDatabaseHas('branch_kiosks', [
-            'branch_id' => $existing->branch_id,
-            'name' => 'Back Office Kiosk',
-        ]);
+            ->get(route('business-admin.kiosk.settings'))
+            ->assertOk()
+            ->assertDontSee('Create Kiosk')
+            ->assertDontSee('Generate Kiosk Link');
     }
 
     public function test_home_page_shows_smart_kiosk_section(): void

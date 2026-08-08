@@ -155,6 +155,7 @@ final class StaffHrService implements ServiceInterface
         return RotaShift::query()
             ->where('user_id', $staff->id)
             ->whereDate('shift_date', '>=', now()->toDateString())
+            ->whereHas('rotaVersion', fn ($q) => $q->whereIn('status', ['published', 'locked']))
             ->orderBy('shift_date')
             ->orderBy('start_time')
             ->limit(20)

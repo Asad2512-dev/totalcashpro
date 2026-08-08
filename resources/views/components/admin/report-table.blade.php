@@ -13,8 +13,8 @@
             <input
                 type="search"
                 x-model="search"
-                placeholder="Search table…"
-                class="admin-input w-full pl-9"
+                placeholder="Search records…"
+                class="admin-input w-full min-h-[44px] pl-9"
             />
             <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                 <x-admin.icon name="search" class="h-4 w-4" />
@@ -24,13 +24,29 @@
     </div>
 
     <template x-if="filteredRows.length === 0">
-        <div class="p-8">
+        <div class="p-6 sm:p-8">
             <x-admin.empty-state title="No matching rows" :description="$empty" />
         </div>
     </template>
 
     <template x-if="filteredRows.length > 0">
-        <div class="report-table-wrap max-h-[32rem] overflow-auto">
+        <div class="admin-mobile-records p-4 lg:hidden">
+            <template x-for="(row, rowIndex) in paginatedRows" :key="'m-'+rowIndex">
+                <article class="admin-mobile-record">
+                    <p class="admin-mobile-record__title" x-text="row[0]"></p>
+                    <dl class="mt-2 space-y-0.5">
+                        <template x-for="(cell, cellIndex) in row" :key="'c-'+cellIndex">
+                            <div class="admin-mobile-record__row" x-show="cellIndex > 0">
+                                <dt class="admin-mobile-record__label" x-text="columns[cellIndex]"></dt>
+                                <dd class="admin-mobile-record__value" x-text="cell"></dd>
+                            </div>
+                        </template>
+                    </dl>
+                </article>
+            </template>
+        </div>
+
+        <div class="report-table-wrap hidden max-h-[32rem] overflow-auto lg:block">
             <table class="admin-table min-w-full text-left text-sm">
                 <thead class="sticky top-0 z-10 bg-white shadow-sm dark:bg-gray-900">
                     <tr>

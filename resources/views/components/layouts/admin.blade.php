@@ -43,7 +43,7 @@
                 :unread-notifications="$unreadNotifications"
             />
 
-            <main class="admin-shell-main admin-fade-in flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <main class="admin-shell-main admin-page admin-fade-in flex-1 px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
                 @if (session('status'))
                     <div class="mb-5">
                         <x-admin.alert tone="success">{{ session('status') }}</x-admin.alert>

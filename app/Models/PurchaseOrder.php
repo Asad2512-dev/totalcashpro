@@ -13,7 +13,7 @@ final class PurchaseOrder extends Model
 {
     protected $fillable = [
         'organization_id', 'branch_id', 'supplier_id', 'po_number', 'status',
-        'ordered_at', 'expected_at', 'subtotal', 'vat_total', 'total', 'notes',
+        'ordered_at', 'expected_at', 'sent_at', 'sent_by', 'subtotal', 'vat_total', 'total', 'notes',
         'approved_at', 'approved_by', 'supplier_invoice_id', 'created_by',
     ];
 
@@ -23,6 +23,7 @@ final class PurchaseOrder extends Model
             'status' => PurchaseOrderStatus::class,
             'ordered_at' => 'date',
             'expected_at' => 'date',
+            'sent_at' => 'datetime',
             'subtotal' => 'decimal:2',
             'vat_total' => 'decimal:2',
             'total' => 'decimal:2',
@@ -68,5 +69,23 @@ final class PurchaseOrder extends Model
     public function isFullyReceived(): bool
     {
         return $this->lines->every(fn (PurchaseOrderLine $line) => (float) $line->quantity_received >= (float) $line->quantity);
+    }
+
+    public function delivery(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Delivery::class);
+    }
+
+    public function amendments(): HasMany
+    {
+        return $this->hasMany(PurchaseOrderAmendment::class);
+    }
+
+    public function totalAcceptedQuantity(): float
+    {
+        return (float) $this->goodsReceivedNotes()
+            ->with('lines')
+            ->get()
+            ->sum(fn (GoodsReceivedNote $grn) => $grn->totalAccepted());
     }
 }

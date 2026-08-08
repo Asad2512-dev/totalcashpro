@@ -6,6 +6,8 @@
 @php
     $ui = app(\App\Services\Staff\StaffUiService::class);
     $nav = $ui->navigation();
+    $mobileNav = $ui->mobileNavigation();
+    $mobileMore = $ui->mobileMoreNavigation();
     $commandLinks = $ui->commandLinks();
     $user = auth()->user();
     $organization = $user?->organization;
@@ -32,7 +34,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="admin-shell admin-shell--viewport bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+<body class="admin-shell admin-shell--viewport admin-shell--mobile-nav bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
     <div class="admin-shell-layout flex min-h-0">
         <x-admin.sidebar :nav="$nav" :active="$active" :business-tree="[]" home-route="staff.dashboard" />
 
@@ -48,7 +50,7 @@
                 :unread-notifications="$unreadNotifications"
             />
 
-            <main class="admin-shell-main admin-fade-in flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <main class="admin-shell-main admin-page admin-fade-in flex-1 px-4 py-3 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
                 @if (session('status'))
                     <div class="mb-5">
                         <x-admin.alert tone="success">{{ session('status') }}</x-admin.alert>
@@ -97,6 +99,8 @@
     </div>
 
     <x-admin.mobile-backdrop />
+
+    <x-admin.mobile-nav :items="$mobileNav" :more-groups="$mobileMore" :active="$active" />
 
     <x-admin.logout-confirm :user-name="$user?->name" />
 </body>

@@ -106,3 +106,8 @@ Route::prefix('staff')
     ->name('staff.')
     ->middleware(['auth', 'staff', 'org_active', 'verified'])
     ->group(base_path('routes/staff.php'));
+
+Route::prefix('rider')
+    ->name('rider.')
+    ->middleware(['auth', 'rider', 'org_active', 'verified'])
+    ->group(base_path('routes/rider.php'));

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Services\BusinessAdmin;
 
 use App\Contracts\ServiceInterface;
+use App\Enums\RotaVersionStatus;
 use App\Models\RotaGroup;
 use App\Models\RotaSection;
 use App\Models\RotaShift;
+use App\Models\RotaVersion;
 use App\Models\User;
 use App\Repositories\Contracts\RotaRepositoryInterface;
 use App\Repositories\Contracts\StaffRepositoryInterface;
@@ -21,6 +23,8 @@ final class RotaService implements ServiceInterface
         private readonly RotaRepositoryInterface $rota,
         private readonly StaffRepositoryInterface $staff,
         private readonly BranchContext $branchContext,
+        private readonly RotaVersionService $versions,
+        private readonly RotaValidationService $validation,
     ) {}
 
     public function weekView(User $user, string $weekStart): array
@@ -30,14 +34,22 @@ final class RotaService implements ServiceInterface
         $from = Carbon::parse($weekStart)->startOfWeek();
         $to = $from->copy()->endOfWeek();
 
-        $shifts = RotaShift::query()
-            ->with(['user', 'rotaSection'])
-            ->where('organization_id', $orgId)
-            ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
-            ->whereBetween('shift_date', [$from->toDateString(), $to->toDateString()])
-            ->orderBy('shift_date')
-            ->orderBy('start_time')
-            ->get();
+        $draft = $branchId
+            ? $this->versions->resolveDraftVersion($user, $from->toDateString())
+            : null;
+
+        $published = $branchId
+            ? $this->versions->publishedVersion($orgId, $branchId, $from)
+            : null;
+
+        $editingVersion = $draft;
+        $shifts = $editingVersion
+            ? $editingVersion->shifts()
+                ->with(['user', 'rotaSection'])
+                ->orderBy('shift_date')
+                ->orderBy('start_time')
+                ->get()
+            : collect();
 
         $staffList = $this->staff->activeStaff($orgId, $branchId);
         $sections = RotaSection::query()
@@ -62,6 +74,16 @@ final class RotaService implements ServiceInterface
                 'full' => $day->format('D, M j'),
             ];
         }
+
+        $history = $branchId
+            ? $this->versions->versionHistory($orgId, $branchId, $from)
+            : collect();
+
+        $conflicts = $editingVersion ? $this->validation->conflicts($editingVersion) : [];
+        $publishSummary = $editingVersion ? $this->validation->publishSummary($editingVersion) : null;
+        $changes = $published && $editingVersion
+            ? $this->validation->compareVersions($published, $editingVersion)
+            : [];
 
         return [
             'days' => $days,
@@ -90,6 +112,13 @@ final class RotaService implements ServiceInterface
             'to' => $to,
             'weekStart' => $from->toDateString(),
             'weekLabel' => 'Week of '.$from->format('d M Y'),
+            'draftVersion' => $editingVersion,
+            'publishedVersion' => $published,
+            'versionHistory' => $history,
+            'conflicts' => $conflicts,
+            'publishSummary' => $publishSummary,
+            'versionChanges' => $changes,
+            'isEditable' => $editingVersion?->status->isEditable() ?? false,
         ];
     }
 
@@ -117,9 +146,13 @@ final class RotaService implements ServiceInterface
             $end->addDay();
         }
 
-        $this->assertNoOverlap((int) $staff->id, $start, $end, isset($data['id']) ? (int) $data['id'] : null);
+        $version = $this->versions->resolveDraftVersion($user, Carbon::parse($date)->startOfWeek()->toDateString());
+        $this->versions->assertEditable($user, $version);
+
+        $this->assertNoOverlap((int) $staff->id, $start, $end, isset($data['id']) ? (int) $data['id'] : null, $version->id);
 
         $payload = [
+            'rota_version_id' => $version->id,
             'organization_id' => $user->organization_id,
             'branch_id' => $branchId,
             'user_id' => $staff->id,
@@ -128,12 +161,17 @@ final class RotaService implements ServiceInterface
             'start_time' => $start,
             'end_time' => $end,
             'shift_type' => $data['shift_type'] ?? 'Morning',
+            'break_minutes' => (int) ($data['break_minutes'] ?? 0),
+            'status' => 'draft',
         ];
 
         if (! empty($data['id'])) {
             $shift = RotaShift::query()->findOrFail((int) $data['id']);
             if ((int) $shift->organization_id !== (int) $user->organization_id) {
                 abort(403);
+            }
+            if ((int) $shift->rota_version_id !== (int) $version->id) {
+                abort(403, 'Cannot edit shifts from a different version.');
             }
             $shift->update($payload);
 
@@ -182,10 +220,14 @@ final class RotaService implements ServiceInterface
 
     public function destroyShift(User $user, int $shiftId): void
     {
-        $shift = RotaShift::query()->findOrFail($shiftId);
+        $shift = RotaShift::query()->with('rotaVersion')->findOrFail($shiftId);
 
         if ((int) $shift->organization_id !== (int) $user->organization_id) {
             abort(403);
+        }
+
+        if ($shift->rotaVersion !== null) {
+            $this->versions->assertEditable($user, $shift->rotaVersion);
         }
 
         $shift->delete();
@@ -238,10 +280,11 @@ final class RotaService implements ServiceInterface
         })->values()->all();
     }
 
-    private function assertNoOverlap(int $userId, Carbon $start, Carbon $end, ?int $ignoreId = null): void
+    private function assertNoOverlap(int $userId, Carbon $start, Carbon $end, ?int $ignoreId = null, ?int $versionId = null): void
     {
         $overlap = RotaShift::query()
             ->where('user_id', $userId)
+            ->when($versionId, fn ($q) => $q->where('rota_version_id', $versionId))
             ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
             ->where('start_time', '<', $end)
             ->where('end_time', '>', $start)

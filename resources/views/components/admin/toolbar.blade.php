@@ -19,7 +19,7 @@
         @endif
     </div>
 @elseif ($title || $description || $actionSlot->isNotEmpty())
-    <div {{ $attributes->class(['mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between']) }}>
+    <div {{ $attributes->class(['mb-4 flex flex-col gap-3 lg:mb-6 lg:gap-4 sm:flex-row sm:items-start sm:justify-between']) }}>
         @if ($title || $description)
             <div class="min-w-0 flex-1">
                 @if ($title)
@@ -31,7 +31,7 @@
             </div>
         @endif
         @if ($actionSlot->isNotEmpty())
-            <div class="flex shrink-0 flex-wrap items-center gap-2">{{ $actionSlot }}</div>
+            <div class="admin-toolbar-actions flex shrink-0 flex-wrap items-center gap-2">{{ $actionSlot }}</div>
         @endif
     </div>
 @endif

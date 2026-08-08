@@ -55,9 +55,9 @@
                             @endforeach
                         </ul>
                     @if (! empty($plan['id']))
-                        <div class="mt-8 grid gap-2">
+                        <div class="mt-8 admin-action-grid">
                             <x-admin.button class="w-full" variant="{{ ($plan['featured'] ?? false) ? 'primary' : 'secondary' }}" :href="route('super-admin.plans.edit', $plan['id'])">Manage plan</x-admin.button>
-                            <form method="POST" action="{{ route(($plan['is_active'] ?? true) ? 'super-admin.plans.disable' : 'super-admin.plans.enable', $plan['id']) }}">
+                            <form method="POST" action="{{ route(($plan['is_active'] ?? true) ? 'super-admin.plans.disable' : 'super-admin.plans.enable', $plan['id']) }}" class="contents">
                                 @csrf
                                 <x-admin.button class="w-full" variant="ghost" type="submit">{{ ($plan['is_active'] ?? true) ? 'Disable' : 'Enable' }}</x-admin.button>
                             </form>
@@ -141,7 +141,44 @@
                     </form>
                 </div>
 
-                <div class="admin-card overflow-hidden">
+                <div class="admin-mobile-records mb-3 lg:hidden">
+                    @foreach ($records as $record)
+                        <article class="admin-mobile-record">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex min-w-0 items-start gap-3">
+                                    <input type="checkbox" class="mt-1 h-4 w-4 shrink-0 rounded border-gray-300 text-primary-600" :checked="selected.includes({{ $record['id'] }})" @change="toggle({{ $record['id'] }})">
+                                    <div class="min-w-0">
+                                        <a href="{{ route('super-admin.organizations.show', $record['id']) }}" class="admin-mobile-record__title truncate text-primary-700 hover:underline">
+                                            {{ $record['name'] }}
+                                        </a>
+                                        <p class="mt-0.5 text-sm text-gray-500">{{ $record['owner'] }}</p>
+                                    </div>
+                                </div>
+                                <x-admin.badge :tone="$statusTone($record['status'])">{{ $record['status'] }}</x-admin.badge>
+                            </div>
+                            <dl class="mt-3 space-y-1">
+                                <div class="admin-mobile-record__row">
+                                    <dt class="admin-mobile-record__label">Plan</dt>
+                                    <dd class="admin-mobile-record__value">{{ $record['plan'] }}</dd>
+                                </div>
+                                <div class="admin-mobile-record__row">
+                                    <dt class="admin-mobile-record__label">Branches</dt>
+                                    <dd class="admin-mobile-record__value">{{ $record['branches'] ?? '0' }}</dd>
+                                </div>
+                                <div class="admin-mobile-record__row">
+                                    <dt class="admin-mobile-record__label">Created</dt>
+                                    <dd class="admin-mobile-record__value">{{ $record['created'] }}</dd>
+                                </div>
+                            </dl>
+                            <div class="mt-3 flex flex-wrap gap-2 border-t border-gray-100 pt-3 dark:border-gray-700">
+                                <x-admin.button size="sm" variant="secondary" :href="route('super-admin.organizations.show', $record['id'])">View</x-admin.button>
+                                <x-admin.button size="sm" variant="ghost" :href="route('super-admin.organizations.edit', $record['id'])">Edit</x-admin.button>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+
+                <div class="admin-card hidden overflow-hidden lg:block">
                     <div class="admin-table-wrap">
                         <table class="admin-table min-w-full text-left text-sm">
                             <thead class="border-b border-gray-200 bg-gray-50/90 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-400">
@@ -218,7 +255,39 @@
         @if (count($records ?? []) === 0)
             <x-admin.empty-state title="No users found" description="Invite or seed users to populate this directory." />
         @else
-            <div class="admin-card overflow-hidden">
+            <div class="admin-mobile-records mb-3 lg:hidden">
+                @foreach ($records as $record)
+                    <article class="admin-mobile-record">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex min-w-0 items-center gap-3">
+                                <x-admin.avatar :name="$record['name']" />
+                                <div class="min-w-0">
+                                    <p class="admin-mobile-record__title truncate">{{ $record['name'] }}</p>
+                                    <p class="mt-0.5 truncate text-sm text-gray-500">{{ $record['email'] }}</p>
+                                </div>
+                            </div>
+                            <x-admin.badge :tone="$statusTone($record['status'])">{{ $record['status'] }}</x-admin.badge>
+                        </div>
+                        <dl class="mt-3 space-y-1">
+                            <div class="admin-mobile-record__row">
+                                <dt class="admin-mobile-record__label">Role</dt>
+                                <dd class="admin-mobile-record__value">{{ $record['role'] }}</dd>
+                            </div>
+                            <div class="admin-mobile-record__row">
+                                <dt class="admin-mobile-record__label">Created</dt>
+                                <dd class="admin-mobile-record__value">{{ $record['created'] }}</dd>
+                            </div>
+                        </dl>
+                        @if (! empty($record['id']))
+                            <div class="mt-3 border-t border-gray-100 pt-3 dark:border-gray-700">
+                                <x-admin.button size="sm" variant="secondary" class="w-full min-h-[44px]" :href="route('super-admin.users.show', $record['id'])">Manage user</x-admin.button>
+                            </div>
+                        @endif
+                    </article>
+                @endforeach
+            </div>
+
+            <div class="admin-card hidden overflow-hidden lg:block">
                 <div class="admin-table-wrap">
                     <table class="admin-table min-w-full text-left text-sm">
                         <thead class="border-b border-gray-200 bg-gray-50/90 text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-400">

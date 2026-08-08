@@ -90,6 +90,31 @@
                             <input type="checkbox" name="show_photos" value="1" @checked($kiosk->show_photos)>
                             Show staff photos
                         </label>
+                        @php($settings = array_replace_recursive($kioskDefaults, $kiosk->settings ?? []))
+                        <details class="rounded-xl border border-gray-200 p-3 dark:border-gray-800">
+                            <summary class="cursor-pointer text-sm font-semibold text-gray-900 dark:text-white">Attendance & break settings</summary>
+                            <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                                <label class="flex items-center gap-2 text-sm"><input type="hidden" name="settings[allow_clock_in]" value="0"><input type="checkbox" name="settings[allow_clock_in]" value="1" @checked($settings['allow_clock_in'] ?? true)> Allow clock in</label>
+                                <label class="flex items-center gap-2 text-sm"><input type="hidden" name="settings[allow_clock_out]" value="0"><input type="checkbox" name="settings[allow_clock_out]" value="1" @checked($settings['allow_clock_out'] ?? true)> Allow clock out</label>
+                                <label class="flex items-center gap-2 text-sm"><input type="hidden" name="settings[allow_breaks]" value="0"><input type="checkbox" name="settings[allow_breaks]" value="1" @checked($settings['allow_breaks'] ?? true)> Allow breaks</label>
+                                <div>
+                                    <label class="admin-label">Rota enforcement</label>
+                                    <select name="settings[rota_enforcement]" class="admin-input mt-1 w-full">
+                                        @foreach (['disabled' => 'Disabled', 'soft' => 'Soft warning', 'strict' => 'Strict'] as $value => $label)
+                                            <option value="{{ $value }}" @selected(($settings['rota_enforcement'] ?? 'disabled') === $value)>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="admin-label">Early clock-in (minutes)</label>
+                                    <input type="number" min="0" max="120" name="settings[early_clock_in_minutes]" value="{{ $settings['early_clock_in_minutes'] ?? 15 }}" class="admin-input mt-1 w-full">
+                                </div>
+                                <div>
+                                    <label class="admin-label">Late clock-in (minutes)</label>
+                                    <input type="number" min="0" max="120" name="settings[late_clock_in_minutes]" value="{{ $settings['late_clock_in_minutes'] ?? 15 }}" class="admin-input mt-1 w-full">
+                                </div>
+                            </div>
+                        </details>
                         <x-admin.button type="submit" variant="secondary" size="sm">Save</x-admin.button>
                     </form>
 

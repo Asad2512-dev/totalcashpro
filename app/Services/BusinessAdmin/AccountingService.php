@@ -88,7 +88,7 @@ final class AccountingService implements ServiceInterface
             ->whereBetween('cashup_date', [$from->toDateString(), $to->toDateString()])
             ->when($branchId, fn ($q) => $q->where('branch_id', $branchId));
 
-        $revenue = (float) $cashQuery->get()->sum(fn (CashUp $c) => $c->netTotal());
+        $revenue = (float) $cashQuery->get()->sum(fn (CashUp $c) => $c->revenueTotal());
 
         $payrollOut = (float) Wage::query()
             ->where('organization_id', $orgId)

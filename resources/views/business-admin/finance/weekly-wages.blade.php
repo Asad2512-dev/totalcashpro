@@ -1,13 +1,28 @@
 <x-layouts.business-admin title="Weekly Wages" active="finance">
-    <x-admin.toolbar title="Weekly Wages" description="Wages grouped by scheduled payment week.">
-        <form method="GET" class="flex items-center gap-2">
+    <x-finance.page-header title="Weekly Wages" description="Wages grouped by scheduled payment week.">
+        <form method="GET" class="hidden items-center gap-2 lg:flex">
             <input type="date" name="week" value="{{ $week_start->toDateString() }}" class="admin-input" />
             <x-admin.button type="submit" size="sm">Go</x-admin.button>
         </form>
-    </x-admin.toolbar>
+    </x-finance.page-header>
     <x-finance.nav active="weekly-wages" />
 
-    <x-admin.stat-card class="mb-6" label="Total due this payment week" :value="'£'.number_format((float) $total, 2)" change="Week of {{ $week_start->format('d M Y') }}" tone="info" />
+    <x-admin.filter-sheet title="Payment week" :active-count="1" class="mb-4 lg:hidden">
+        <form method="GET" class="grid gap-4">
+            <x-admin.input type="date" name="week" label="Week starting" :value="$week_start->toDateString()" />
+            <x-admin.button type="submit" size="sm">Apply</x-admin.button>
+        </form>
+    </x-admin.filter-sheet>
+
+    @php
+        $weekKpis = [
+            ['label' => 'Total due', 'value' => '£'.number_format((float) $total, 2), 'change' => 'Week of '.$week_start->format('d M Y'), 'tone' => 'info'],
+        ];
+    @endphp
+
+    <x-admin.mobile-kpi-grid :items="$weekKpis" class="mb-4 lg:hidden" />
+
+    <x-admin.stat-card class="mb-6 hidden lg:block" label="Total due this payment week" :value="'£'.number_format((float) $total, 2)" change="Week of {{ $week_start->format('d M Y') }}" tone="info" />
 
     @if ($wages->isEmpty())
         <x-admin.empty-state title="No wages for this payment week" description="Generate payroll from attendance or approve draft wages." />

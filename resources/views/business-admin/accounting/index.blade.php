@@ -1,5 +1,19 @@
 <x-layouts.business-admin title="Accounting" active="accounting">
-    <x-admin.toolbar title="Accounting" description="Bills, spendings and a live financial overview for your business.">
+    <x-admin.mobile-page-header
+        class="lg:hidden"
+        title="Accounting"
+        description="Bills, spendings and financial overview."
+    >
+        <x-slot:actions>
+            @if ($tab === 'bills')
+                <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-bill')">Add</x-admin.button>
+            @elseif ($tab === 'spendings')
+                <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-spending')">Add</x-admin.button>
+            @endif
+        </x-slot:actions>
+    </x-admin.mobile-page-header>
+
+    <x-admin.toolbar title="Accounting" description="Bills, spendings and a live financial overview for your business." class="hidden lg:flex">
         @if ($tab === 'bills')
             <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-bill')">Add bill</x-admin.button>
         @elseif ($tab === 'spendings')
@@ -7,47 +21,54 @@
         @endif
     </x-admin.toolbar>
 
-    <div class="mb-6 flex flex-wrap gap-2 border-b border-gray-200 dark:border-gray-700">
+    <x-admin.action-grid class="mb-4">
         @foreach (['overview' => 'Overview', 'bills' => 'Bills', 'spendings' => 'Spendings'] as $key => $label)
-            <a
-                href="{{ route('business-admin.accounting', ['tab' => $key]) }}"
-                @class([
-                    'admin-touch-target -mb-px border-b-2 px-1 py-3 text-sm font-semibold transition',
-                    'border-primary-600 text-primary-700' => $tab === $key,
-                    'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200' => $tab !== $key,
-                ])
-            >{{ $label }}</a>
+            <x-admin.action-tile
+                :href="route('business-admin.accounting', ['tab' => $key])"
+                :label="$label"
+                :variant="$tab === $key ? 'primary' : 'default'"
+            />
         @endforeach
-    </div>
+    </x-admin.action-grid>
 
     @if ($tab === 'overview')
-        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            <x-admin.stat-card label="Cash up revenue" :value="'£'.number_format($overview['revenue'], 2)" change="This month" tone="success" />
-            <x-admin.stat-card label="Payroll paid" :value="'£'.number_format($overview['payroll_out'], 2)" change="This month" tone="info" />
-            <x-admin.stat-card label="Supplier invoices paid" :value="'£'.number_format($overview['supplier_bills'], 2)" change="This month" tone="info" />
-            <x-admin.stat-card label="Operational spendings" :value="'£'.number_format($overview['spendings'], 2)" change="This month" tone="warning" />
-            <x-admin.stat-card label="Bills due" :value="'£'.number_format($overview['bills_due'], 2)" change="Outstanding" tone="danger" />
-            <x-admin.stat-card label="Net position" :value="'£'.number_format($overview['net_position'], 2)" change="Revenue − outflows" :tone="$overview['net_position'] >= 0 ? 'success' : 'danger'" />
+        @php
+            $overviewKpis = [
+                ['label' => 'Cash up revenue', 'value' => '£'.number_format($overview['revenue'], 2), 'change' => 'This month', 'tone' => 'success'],
+                ['label' => 'Payroll paid', 'value' => '£'.number_format($overview['payroll_out'], 2), 'change' => 'This month', 'tone' => 'info'],
+                ['label' => 'Supplier invoices', 'value' => '£'.number_format($overview['supplier_bills'], 2), 'change' => 'Paid', 'tone' => 'info'],
+                ['label' => 'Spendings', 'value' => '£'.number_format($overview['spendings'], 2), 'change' => 'This month', 'tone' => 'warning'],
+                ['label' => 'Bills due', 'value' => '£'.number_format($overview['bills_due'], 2), 'change' => 'Outstanding', 'tone' => 'danger'],
+                ['label' => 'Net position', 'value' => '£'.number_format($overview['net_position'], 2), 'change' => 'Revenue − outflows', 'tone' => $overview['net_position'] >= 0 ? 'success' : 'danger'],
+            ];
+        @endphp
+
+        <x-admin.mobile-kpi-grid :items="$overviewKpis" class="mb-4" />
+
+        <div class="admin-stat-grid--compact mb-4 hidden lg:grid">
+            @foreach ($overviewKpis as $stat)
+                <x-admin.stat compact :label="$stat['label']" :value="$stat['value']" :change="$stat['change']" :tone="$stat['tone']" />
+            @endforeach
         </div>
 
-        <div class="mt-6 grid gap-4 lg:grid-cols-2">
+        <div class="admin-panel-grid">
             <x-admin.card>
                 <h3 class="font-display font-bold text-gray-900 dark:text-white">Quick links</h3>
-                <div class="mt-4 flex flex-wrap gap-3">
-                    <x-admin.button size="sm" variant="secondary" :href="route('business-admin.accounting', ['tab' => 'bills'])">Manage bills</x-admin.button>
-                    <x-admin.button size="sm" variant="secondary" :href="route('business-admin.accounting', ['tab' => 'spendings'])">Record spending</x-admin.button>
-                    <x-admin.button size="sm" variant="secondary" :href="route('business-admin.payroll')">Payroll</x-admin.button>
-                    <x-admin.button size="sm" variant="secondary" :href="route('business-admin.suppliers', ['tab' => 'invoices'])">Supplier invoices</x-admin.button>
-                    <x-admin.button size="sm" variant="secondary" :href="route('business-admin.cash-history')">Cash history</x-admin.button>
-                </div>
+                <x-admin.action-grid class="mt-3">
+                    <x-admin.action-tile :href="route('business-admin.accounting', ['tab' => 'bills'])" icon="card" label="Bills" />
+                    <x-admin.action-tile :href="route('business-admin.accounting', ['tab' => 'spendings'])" icon="cash" label="Spendings" />
+                    <x-admin.action-tile :href="route('business-admin.payroll')" icon="users" label="Payroll" />
+                    <x-admin.action-tile :href="route('business-admin.suppliers', ['tab' => 'invoices'])" icon="tag" label="Invoices" />
+                    <x-admin.action-tile :href="route('business-admin.cash-history')" icon="chart" label="Cash history" />
+                </x-admin.action-grid>
             </x-admin.card>
             <x-admin.card>
                 <h3 class="font-display font-bold text-gray-900 dark:text-white">What we track</h3>
-                <ul class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                    <li>✓ Recurring & one-off bills with due dates</li>
-                    <li>✓ Day-to-day operational spendings</li>
-                    <li>✓ Payroll and supplier invoice outflows</li>
-                    <li>✓ Cash up revenue from your branches</li>
+                <ul class="admin-compact-grid mt-3 text-sm text-gray-600 dark:text-gray-300">
+                    <li class="admin-compact-item">Recurring & one-off bills</li>
+                    <li class="admin-compact-item">Day-to-day spendings</li>
+                    <li class="admin-compact-item">Payroll & supplier outflows</li>
+                    <li class="admin-compact-item">Cash up revenue</li>
                 </ul>
             </x-admin.card>
         </div>
@@ -57,31 +78,31 @@
                 <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-bill')">Add bill</x-admin.button>
             </x-admin.empty-state>
         @else
-            <div class="admin-mobile-cards md:hidden">
+            <div class="admin-mobile-records mb-3 lg:hidden">
                 @foreach ($bills as $bill)
                     @php
                         $status = $bill->status instanceof \BackedEnum ? $bill->status->value : (string) $bill->status;
                         $pending = strcasecmp($status, 'Paid') !== 0;
                     @endphp
-                    <article class="admin-mobile-card">
+                    <article class="admin-mobile-record">
                         <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <h3 class="font-semibold text-gray-900 dark:text-white">{{ $bill->title }}</h3>
-                                <p class="mt-1 text-sm text-gray-500">{{ $bill->vendor ?: 'No vendor' }} · Due {{ $bill->due_date?->format('d M Y') }}</p>
+                            <div class="min-w-0">
+                                <p class="admin-mobile-record__title">{{ $bill->title }}</p>
+                                <p class="mt-0.5 text-sm text-gray-500">{{ $bill->vendor ?: 'No vendor' }} · Due {{ $bill->due_date?->format('d M Y') }}</p>
                             </div>
-                            <span class="text-sm font-semibold">£{{ number_format((float) $bill->amount, 2) }}</span>
+                            <span class="shrink-0 text-sm font-semibold">£{{ number_format((float) $bill->amount, 2) }}</span>
                         </div>
                         @if ($pending)
-                            <form method="POST" action="{{ route('business-admin.accounting.bills.paid', $bill) }}" class="mt-4">
+                            <form method="POST" action="{{ route('business-admin.accounting.bills.paid', $bill) }}" class="mt-3">
                                 @csrf
-                                <x-admin.table-action type="submit" variant="success">Mark paid</x-admin.table-action>
+                                <x-admin.button size="sm" variant="secondary" type="submit" class="w-full">Mark paid</x-admin.button>
                             </form>
                         @endif
                     </article>
                 @endforeach
             </div>
 
-            <div class="admin-card hidden overflow-hidden md:block">
+            <div class="admin-card hidden overflow-hidden lg:block">
                 <div class="admin-table-wrap">
                     <table class="admin-table min-w-full text-left text-sm">
                         <thead>
@@ -133,21 +154,21 @@
                 <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-spending')">Add spending</x-admin.button>
             </x-admin.empty-state>
         @else
-            <div class="admin-mobile-cards md:hidden">
+            <div class="admin-mobile-records mb-3 lg:hidden">
                 @foreach ($spendings as $spending)
-                    <article class="admin-mobile-card">
+                    <article class="admin-mobile-record">
                         <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <h3 class="font-semibold text-gray-900 dark:text-white">{{ $spending->title }}</h3>
-                                <p class="mt-1 text-sm text-gray-500">{{ $spendingCategories[$spending->category] ?? $spending->category }} · {{ $spending->spent_date?->format('d M Y') }}</p>
+                            <div class="min-w-0">
+                                <p class="admin-mobile-record__title">{{ $spending->title }}</p>
+                                <p class="mt-0.5 text-sm text-gray-500">{{ $spendingCategories[$spending->category] ?? $spending->category }} · {{ $spending->spent_date?->format('d M Y') }}</p>
                             </div>
-                            <span class="text-sm font-semibold">£{{ number_format((float) $spending->amount, 2) }}</span>
+                            <span class="shrink-0 text-sm font-semibold">£{{ number_format((float) $spending->amount, 2) }}</span>
                         </div>
                     </article>
                 @endforeach
             </div>
 
-            <div class="admin-card hidden overflow-hidden md:block">
+            <div class="admin-card hidden overflow-hidden lg:block">
                 <div class="admin-table-wrap">
                     <table class="admin-table min-w-full text-left text-sm">
                         <thead>

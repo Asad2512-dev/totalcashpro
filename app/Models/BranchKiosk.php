@@ -16,8 +16,10 @@ final class BranchKiosk extends Model
         'branch_id',
         'name',
         'token',
+        'description',
         'welcome_message',
         'show_photos',
+        'settings',
         'is_enabled',
         'last_started_at',
     ];
@@ -28,6 +30,7 @@ final class BranchKiosk extends Model
             'show_photos' => 'boolean',
             'is_enabled' => 'boolean',
             'last_started_at' => 'datetime',
+            'settings' => 'array',
         ];
     }
 

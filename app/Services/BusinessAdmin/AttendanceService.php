@@ -192,6 +192,155 @@ final class AttendanceService implements ServiceInterface
     }
 
     /**
+     * @return array{from: Carbon, to: Carbon, sessions: list<array<string, mixed>>}
+     */
+    public function sessionRecords(User $admin, ?string $start = null): array
+    {
+        $from = $start ? Carbon::parse($start)->startOfWeek() : now()->startOfWeek();
+        $to = $from->copy()->endOfWeek();
+        $branchId = $this->branchContext->currentBranchId($admin);
+
+        $logs = $this->attendance->logsForRange((int) $admin->organization_id, $branchId, $from, $to);
+        $breaks = AttendanceBreak::query()
+            ->with(['branchKiosk'])
+            ->where('organization_id', $admin->organization_id)
+            ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
+            ->whereBetween('break_started_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])
+            ->get();
+
+        $sessions = [];
+        foreach ($logs->groupBy('user_id') as $userId => $userLogs) {
+            $userBreaks = $breaks->where('user_id', (int) $userId);
+            foreach ($userLogs->groupBy(fn ($log) => $log->logged_at->toDateString()) as $date => $dayLogs) {
+                $sessions = array_merge(
+                    $sessions,
+                    $this->buildDaySessions($dayLogs, $userBreaks, (string) $date),
+                );
+            }
+        }
+
+        usort($sessions, fn (array $a, array $b) => [$b['date'], $a['user']->name] <=> [$a['date'], $b['user']->name]);
+
+        return compact('from', 'to', 'sessions');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function sessionDetail(User $admin, int $userId, string $date): array
+    {
+        $member = $this->staff->findOrFail($userId);
+        if ((int) $member->organization_id !== (int) $admin->organization_id) {
+            abort(403);
+        }
+
+        $day = Carbon::parse($date);
+        $logs = $this->attendance->logsForUserOnDate($userId, $day)->load(['branch', 'branchKiosk']);
+        $breaks = AttendanceBreak::query()
+            ->with(['branchKiosk'])
+            ->where('user_id', $userId)
+            ->whereDate('break_started_at', $day->toDateString())
+            ->orderBy('break_started_at')
+            ->get();
+
+        $sessions = $this->buildDaySessions($logs, $breaks, $day->toDateString());
+        $shift = RotaShift::query()
+            ->where('user_id', $userId)
+            ->whereDate('shift_date', $day->toDateString())
+            ->whereHas('rotaVersion', fn ($q) => $q->whereIn('status', ['published', 'locked']))
+            ->first();
+
+        return [
+            'user' => $member,
+            'date' => $day,
+            'sessions' => $sessions,
+            'logs' => $logs,
+            'breaks' => $breaks,
+            'shift' => $shift,
+        ];
+    }
+
+    /**
+     * @param  Collection<int, \App\Models\AttendanceLog>  $dayLogs
+     * @param  Collection<int, AttendanceBreak>  $dayBreaks
+     * @return list<array<string, mixed>>
+     */
+    private function buildDaySessions(Collection $dayLogs, Collection $dayBreaks, string $date): array
+    {
+        $sorted = $dayLogs->sortBy('logged_at')->values();
+        $sessions = [];
+        $inLog = null;
+
+        foreach ($sorted as $log) {
+            if ($log->type === AttendanceLogType::ClockIn) {
+                $inLog = $log;
+            } elseif ($log->type === AttendanceLogType::ClockOut && $inLog !== null) {
+                $sessions[] = $this->sessionRow($inLog, $log, $dayBreaks, $date);
+                $inLog = null;
+            }
+        }
+
+        if ($inLog !== null) {
+            $sessions[] = $this->sessionRow($inLog, null, $dayBreaks, $date);
+        }
+
+        return $sessions;
+    }
+
+    /**
+     * @param  Collection<int, AttendanceBreak>  $dayBreaks
+     * @return array<string, mixed>
+     */
+    private function sessionRow(\App\Models\AttendanceLog $inLog, ?\App\Models\AttendanceLog $outLog, Collection $dayBreaks, string $date): array
+    {
+        $in = $inLog->logged_at;
+        $out = $outLog?->logged_at;
+        $outAt = $out ?? now();
+        $grossSeconds = $in->diffInSeconds($outAt);
+
+        $sessionBreaks = $dayBreaks->filter(
+            fn (AttendanceBreak $break) => $break->break_started_at >= $in
+                && ($out === null || $break->break_started_at <= $out),
+        );
+
+        $breakSeconds = 0;
+        $unpaidBreakSeconds = 0;
+        foreach ($sessionBreaks as $break) {
+            $end = $break->break_ended_at ?? $outAt;
+            $secs = (int) $break->break_started_at->diffInSeconds($end);
+            $breakSeconds += $secs;
+            if (! $break->is_paid) {
+                $unpaidBreakSeconds += $secs;
+            }
+        }
+
+        $paidSeconds = max(0, $grossSeconds - $unpaidBreakSeconds);
+        $hasActiveBreak = $sessionBreaks->contains(fn (AttendanceBreak $b) => $b->break_ended_at === null);
+
+        $status = match (true) {
+            $hasActiveBreak => 'on_break',
+            $outLog === null => 'working',
+            default => 'clocked_out',
+        };
+
+        return [
+            'user' => $inLog->user,
+            'branch' => $inLog->branch,
+            'date' => $date,
+            'clock_in' => $in->format('H:i'),
+            'clock_out' => $out?->format('H:i'),
+            'gross_hours' => round($grossSeconds / 3600, 2),
+            'break_hours' => round($breakSeconds / 3600, 2),
+            'paid_hours' => round($paidSeconds / 3600, 2),
+            'status' => $status,
+            'kiosk' => $inLog->branchKiosk?->name,
+            'source' => $inLog->source instanceof \BackedEnum ? $inLog->source->value : (string) ($inLog->source ?? 'manual'),
+            'breaks_count' => $sessionBreaks->count(),
+            'clock_in_log_id' => $inLog->id,
+        ];
+    }
+
+    /**
      * @param  list<array{in: string, out: string}>  $slots
      */
     public function replaceDayEntries(User $admin, int $userId, string $date, array $slots): void
@@ -325,13 +474,16 @@ final class AttendanceService implements ServiceInterface
             throw ValidationException::withMessages(['action' => 'Must be clocked in to start a break.']);
         }
 
-        // Legacy: schedule break end 30 minutes ahead.
         $this->attendance->createBreak([
             'organization_id' => $admin->organization_id,
             'branch_id' => $branchId,
             'user_id' => $staff->id,
+            'break_type' => 'other',
             'break_started_at' => now(),
-            'break_ended_at' => now()->addMinutes(30),
+            'break_ended_at' => null,
+            'is_paid' => false,
+            'planned_minutes' => 30,
+            'source' => 'manual',
         ]);
     }
 
@@ -376,8 +528,7 @@ final class AttendanceService implements ServiceInterface
         return AttendanceBreak::query()
             ->where('user_id', $staff->id)
             ->whereDate('break_started_at', now()->toDateString())
-            ->where('break_started_at', '<=', now())
-            ->where('break_ended_at', '>', now())
+            ->whereNull('break_ended_at')
             ->latest('break_started_at')
             ->first();
     }
@@ -394,6 +545,7 @@ final class AttendanceService implements ServiceInterface
         return RotaShift::query()
             ->where('user_id', $staff->id)
             ->whereDate('shift_date', now()->toDateString())
+            ->whereHas('rotaVersion', fn ($q) => $q->whereIn('status', ['published', 'locked']))
             ->where('start_time', '<=', now())
             ->where('end_time', '>=', now())
             ->exists();

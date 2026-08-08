@@ -1,9 +1,19 @@
 <x-layouts.business-admin :title="$customer->name" active="crm">
-    <x-admin.toolbar description="Customer profile, timeline and visit history.">
+    <x-admin.mobile-page-header
+        class="lg:hidden"
+        :title="$customer->name"
+        description="Customer profile, timeline and visits."
+    >
+        <x-slot:actions>
+            <x-admin.button size="sm" variant="secondary" :href="route('business-admin.crm')">Back</x-admin.button>
+        </x-slot:actions>
+    </x-admin.mobile-page-header>
+
+    <x-admin.toolbar description="Customer profile, timeline and visit history." class="hidden lg:flex">
         <x-admin.button size="sm" variant="secondary" :href="route('business-admin.crm')">Back to list</x-admin.button>
     </x-admin.toolbar>
 
-    <div class="grid gap-6 lg:grid-cols-3">
+    <div class="grid gap-4 lg:grid-cols-3 lg:gap-6">
         <div class="lg:col-span-1">
             <x-admin.card title="Details">
                 <form method="POST" action="{{ route('business-admin.crm.update', $customer) }}" class="space-y-4">
@@ -30,7 +40,7 @@
             </x-admin.card>
         </div>
 
-        <div class="space-y-6 lg:col-span-2">
+        <div class="space-y-4 lg:col-span-2 lg:space-y-6">
             <x-admin.card title="Add note">
                 <form method="POST" action="{{ route('business-admin.crm.notes.store', $customer) }}" class="space-y-3">
                     @csrf
@@ -57,16 +67,16 @@
                 @if ($timeline->isEmpty())
                     <x-admin.empty-state title="No activity yet" description="Notes and visits will appear here." />
                 @else
-                    <ol class="space-y-4">
+                    <ol class="admin-compact-grid mt-3">
                         @foreach ($timeline as $entry)
-                            <li class="border-l-2 border-primary-200 pl-4 dark:border-primary-800">
-                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">{{ $entry['at']->format('d M Y, H:i') }}</p>
-                                <p class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $entry['title'] }}</p>
+                            <li class="admin-compact-item">
+                                <p class="admin-compact-item__meta">{{ $entry['at']->format('d M Y, H:i') }}</p>
+                                <p class="admin-compact-item__title">{{ $entry['title'] }}</p>
                                 @if ($entry['body'])
-                                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">{{ $entry['body'] }}</p>
+                                    <p class="mt-1 text-xs text-gray-600 dark:text-gray-300 line-clamp-3">{{ $entry['body'] }}</p>
                                 @endif
                                 @if ($entry['meta'])
-                                    <p class="mt-1 text-xs text-gray-500">{{ $entry['meta'] }}</p>
+                                    <p class="admin-compact-item__meta">{{ $entry['meta'] }}</p>
                                 @endif
                             </li>
                         @endforeach

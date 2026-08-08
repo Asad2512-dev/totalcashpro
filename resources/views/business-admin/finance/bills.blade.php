@@ -1,7 +1,10 @@
 <x-layouts.business-admin title="Bills" active="finance">
-    <x-admin.toolbar title="Bills" description="Recurring and one-off bills with approval workflow.">
+    <x-finance.page-header title="Bills" description="Recurring and one-off bills with approval workflow.">
+        <x-slot:actions>
+            <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-bill')">Add</x-admin.button>
+        </x-slot:actions>
         <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-bill')">Add bill</x-admin.button>
-    </x-admin.toolbar>
+    </x-finance.page-header>
     <x-finance.nav active="bills" />
 
     @if ($bills->isEmpty())

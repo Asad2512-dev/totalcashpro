@@ -19,8 +19,13 @@ final class CashUpRepository extends BaseRepository implements CashUpRepositoryI
         parent::__construct($model);
     }
 
-    public function findByDateShift(int $organizationId, int $branchId, Carbon|string $date, CashUpShift|string $shift): ?CashUp
-    {
+    public function findByDateShift(
+        int $organizationId,
+        int $branchId,
+        Carbon|string $date,
+        CashUpShift|string $shift,
+        ?int $cashDrawerId = null,
+    ): ?CashUp {
         $shiftValue = $shift instanceof CashUpShift ? $shift->value : $shift;
         $dateValue = $date instanceof Carbon ? $date->toDateString() : (string) $date;
 
@@ -29,6 +34,7 @@ final class CashUpRepository extends BaseRepository implements CashUpRepositoryI
             ->where('branch_id', $branchId)
             ->whereDate('cashup_date', $dateValue)
             ->where('shift', $shiftValue)
+            ->when($cashDrawerId !== null, fn ($q) => $q->where('cash_drawer_id', $cashDrawerId))
             ->first();
     }
 
@@ -39,6 +45,7 @@ final class CashUpRepository extends BaseRepository implements CashUpRepositoryI
             (int) $attributes['branch_id'],
             $attributes['cashup_date'],
             $attributes['shift'],
+            isset($attributes['cash_drawer_id']) ? (int) $attributes['cash_drawer_id'] : null,
         );
 
         if ($existing !== null && ! $overwrite) {
@@ -79,7 +86,7 @@ final class CashUpRepository extends BaseRepository implements CashUpRepositoryI
     public function forDateRange(int $organizationId, ?int $branchId, string $startDate, string $endDate): Collection
     {
         return $this->model->newQuery()
-            ->with(['branch', 'creator'])
+            ->with(['branch', 'creator', 'cashDrawer'])
             ->where('organization_id', $organizationId)
             ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
             ->whereDate('cashup_date', '>=', $startDate)
@@ -92,7 +99,7 @@ final class CashUpRepository extends BaseRepository implements CashUpRepositoryI
     public function sumNetForRange(int $organizationId, ?int $branchId, Carbon $from, Carbon $to): float
     {
         return (float) $this->forRange($organizationId, $branchId, $from, $to)
-            ->sum(fn (CashUp $cashUp) => $cashUp->netTotal());
+            ->sum(fn (CashUp $cashUp) => $cashUp->revenueTotal());
     }
 
     public function todayTotals(int $organizationId, ?int $branchId): array

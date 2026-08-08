@@ -21,12 +21,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'super_admin' => \App\Http\Middleware\EnsureSuperAdmin::class,
             'business_admin' => \App\Http\Middleware\EnsureBusinessAdmin::class,
             'staff' => \App\Http\Middleware\EnsureStaff::class,
+            'rider' => \App\Http\Middleware\EnsureRider::class,
             'org_active' => \App\Http\Middleware\EnsureOrganizationActive::class,
             'plan_feature' => \App\Http\Middleware\EnsurePlanFeature::class,
             'onboarding_complete' => \App\Http\Middleware\EnsureOnboardingComplete::class,
             'plan_selected' => \App\Http\Middleware\EnsurePlanSelected::class,
             'kiosk_lock' => \App\Http\Middleware\EnsureKioskLock::class,
         ]);
+
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
 
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(function () {
@@ -44,6 +47,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 return route('staff.dashboard');
             }
 
+            if ($user?->isRider() && $user->organization_id) {
+                return route('rider.dashboard');
+            }
+
             return route('login');
         });
     })
@@ -58,4 +65,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('billing:process-expired-subscriptions')->dailyAt('01:00');
         $schedule->command('billing:process-expired-trials')->dailyAt('02:00');
         $schedule->command('security:prune')->weekly();
+        $schedule->command('executive:generate-alerts')->dailyAt('07:00');
+        $schedule->command('reports:run-scheduled')->dailyAt('08:00');
     })->create();

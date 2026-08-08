@@ -1,7 +1,10 @@
 <x-layouts.business-admin title="Purchase Invoices" active="finance">
-    <x-admin.toolbar title="Purchase Invoices" description="Supplier purchase invoices with VAT breakdown.">
+    <x-finance.page-header title="Purchase Invoices" description="Supplier purchase invoices with VAT breakdown.">
+        <x-slot:actions>
+            <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-purchase-invoice')">Add</x-admin.button>
+        </x-slot:actions>
         <x-admin.button size="sm" x-data @click="$dispatch('open-modal', 'add-purchase-invoice')">Add invoice</x-admin.button>
-    </x-admin.toolbar>
+    </x-finance.page-header>
     <x-finance.nav active="purchase-invoices" />
 
     @if ($invoices->isEmpty())

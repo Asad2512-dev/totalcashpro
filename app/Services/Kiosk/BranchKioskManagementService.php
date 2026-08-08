@@ -38,7 +38,8 @@ final class BranchKioskManagementService implements ServiceInterface
             'branch_id' => $branch->id,
             'name' => $name !== null && trim($name) !== '' ? trim($name) : $this->defaultKioskName($branch),
             'token' => $this->generateToken(),
-            'welcome_message' => 'Welcome — enter your PIN to clock in or out.',
+            'welcome_message' => 'Enter your 4-digit PIN',
+            'settings' => app(KioskConfigurationService::class)->defaults(),
         ]);
     }
 
@@ -46,10 +47,18 @@ final class BranchKioskManagementService implements ServiceInterface
     {
         $this->assertKiosk($admin, $kiosk);
 
+        $settings = $kiosk->settings ?? app(KioskConfigurationService::class)->defaults();
+
+        if (isset($data['settings']) && is_array($data['settings'])) {
+            $settings = array_replace_recursive($settings, $data['settings']);
+        }
+
         $kiosk->update([
             'name' => trim((string) ($data['name'] ?? $kiosk->name)),
+            'description' => trim((string) ($data['description'] ?? $kiosk->description ?? '')),
             'welcome_message' => trim((string) ($data['welcome_message'] ?? $kiosk->welcome_message)),
             'show_photos' => (bool) ($data['show_photos'] ?? $kiosk->show_photos),
+            'settings' => $settings,
         ]);
 
         return $kiosk->fresh(['branch', 'activeSession']);

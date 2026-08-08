@@ -16,6 +16,11 @@ enum KioskActivityEvent: string
     case ForceLogout = 'force_logout';
     case KioskReset = 'kiosk_reset';
     case TokenRegenerated = 'token_regenerated';
+    case RotaRestricted = 'rota_restricted';
+    case RotaOverride = 'rota_override';
+    case KioskDisabled = 'kiosk_disabled';
+    case BranchChanged = 'branch_changed';
+    case SettingsChanged = 'settings_changed';
 
     public function label(): string
     {
@@ -30,6 +35,11 @@ enum KioskActivityEvent: string
             self::ForceLogout => 'Force Logout',
             self::KioskReset => 'Kiosk Reset',
             self::TokenRegenerated => 'Token Regenerated',
+            self::RotaRestricted => 'Rota Restricted',
+            self::RotaOverride => 'Rota Override',
+            self::KioskDisabled => 'Kiosk Disabled',
+            self::BranchChanged => 'Branch Changed',
+            self::SettingsChanged => 'Settings Changed',
         };
     }
 }

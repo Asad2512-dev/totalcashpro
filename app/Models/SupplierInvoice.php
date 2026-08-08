@@ -81,4 +81,19 @@ final class SupplierInvoice extends Model
     {
         return $this->hasMany(FinanceSupplierPayment::class);
     }
+
+    public function lines(): HasMany
+    {
+        return $this->hasMany(SupplierInvoiceLine::class);
+    }
+
+    public function goodsReceivedNote(): BelongsTo
+    {
+        return $this->belongsTo(GoodsReceivedNote::class, 'goods_received_note_id');
+    }
+
+    public function invoiceMatch(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(InvoiceMatch::class);
+    }
 }

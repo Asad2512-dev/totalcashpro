@@ -13,7 +13,15 @@ final class CashUpFinanceSyncObserver
 {
     public function saved(CashUp $cashUp): void
     {
-        if ((float) $cashUp->netTotal() <= 0) {
+        $revenue = $cashUp->revenueTotal();
+
+        if ($revenue <= 0) {
+            FinanceIncomeEntry::query()
+                ->where('organization_id', $cashUp->organization_id)
+                ->where('reference_type', CashUp::class)
+                ->where('reference_id', $cashUp->id)
+                ->delete();
+
             return;
         }
 
@@ -31,9 +39,9 @@ final class CashUpFinanceSyncObserver
                     $cashUp->cashup_date?->format('d M Y'),
                     $cashUp->shift instanceof \BackedEnum ? $cashUp->shift->value : (string) $cashUp->shift,
                 ),
-                'net_amount' => $cashUp->netTotal(),
+                'net_amount' => $revenue,
                 'vat_amount' => 0,
-                'gross_amount' => $cashUp->netTotal(),
+                'gross_amount' => $revenue,
                 'income_date' => $cashUp->cashup_date,
                 'status' => FinanceStatus::Approved->value,
                 'approved_at' => now(),
